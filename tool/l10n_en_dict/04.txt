@@ -1,0 +1,209 @@
+تأكيد	Confirm
+تأكيد إنهاء الشيفت	Confirm ending the shift
+تأكيد الحذف	Confirm deletion
+تأكيد الدفع	Confirm payment
+تأكيد الطلب	Confirm order
+تأكيد القفل	Confirm closing
+تأكيد المسح	Confirm clearing
+تأكيد حذف الكل	Confirm deleting all
+تأكيد قفل الشيفت	Confirm closing the shift
+تأكيد كلمة السر	Confirm password
+تأكيد كلمة المرور	Confirm password
+تأكيد مسح المبيعات	Confirm clearing sales
+تأكيد مسح كل المصروفات	Confirm clearing all expenses
+تأكيد مسح مبيعات البلايستيشن	Confirm clearing PlayStation sales
+تاريخ الاستحقاق:	Due date:
+تاريخ التقرير : {v1}	Report date: {v1}
+تاريخ الصرف	Payout date
+تاريخ الصرف - {v1}	Payout date - {v1}
+تاريخ الطباعة: {v1}	Printed on: {v1}
+تاريخ الفاتورة:	Invoice date:
+تاريخ محدد	Specific date
+تاريخ: {v1}	Date: {v1}
+تاو	Tau
+تجريبي (ديمو )	Trial (Demo )
+تجريبي (ديمو)	Trial (Demo)
+تحديث	Update
+تحديث الأرقام	Update numbers
+تحديث البيانات	Update data
+تحديث التقرير	Update report
+تحديث الطلبات	Update orders
+تحديث المنيو	Update menu
+تحديث النسخة المتاحة للموبايل فوراً (نفس الواي فاي)	Instantly update the mobile version (same Wi-Fi)
+تحرير	Edit
+تحريك لتحت	Move down
+تحريك لفوق	Move up
+تحصيل	Collection
+تحصيل الآجل	Collect credit
+تحصيل الدين	Collect debt
+تحصيل دين {customer}	Collect {customer}'s debt
+تحميل المزيد	Load more
+تحويل لدائم (شراء)	Convert to permanent (purchase)
+تخصيص النظام لنشاطك	Customize the system for your business
+تخطي	Skip
+ترابيزات متاحة	Available tables
+ترابيزات محجوزة	Reserved tables
+ترابيزة	Table
+ترابيزة {v1}	Table {v1}
+تراجع	Undo
+ترخيص دائم مدى الحياة	Lifetime permanent license
+تسجيل الدخول	Log in
+تسجيل الدين	Record debt
+تسجيل الشحن كدين	Record top-up as debt
+تسجيل العملية	Record transaction
+تسجيل خروج	Log out
+تسجيل خروج (تغيير دور)	Log out (switch role)
+تسجيل دخول المهندس	Engineer log in
+تسجيل مصروف على الشيفت	Record expense on the shift
+تسديد دين {name}	Settle {name}'s debt
+تصدير نسخة	Export copy
+تطبيق	Apply
+تعديل	Edit
+تعديل الاسم	Edit name
+تعديل الجهاز	Edit device
+تعديل الدين	Edit debt
+تعديل المستخدم	Edit user
+تعديل الموظف: {v1}	Edit employee: {v1}
+تعديل بيانات الموظف	Edit employee details
+تعديل كمية	Edit quantity
+تعديل مدة التجربة	Edit trial duration
+تعديلات معروضة	Edits shown
+تعذر تحميل المنيو	Failed to load menu
+تعذر تحميل المنيو. تحقق من الاتصال.	Failed to load menu. Check your connection.
+تعذّر قراءة بصمة الجهاز	Failed to read device fingerprint
+تعيين	Assign
+تعيين الويترات كموظفين فرعيين	Assign waiters as subordinate employees
+تعيين موظف طلبات (ويتر) كموظف فرعي	Assign an orders employee (waiter) as a subordinate
+تغيير شكل التقرير	Change report layout
+تغيير شكل اللوحة	Change dashboard layout
+تغيير كلمة سر السوبر ادمن	Change super admin password
+تفاصيل أيام العمل	Work days details
+تفاصيل أيام العمل – {name}	Work days details – {name}
+تفاصيل إجمالي المبيعات	Total sales details
+تفاصيل الآجل	Credit details
+تفاصيل الاجل {personName}	Credit details of {personName}
+تفاصيل الدخل الكلي	Gross income details
+تفاصيل العمليات:	Transaction details:
+تفاصيل الفاتورة	Invoice details
+تفاصيل الفواتير المصرّفة اليوم	Details of today's cashed invoices
+تفاصيل المدفوع	Payment details
+تفاصيل المصروفات	Expense details
+تفاصيل المصروفات (اليوم)	Expense details (today)
+تفاصيل النواقص	Shortage details
+تفاصيل تحصيل الآجل ({v1} عملية)	Credit collection details ({v1} transactions)
+تفاصيل دخل الشيفت	Shift income details
+تفاصيل دخل اليوم	Today's income details
+تفاصيل دين {v1}	Debt details of {v1}
+تفاصيل ديون {personName}	Debt details of {personName}
+تفاصيل شيفت {v1}	Shift {v1} details
+تفاصيل فودافون كاش	Vodafone Cash details
+تفاصيل مداخل الكاش (اليوم)	Cash intake details (today)
+تفاصيل:	Details:
+تفعيل ({selectedDays} يوم)	Activate ({selectedDays} days)
+تفعيل تجريبي (ديمو)	Trial activation (demo)
+تفعيل دائم (شراء)	Permanent activation (purchase)
+تقارير الشيفتات	Shift reports
+تقارير المكنة	Top-up machine reports
+تقارير مفصلة	Detailed reports
+تقارير ورديات مفصّلة	Detailed shift reports
+تقدر تسلّم الشيفت (بالترابيزات المفتوحة وحسابها) لموظف تاني ويكمّله.	You can hand over the shift (with its open tables and balance) to another employee to continue it.
+تقدر تسلّم الشيفت (بالجلسات المفتوحة وحسابها) لموظف تاني ويكمّله.	You can hand over the shift (with its open sessions and balance) to another employee to continue it.
+تقرير {v1}	{v1} report
+تقرير الجرد	Stock count report
+تقرير الدخل	Income report
+تقرير السجائر	Cigarettes report
+تقرير الشيشة	Hookah report
+تقرير العملاء الشهري	Monthly customer report
+تقرير المبيعات	Sales report
+تقرير المنتجات	Products report
+تقرير جرد الخامات	Materials stock report
+تقرير ماكينة الشحن	Top-up machine report
+تقرير مبيعات البلايستيشن	PlayStation sales report
+تقرير مفصّل لمبيعات الشيفت	Detailed shift sales report
+تقرير نهاية الشيفت	End-of-shift report
+تكلفة الجهاز	Device cost
+تكلفة الجهاز:	Device cost:
+تكلفة الجهاز: {v1}	Device cost: {v1}
+تكلفة الجهاز: {v1} {v2}	Device cost: {v1} {v2}
+تكلفة الجهاز: {v1} ج	Device cost: {v1} EGP
+تكلفة السجائر	Cigarettes cost
+تكلفة الشيشة	Hookah cost
+تكلفة العملية (المخصومة من المكنة)	Transaction cost (deducted from machine)
+تكلفة الفلتر	Filter cost
+تكلفة المشروبات	Drinks cost
+تكلفة المشروبات:	Drinks cost:
+تكلفة المشروبات: {v1}	Drinks cost: {v1}
+تليفون (اختياري)	Phone (optional)
+تليفون: {v1}	Phone: {v1}
+تم	Done
+تم إرسال الطلب	Request sent
+تم إرسال طلبك!	Your request was sent!
+تم إضافة الأجر إلى الرصيد	Wage added to the balance
+تم إضافة القائمة ✅	Menu added ✅
+تم إضافة القسم ✅	Section added ✅
+تم إضافة المصروف بنجاح	Expense added successfully
+تم إضافة المصروف وخصم المبلغ	Expense added and amount deducted
+تم إضافة قسم «{name}»	Section "{name}" added
+تم إنشاء حساب الأدمن ✅	Admin account created ✅
+تم إنشاء حساب الستاف ✅	Staff account created ✅
+تم استعادة النسخة بنجاح 📥	Backup restored successfully 📥
+تم اعتماد الجرد بنجاح	Stock count approved successfully
+تم التعديل ✅	Updated ✅
+تم الحذف	Deleted
+تم الطباعة بواسطة النظام	Printed by the system
+تم النسخ	Copied
+تم النسخ!	Copied!
+تم بحمد الله 	Done, praise be to God
+تم تحديث اللوجو ✅	Logo updated ✅
+تم تحصيله جزئيًا: {v1} ج	Partially collected: {v1} EGP
+تم تحصيله سابقًا: {v1} ج	Previously collected: {v1} EGP
+تم تسجيل العملية بنجاح	Transaction recorded successfully
+تم تسجيل شحن {received} ج كدين باسم {customerName}	Recorded top-up of {received} EGP as debt for {customerName}
+تم تعديل القسم ✅	Section updated ✅
+تم تغيير كلمة السر ✅	Password changed ✅
+تم توليد الكود	Code generated
+تم حذف القسم	Section deleted
+تم حذف المستخدم "{username}"	User "{username}" deleted
+تم حفظ {totalSaved} كارت في المخزون{pagesInfo} ✅	Saved {totalSaved} cards to inventory{pagesInfo} ✅
+تم حفظ الملف التجاري ✅	Commercial profile saved ✅
+تم حفظ النسخة بنجاح 📁	Copy saved successfully 📁
+تم صرف الأجر مباشرة كمصروف	Wage paid out directly as an expense
+تم صرف الراتب لـ {name}	Salary paid out to {name}
+تم صرف المرتب	Salary paid out
+تم صرف هذا الشهر مسبقًا	This month was already paid out
+تم طباعة {printed} كارت	Printed {printed} cards
+تم طباعة {printed} كارت، والمتبقي {queueCount}	Printed {printed} cards, {queueCount} remaining
+تم قفل الشيفت في {v1}	Shift closed at {v1}
+تم مسح بيانات الشيفت بالكامل	Shift data fully cleared
+تم مسح جميع البيانات بنجاح!	All data cleared successfully!
+تم مسح كل العمليات بنجاح	All transactions cleared successfully
+تم مسح كل المصروفات	All expenses cleared
+تم نسخ رابط {tableName}	Copied {tableName} link
+تم نسخ كل المواصفات — جاهزة للإرسال	All specs copied — ready to send
+تم نسخ كود التفعيل	Activation code copied
+تمت الإضافة بواسطة: {v1} - التاريخ: {v2}	Added by: {v1} - date: {v2}
+تمت الإضافة بواسطة: {v1} • {v2}	Added by: {v1} • {v2}
+تمت في: {v1} بواسطة: {v2}	Done at: {v1} by: {v2}
+تهيئة النظام	System setup
+تواصل مع المهندس للتجديد وأرسل له كود الجهاز بالأسفل	Contact the engineer for renewal and send them the device code below
+تواصل مع المهندس للتجديد وأرسله كود الجهاز أدناه	Contact the engineer for renewal and send them the device code below
+توقيع السائق	Driver signature
+توقيع العميل	Customer signature
+توليد كود التفعيل	Generate activation code
+توليد كود ترخيص لجهاز العميل	Generate a license code for the customer device
+تيك أواي	Takeaway
+ج.م	EGP
+جاري الآن	In progress
+جاري الإرسال...	Sending...
+جاري التحميل من السيرفر...	Loading from server...
+جاري التحميل والاسترجاع...	Loading and restoring...
+جاري التسجيل...	Recording...
+جاري التفعيل...	Activating...
+جاري الحفظ...	Saving...
+جاري الرفع على السيرفر...	Uploading to server...
+جاري المسح...	Clearing...
+جاري تجهيز النسخة...	Preparing copy...
+جاري تحميل المنيو...	Loading menu...
+جاري فك التشفير والاسترجاع...	Decrypting and restoring...
+جاري مزامنة المنيو...	Syncing menu...
+جارٍ الاستخراج...	Extracting...

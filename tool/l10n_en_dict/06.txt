@@ -1,0 +1,241 @@
+طباعة	Print
+طباعة PDF	Print PDF
+طباعة إيصال التحصيل	Print collection receipt
+طباعة إيصال الدين	Print debt receipt
+طباعة إيصال بعد التحصيل	Print a receipt after collection
+طباعة الفاتورة	Print invoice
+طباعة جرد الخامات	Print materials stock count
+طباعة جرد الديون	Print debt stock count
+طباعة حسب القسم	Print by section
+طباعة دين {customerName}	Print {customerName}'s debt
+طباعة دين {v1}	Print debt of {v1}
+طباعة كارت إنترنت ({_count} متاح)	Print internet card ({_count} available)
+طباعة كروت الإنترنت	Print internet cards
+طلب جديد	New order
+طلبات المنيو	Menu requests
+طلبات تفعيل الأجهزة	Device activation requests
+طلبات جديدة	New requests
+طلبات مقبولة	Accepted requests
+طلبات ملغية	Cancelled requests
+طي القائمة	Collapse menu
+عام	General
+عبر كل الأقسام	Across all sections
+عجز	Shortage
+عدد	Number
+عدد الأجهزة النشطة	Active device count
+عدد الأصناف	Item count
+عدد الأصناف المباعة	Sold item count
+عدد الأصناف: {v1}	Item count: {v1}
+عدد الترابيزات الجديدة	New table count
+عدد الحركات	Entry count
+عدد الخامات	Material count
+عدد الخامات الناقصة	Missing material count
+عدد الخامات: {v1}	Material count: {v1}
+عدد العملاء	Customer count
+عدد العملاء: {v1}	Customer count: {v1}
+عدد العمليات	Transaction count
+عدد العمليات (المفلترة): {v1}	Transaction count (filtered): {v1}
+عدد العمليات (كُلها)	Transaction count (all)
+عدد العمليات (كُلها): {totalOps}	Transaction count (all): {totalOps}
+عدد العمليات: {v1}	Transaction count: {v1}
+عدد الفواتير	Invoice count
+عدد الفواتير: {totalInvoices}	Invoice count: {totalInvoices}
+عدد الفواتير: {v1}	Invoice count: {v1}
+عدد الكروت:	Card count:
+عدد المصروفات	Expense count
+عدد ساعات العمل اليومية	Daily working hours
+عدّل قائمة الوحدات على مزاج نشاطك	Tune the units list the way your business wants
+عرض QR كودات الترابيزات	Show table QR codes
+عرض الفواتير الاجله	Show credit invoices
+عرض الكل	Show all
+عرض المشروبات كشبكة أزرار سريعة	Show drinks as a quick-button grid
+عرض المشروبات كقائمة عادية	Show drinks as a plain list
+عرض الملخص المالي	Show financial summary
+عرض فواتير الأجل والتحصيل	Show credit invoices and collections
+عرض كقائمة	Show as list
+عرض كل العمليات	Show all transactions
+عرض كل الفواتير	Show all invoices
+عرض كل مبيعات	Show all sales
+عرض ورق الفاتورة	Invoice paper width
+عرض ونسخ كود التفعيل والمكونات	Show and copy the activation code and device specs
+عشان تصرفها وتتسجل كمصروف تلقائيًا.	so you pay it out and it's logged as an expense automatically.
+على الحساب	On account
+علي الحساب	On account
+عليها فواتير مفتوحة	Has open invoices
+عمليات الفلتر	Filtered transactions
+عمليات الفلتر: {v1}	Filtered transactions: {v1}
+عملية شحن جديدة	New top-up
+عميل جديد	New customer
+عنوان IP بتاع جهاز الكاشير	IP address of the cashier device
+عنوان جهاز الكاشير على الشبكة	Cashier device address on the network
+غلق فاتوره	Close invoice
+غير متصل	Offline
+غير متصل بأي شبكة	Not connected to any network
+غير متوفر بالمخزون	Not available in stock
+غير محدد	Unspecified
+غير مسموح	Not allowed
+غير مصنف (تصنيف قديم)	Uncategorized (legacy category)
+غير معروف	Unknown
+فاتورة	Invoice
+فاتورة #{activeInvoice}	Invoice #{activeInvoice}
+فاتورة #{id}	Invoice #{id}
+فاتورة #{invoiceId}	Invoice #{invoiceId}
+فاتورة #{v1}	Invoice #{v1}
+فاتورة #{v1} - {total} ج	Invoice #{v1} - {total} EGP
+فاتورة #{v1} • 	Invoice #{v1} •
+فاتورة اجله	Credit invoice
+فاتورة الجرد	Stock count invoice
+فاتورة الجلسة	Session invoice
+فاتورة الطلب	Order invoice
+فاتورة بتاريخ {date}	Invoice dated {date}
+فاتورة بتاريخ {formattedDate}	Invoice dated {formattedDate}
+فاتورة بتاريخ {formattedDate} الساعة {formattedTime}	Invoice dated {formattedDate} at {formattedTime}
+فاتورة سريعة للسفري	Quick takeaway invoice
+فاتورة مبيعات	Sales invoice
+فاتورة مشروبات	Drinks invoice
+فبراير	February
+فتح ترابيزة	Open table
+فشل اختيار الصورة: {e}	Image pick failed: {e}
+فشل الاتصال بجهاز الكاشير	Failed to connect to the cashier device
+فشل تحميل الطلبات: {e}	Failed to load requests: {e}
+فشل تسجيل الدخول: {e}	Login failed: {e}
+فلترة بالتاريخ	Filter by date
+فواتير	Invoices
+فواتير {name} في {_month}	{name}'s invoices in {_month}
+فواتير آجلة غير مسددة	Unsettled credit invoices
+فواتير اليوم • مداخل الكاش • المصروفات	Today's invoices • cash intake • expenses
+فواتير مدفوعة + شحنات + دفعات ديون + مصروفات	Paid invoices + top-ups + debt payments + expenses
+فودافون كاش	Vodafone Cash
+فودافون كاش (معلومة فقط)	Vodafone Cash (info only)
+فودافون كاش (معلومة فقط): {v1} {v2}	Vodafone Cash (info only): {v1} {v2}
+فودافون كاش: {v1}	Vodafone Cash: {v1}
+فوق الحد الأدنى	Above minimum
+في الانتظار	Waiting
+في المخزون فورًا	In stock immediately
+قائمة	Menu
+قائمة جديدة	New menu
+قائمة فرعية جديدة	New submenu
+قاعدة البيانات غير موجودة	Database not found
+قبول	Accept
+قسم جديد	New section
+قطعة	pc
+قفل الشيفت	Close shift
+قوائم قسم «{v1}»	Menus of section "{v1}"
+قوائم مفعّلة	Enabled menus
+قيمة الترابيزات المفتوحة	Open tables value
+قيمة الترابيزات المفتوحة (لسه شغالة)	Open tables value (still active)
+كاشير	Cashier
+كاشير ومبيعات لحظية	Cashier and live sales
+كاشير — مدير الصالة	Cashier — floor manager
+كاشير، أقسام ومنتجات، مخزون وخامات، بلايستيشن، وتقارير — 	Cashier, sections and products, stock and materials, PlayStation, and reports —
+كافيه دافئ	Warm cafe
+كام كارت؟	How many cards?
+كجم	kg
+كروت	Cards
+كروت المخزون	Inventory cards
+كروت لكل صفحة مصدر	Cards per source page
+كشف المستحقات	Dues statement
+كل الأدوات	All tools
+كل الأقسام	All sections
+كل التعديلات المسجلة	All recorded edits
+كل الحركات	All entries
+كل الخامات	All materials
+كل الخامات فوق الحد الأدنى — المخزون سليم.	All materials are above the minimum — stock is healthy.
+كل الطلبات اللي اتلغت هتظهر هنا.	All cancelled requests will appear here.
+كل العملاء المسجّلين	All registered customers
+كل الفواتير	All invoices
+كل الفواتير • {v1} فاتورة	All invoices • {v1} invoices
+كل المبيعات	All sales
+كل المصروفات	All expenses
+كل حركات الكاش الداخل (income)	All incoming cash entries (income)
+كل خطوات التهيئة خلصت	All setup steps are done
+كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة + تقرير 	Each section automatically appears in the admin dashboard: manage + report
+كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة القسم + تقرير القسم. 	Each section automatically appears in the admin dashboard: section management + section report.
+كل قسم له إدارة وتقارير خاصة	Each section has its own management and reports
+كل كارت بيفتح تفاصيل الدخل الخاصة بيه (اليوم / الشيفت / الكلي).	Each card opens its own income details (today / shift / total).
+كلاسيكي	Classic
+كلم السوبر ادمن يضيف الأقسام والقوائم من لوحته.	Ask the super admin to add sections and menus from their dashboard.
+كلمة السر	Password
+كلمة السر الجديدة	New password
+كلمة السر الجديدة غير متطابقة	New passwords don't match
+كلمة السر الحالية	Current password
+كلمة السر الحالية غير صحيحة	Current password is incorrect
+كلمة السر غير صحيحة	Wrong password
+كلمة المرور	Password
+كلمة المرور غير صحيحة	Wrong password
+كلمة سر الاسترجاع	Restore password
+كلمة سر المهندس	Engineer password
+كلمة مرور الأدمن	Admin password
+كلمتا السر غير متطابقتين	Passwords don't match
+كلها مظبوطة ومن غير ورق.	All accurate and paper-free.
+كمية	Quantity
+كمية أقل من أو تساوي الحد الأدنى	Quantity at or below the minimum
+كمية: {v1}	Quantity: {v1}
+كود التفعيل (من المهندس):	Activation code (from engineer):
+كود التفعيل غير صحيح — تأكد من الكود وحاول مرة ثانية	Invalid activation code — check it and try again
+كود التفعيل للعميل	Customer activation code
+كود التفعيل منتهي الصلاحية — تواصل مع المهندس للتجديد	Activation code expired — contact the engineer for renewal
+كود التفعيل ومكونات الجهاز — جاهزة للنسخ والإرسال	Activation code and device specs — ready to copy and send
+كود التفعيل:	Activation code:
+كود الجهاز	Device code
+كود الجهاز الكامل (المستخدم في القفل)	Full device code (used for locking)
+كود جهاز العميل	Customer device code
+كود جهاز تحب تحظره	Device code to block
+كود جهازك الحالي (مرجعية):	Your current device code (reference):
+كود هذا الجهاز:	This device's code:
+كيلو	kg
+لا	No
+لا توجد أصناف	No items
+لا توجد أصناف مباعة في هذا الشيفت	No items sold in this shift
+لا توجد أصناف مسجلة	No items recorded
+لا توجد بيانات	No data
+لا توجد بيانات شيفتات بعد	No shift data yet
+لا توجد بيانات لهذا الشهر	No data for this month
+لا توجد تعديلات مسجلة	No recorded edits
+لا توجد جلسات بلايستيشن في هذه الفترة	No PlayStation sessions in this period
+لا توجد حركات في الشيفت	No entries in the shift
+لا توجد خامات كافية لـ {v1}	Not enough materials for {v1}
+لا توجد خامات لطباعتها	No materials to print
+لا توجد خامات مضافة لهذا المشروب	No materials added for this drink
+لا توجد دفعات ديون	No debt payments
+لا توجد ديون آجلة	No credit debts
+لا توجد ديون حالياً	No debts currently
+لا توجد ديون لطباعتها	No debts to print
+لا توجد شحنات	No top-ups
+لا توجد شيفتات	No shifts
+لا توجد طلبات حاليًا	No requests currently
+لا توجد عمليات	No transactions
+لا توجد عمليات لعرضها	No transactions to show
+لا توجد فواتير	No invoices
+لا توجد فواتير اليوم	No invoices today
+لا توجد فواتير بلايستيشن في هذه الفترة لمسحها	No PlayStation invoices in this period to clear
+لا توجد فواتير في هذا الشيفت	No invoices in this shift
+لا توجد فواتير في هذه الفترة لمسحها	No invoices in this period to clear
+لا توجد فواتير لهذا العميل	No invoices for this customer
+لا توجد فواتير ملغية	No cancelled invoices
+لا توجد مبيعات في هذه الفترة	No sales in this period
+لا توجد مبيعات منتجات في هذه الفترة	No product sales in this period
+لا توجد مداخل كاش اليوم	No cash intake today
+لا توجد مستحقات حتى الآن	No dues yet
+لا توجد مشروبات	No drinks
+لا توجد مشروبات في هذا القسم	No drinks in this section
+لا توجد مشروبات مسجلة	No drinks recorded
+لا توجد مصروفات	No expenses
+لا توجد مصروفات اليوم	No expenses today
+لا توجد مصروفات لهذا الشيفت	No expenses for this shift
+لا توجد مصروفات مسجلة	No expenses recorded
+لا توجد منتجات هنا	No products here
+لا توجد نتائج	No results
+لا توجد نسخة احتياطية بعد على هذا الجهاز	No backup on this device yet
+لا توجد نسخة احتياطية على جهاز الكاشير بعد	No backup on the cashier device yet
+لا يوجد تحصيل في هذا الشيفت	No collection in this shift
+لا يوجد دين متبقي على هذا العميل	No debt remaining for this customer
+لا يوجد كروت متاحة في المخزون	No cards available in stock
+لا يوجد كروت محفوظة في المخزون	No cards saved in stock
+لا يوجد منتجات	No products
+لا يوجد موظفين فرعيين مسجلين	No subordinate employees registered
+لازم تكونوا على نفس شبكة الواي فاي	You must be on the same Wi-Fi network
+لتر	L
+لسه شغالة	Still active
+لسه متصرفش	Not paid out yet
+لسه مفيش أقسام	No sections yet

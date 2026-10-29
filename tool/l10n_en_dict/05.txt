@@ -1,0 +1,209 @@
+جارٍ الطباعة...	Printing...
+جارٍ المسح...	Clearing...
+جاهزة لبدء جلسة جديدة	Ready to start a new session
+جاهزة للإضافة على الفواتير.	Ready to add to invoices.
+جاهزة للبيع.	Ready for sale.
+جديد	New
+جرام	g
+جرد الخامات	Materials stock count
+جرد الديون	Debt stock count
+جرد الديون (الآجل)	Debt stock count (credit)
+جرّب اسم تاني أو امسح كلمة البحث.	Try another name or clear the search word.
+جرّب اسم تاني — أو امسح كلمة البحث.	Try another name — or clear the search word.
+جرّب تغيير الفترة أو البحث عن صنف تاني.	Try changing the period or search for another item.
+جرّب تغيير نوع الإجراء أو كلمة البحث.	Try changing the action type or the search word.
+جرّب تغيّر البحث أو الفئة من فوق.	Try changing the search or the category above.
+جرّب تغيّر البحث أو فلتر الحالة من فوق.	Try changing the search or the status filter above.
+جرّب تغيّر الفترة أو القسم من الفلاتر اللي فوق.	Try changing the period or section from the filters above.
+جرّب تغيّر الفترة من الفلاتر فوق أو امسح كلمة البحث.	Try changing the period from the filters above or clear the search word.
+جرّب كلمة بحث تانية أو اختار قائمة فرعية تانية.	Try another search word or pick another submenu.
+جرّب كلمة بحث تانية — أو امسح البحث.	Try another search word — or clear the search.
+جلسات	Sessions
+جلسات مفتوحة	Open sessions
+جلسات: {v1}   ساعات: {v2}	Sessions: {v1}   hours: {v2}
+جملة الشكر	Thank-you line
+جملة الشكر / تليفون / عنوان / الرقم الضريبي	Thank-you line / phone / address / tax number
+جملة الشكر / تليفون / عنوان / رقم ضريبي	Thank-you line / phone / address / tax number
+جهاز	Device
+جهاز :	Device:
+حالة التهيئة	Setup status
+حدث خطأ أثناء الاستخراج: {e}	Error during extraction: {e}
+حدث خطأ أثناء الطباعة: {e}	Error during printing: {e}
+حدث خطأ أثناء تحميل البيانات	Error while loading data
+حدث خطأ أثناء فتح الشيفت	Error while opening the shift
+حدث خطأ: {v1}	Error: {v1}
+حدد مدة التجربة بالإنترنت. بعد انتهاء المدة سيتم قفل السيستم تلقائياً:	Choose your online trial duration. When it ends the system locks automatically:
+حذف	Delete
+حذف الجهاز	Delete device
+حذف الفواتير والمصروفات وكل شيء نهائياً	Delete invoices, expenses and everything permanently
+حذف القائمة؟	Delete menu?
+حذف القسم؟	Delete section?
+حذف المستخدم	Delete user
+حذف المشروب وإرجاع الكمية للمخزون	Delete the drink and return its quantity to stock
+حذف صنف	Delete item
+حذف من الطلب	Remove from order
+حذف من الوصفة	Remove from recipe
+حساب الأدمن	Admin account
+حساب الستاف	Staff account
+حساب موظف الطلبات (ويتر) ملوش شغل على المحطة — الكاشير هو اللي 	The orders employee (waiter) account has no console work — the cashier is the one
+حسن صالح - EGOA02	Hassan Saleh - EGOA02
+حسناً	OK
+حصل خطأ: {e}	Error occurred: {e}
+حصلت مشكلة في الطباعة	A printing problem occurred
+حظر	Block
+حفظ	Save
+حفظ التعديلات	Save changes
+حفظ المصروف	Save expense
+حفظ ملف الجرد	Save stock count file
+حفظ نسخة احتياطية	Save backup
+حفظ نسخة من كل بيانات البرنامج	Save a copy of all app data
+حمدى احمد محمد حسن	Hamdy Ahmed Mohamed Hassan
+خامات متوفرة	Available materials
+خامات مشتركة بين كل الأقسام	Materials shared by all sections
+خامات ناقصة	Missing materials
+خامات ناقصة: {lowStockCount}	Missing materials: {lowStockCount}
+خامات ومخزون مشترك بين الأقسام	Materials and stock shared across sections
+خروج (تغيير دور)	Log out (switch role)
+خصم	Discount
+خصم {v1}	discount {v1}
+خصم على التحصيل: {v1} {v2}	Discount on collection: {v1} {v2}
+خصم وطريقة الدفع للتيك أواي	Discount and payment method for takeaway
+خصم: {v1}	Discount: {v1}
+خصم: {v1} {v2}	Discount: {v1} {v2}
+خطأ أثناء إنشاء الـ PDF: {e}	Error creating the PDF: {e}
+خطأ أثناء الطباعة: {e}	Error during printing: {e}
+خطأ أثناء المسح: {e}	Error during clearing: {e}
+خطأ في اسم المستخدم أو كلمة المرور	Wrong username or password
+خطأ في الاستعادة: {e}	Restore error: {e}
+خطأ في تحميل التقرير: {e}	Report loading error: {e}
+خطأ: {e}	Error: {e}
+خطأ: بيانات الشيفت غير صحيحة	Error: invalid shift data
+خطوة {v1} من {v2} — {v3}	Step {v1} of {v2} — {v3}
+خلص	Done
+دائم مدى الحياة	Lifetime permanent
+دائم — مدى الحياة	Lifetime permanent
+دخل الأجهزة	Device income
+دخل الشيفت	Shift income
+دخل الطلبات المقبولة	Accepted orders income
+دخل اليوم	Today's income
+دخل: {v1}	Income: {v1}
+دخول	Log in
+دخول المهندس	Engineer login
+دفع جزء من تربيزات	Partial table payment
+دفع جزء من تربيزات (غير مضاف للصافي)	Partial table payment (not added to net)
+دفع جزئي	Partial payment
+دفع كامل	Full payment
+دفعات الديون	Debt payments
+دفعات جزئية (غير مضاف للصافي)	Partial payments (not added to net)
+دفعات جزئية على الفواتير الآجلة	Partial payments on credit invoices
+دفعات جزئية على تربيزات (غير مضاف للصافي)	Partial table payments (not added to net)
+دلوقتي	Now
+دوس على أي صنف عشان تضيفه	Click any item to add it
+دوس على أي صنف عشان تضيفه للطلب.	Click any item to add it to the order.
+دي اللي بتظهر كـ تابات في إدارة القسم والكاشير	These show up as tabs in section management and the cashier screen
+ديسمبر	December
+راجع اللوجو الافتراضي ✅	Default logo restored ✅
+ربح الفلتر	Filtered profit
+ربح: {v1}	Profit: {v1}
+رجوع	Back
+رجوع (Esc)	Back (Esc)
+رجوع للون الافتراضي	Back to the default color
+رصيد أول الفترة	Balance at period start
+رصيد الشحن	Top-up balance
+رصيد الشحن: {_balance} ج • {v2} عملية ضمن الفلتر	Top-up balance: {_balance} EGP • {v2} transactions within the filter
+رصيد المكنة	Top-up machine balance
+رصيد النظام	System balance
+رصيد درج الكاش	Cash drawer balance
+رفض	Reject
+رفع نسخة على السيرفر (كلاود)	Upload a copy to the server (cloud)
+رفع نسخة على الشبكة الآن	Upload a copy to the network now
+رقم الرحلة:	Trip number:
+رقم الفاتورة:	Invoice number:
+رمز العملة	Currency symbol
+رمز العملة، عرض ورق الفاتورة، اسم الطابعة	Currency symbol, invoice paper width, printer name
+رمز العملة، ورق الفاتورة، اسم الطابعة	Currency symbol, invoice paper, printer name
+رواتب الشهر {month}	Salaries for {month}
+روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم 	Go to the super admin dashboard → product sections → open the section
+روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم وضيف القوائم.	Go to the super admin dashboard → product sections → open the section and add the menus.
+زي: مشروبات، ماكولات، حلويات... كل قسم هيطلع له تلقائي: 	e.g. drinks, food, desserts... each section automatically gets:
+زي: مشروبات، ماكولات، حلويات... كل قسم هيطلع له تلقائي: إدارة + تقرير في لوحة الأدمن، وتقدر تضيف جواه قوائم فرعية (سخن/بارد/إلخ). الخامات مخزون مشترك لكل الأقسام.	e.g. drinks, food, desserts... each section automatically gets: manage + report in the admin dashboard, and you can add submenus inside it (Hot/Cold/etc.). Materials are a shared stock for all sections.
+زيادة	Increase
+زيادة الكمية	Increase quantity
+ساعات	Hours
+ساعة	Hour
+سبتمبر	September
+سجائر	Cigarettes
+سجائر :	Cigarettes:
+سجائر: {v1}	Cigarettes: {v1}
+سجل التعديلات	Edit history
+سجل تعديلات الفاتورة #{v1}	Invoice #{v1} edit history
+سجل تعديلات هذه الفاتورة	This invoice's edit history
+سجّل دخولك بحساب Supabase للوصول إلى طلبات التفعيل	Log in with a Supabase account to access activation requests
+سحب رصيد	Withdraw balance
+سداد	Settle
+سعر الساعة	Hourly price
+سعر الساعة: {v1}	Hourly price: {v1}
+سعر الشراء	Purchase price
+سعر الشراء: {v1}	Purchase price: {v1}
+سعر الوحدة: {v1} {v2}	Unit price: {v1} {v2}
+سعر ثابت	Fixed price
+سعر ثابت: {v1}	Fixed price: {v1}
+سلة الطلب	Order cart
+سوبر أدمن	Super admin
+سيتم استبدال كل البيانات الحالية بالكامل، ولا يمكن التراجع عن هذه الخطوة. متابعة؟	All current data will be fully replaced — this step can't be undone. Continue?
+سيتم استبدال كل بيانات هذا الجهاز الحالية بآخر نسخة مرفوعة على السيرفر. متابعة؟	All current data on this device will be replaced with the latest copy uploaded to the server. Continue?
+سيتم استبدال كل بيانات هذا الجهاز الحالية. متابعة؟	All current data on this device will be replaced. Continue?
+سيتم تحضير طلبك قريباً 🎉	Your order will be prepared soon 🎉
+سيتم حذف الخامة من المخزون ومن جميع الوصفات المرتبطة بها	The material will be deleted from inventory and from all its linked recipes
+سيتم حذف كل الفواتير والمصروفات والشيفتات والكاش نهائياً ولا يمكن التراجع. ينصح بعمل نسخة احتياطية قبل المتابعة.	All invoices, expenses, shifts and cash will be permanently deleted and can't be undone. Backing up before continuing is recommended.
+شاشة إضافة المشروبات	Add-drinks screen
+شبكة الورقة	Sheet grid
+شحن	Top-up
+شحن الرصيد	Balance top-up
+شحن رصيد	Balance top-up
+شحن رصيد 	Balance top-up
+شغّال دلوقتي	Running now
+شكراً لزيارتكم	Thank you for your visit
+شكرًا لجهودك ❤️	Thanks for your efforts ❤️
+شكل الموبايل: {v1}	Mobile view: {v1}
+شكل تقرير الشيفتات	Shift reports layout
+شكل شاشة إضافة المشروبات	Add-drinks screen layout
+شكل لوحة الأدمن	Admin dashboard layout
+شهر {month} • {v2} موظف	{month} • {v2} employees
+شهر {v1}-{v2}	Month {v1}-{v2}
+شهر: {v1}	Month: {v1}
+شهري	Monthly
+شوكلاته	Chocolate
+شيبسي	Chipsy
+شيشة	Hookah
+شيشة :	Hookah:
+شيشة: {v1}	Hookah: {v1}
+شيفت	Shift
+شيفت #{v1} • المشرف: {v2}	Shift #{v1} • supervisor: {v2}
+شيفت رقم {v1} — كل حاجة تحت إيدك من هنا.	Shift #{v1} — everything is in your hands from here.
+شيفت رقم {v1} • {_placeName}	Shift #{v1} • {_placeName}
+شيفت رقم {v1} • تسجيل عملية شحن للزبون	Shift #{v1} • record a customer top-up
+شيفت رقم {v1} • تسجيل مصروفات الوردية	Shift #{v1} • record shift expenses
+شيفت مفتوح	Open shift
+شيفتات موظفين	Employee shifts
+صافي الفترة المعروضة	Net for the displayed period
+صافي الكاش	Cash net
+صافي الكاش: {v1} {v2}	Cash net: {v1} {v2}
+صرف	Payout
+صرف راتب {name}	Pay salary of {name}
+صرف مباشرة	Pay out now
+صرف مرتبات الموظفين	Pay employee salaries
+صفحة {v1} من {v2}	Page {v1} of {v2}
+صنف	Item
+ضيف أجهزة البلايستيشن من شاشة "إدارة الأجهزة" عشان تبدأ الجلسات.	Add PlayStation devices from the "Manage devices" screen to start sessions.
+ضيف أول جهاز بلايستيشن وحدّد سعر الساعة أو سعر الماتش الثابت.	Add the first PlayStation device and set the hourly price or fixed match price.
+ضيف أول خامة عشان تبدأ تتابع المخزون.	Add the first material to start tracking stock.
+ضيف أول مستخدم وحدّد دوره وإعدادات راتبه.	Add the first user and set their role and salary settings.
+ضيف الخامات الأول من شاشة إدارة الخامات.	Add materials first from the manage materials screen.
+ضيف قوائم زي «سخن / بارد / غازية» — 	Add menus like "Hot / Cold / Sodas" —
+ضيف قوائم زي «سخن / بارد / غازية» — وهتظهر كـ تابات جوه إدارة القسم وشاشة الكاشير.	Add menus like "Hot / Cold / Sodas" — they show up as tabs inside section management and the cashier screen.
+ضيف مشروبات من زرار «إضافة مشروب» فوق 	Add drinks via the "Add drink" button above
+ضيف منتجات من إدارة المنتجات الأول، وبعدها هتظهر هنا 	Add products via product management first, then they'll appear here
+ضيف موظف من شاشة إدارة المستخدمين الأول.	Add an employee first from the user management screen.
+ضيف موظفين الستاف الأول من إدارة المستخدمين، 	Add staff members first from user management,
+ضيف موظفين تابعين للمشرف ده وحدد راتب الساعة 	Add subordinates under this supervisor and set the hourly wage

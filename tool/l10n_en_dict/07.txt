@@ -1,0 +1,165 @@
+لسه مفيش أقسام — تقدر تكمّل من غيرها وتضيفها بعدين 	No sections yet — you can continue without them and add later
+لسه مفيش أقسام — تقدر تكمّل من غيرها وتضيفها بعدين من لوحة السوبر ادمن	No sections yet — you can continue without them and add later from the super admin dashboard
+لسه مفيش أي مصروفات مسجّلة.	No expenses recorded yet.
+لسه مفيش ترابيزات	No tables yet
+لسه مفيش عمليات شحن مسجّلة على المكنة.	No top-ups recorded on the machine yet.
+لسه مفيش قوائم فرعية في القسم ده	No submenus in this section yet
+لصق	Paste
+لم يتم استخراج أي كروت، تأكد من الملف	No cards were extracted, check the file
+لما الشيفتات تسجّل ساعات وأجور، المستحقات هتظهر هنا 	As shifts log hours and wages, dues will appear here
+لو مفعّل هيظهر كروت إدارة الأجهزة وتقرير 	When enabled, the device management cards and report show
+لو مفعّل هيظهر كروت إدارة الأجهزة وتقرير البلايستيشن في لوحة الأدمن	When enabled, the device management cards and PlayStation report show in the admin dashboard
+لوجو البراند	Brand logo
+لوحة احترافية	Professional dashboard
+لوحة التحكم	Control panel
+لوحة الترابيزات	Tables panel
+لوحة السوبر ادمن	Super admin dashboard
+لوحة الموظف	Employee dashboard
+لوحة كاملة	Full dashboard
+لون الهوية	Brand color
+م	m
+م العميل الضريبي	Customer tax number
+مارس	March
+ماكينة الشحن	Top-up machine
+مايو	May
+مبالغ سريعة:	Quick amounts:
+مبيعات (فواتير مدفوعة)	Sales (paid invoices)
+مبيعات الداخل والترابيزات	Indoor and tables sales
+مبيعات السجائر	Cigarette sales
+مبيعات الشيشة	Hookah sales
+مبيعات المشروبات	Drinks sales
+مبيعات المنتجات	Product sales
+متابعة	Continue
+متابعة الآجل وتحصيل المديونيات	Track credit and collect debts
+متابعة الخامات اللي وصلت للحد الأدنى	Track materials that hit the minimum
+متابعة شيفتات الفريق	Track team shifts
+متابعة على أي حال	Continue anyway
+متاح {v1}	Available {v1}
+متاحة	Available
+متاحة {available}	Available {available}
+متبقي {v1} ساعة	{v1} hours remaining
+متبقي {v1} يوم	{v1} days remaining
+متبقي الفاتورة: {v1} {v2}	Invoice remaining: {v1} {v2}
+متبقي: {v1}	Remaining: {v1}
+متصل	Online
+متوسط سعر الصنف	Average item price
+متوقف مؤقتًا	Paused
+مثال: 192.168.1.5	Example: 192.168.1.5
+مثال: ج.م / د.إ / SAR — فاضي يعني افتراضي (ج.م)	Example: EGP / AED / SAR — empty means default (EGP)
+مجموع فواتير كل العملاء	Total invoices of all customers
+محجوزة	Reserved
+محجوزة {busy}	Reserved {busy}
+محدد	Specified
+محصّل جزئيًا (والترابيزة لسه شغالة): {v1}	Partially collected (table still running): {v1}
+محصّل جزئيًا (والترابيزة لسه شغالة): {v1} {v2}	Partially collected (table still running): {v1} {v2}
+محصّل جزئيًا من ترابيزات لسه شغالة	Partially collected from tables still running
+محصّل من الآجل	Collected from credit
+محصّل من الآجل:	Collected from credit:
+محصّل: {v1}	Collected: {v1}
+مخزون "{v1}" مش كفاية لإضافته	"{v1}" stock isn't enough to add it
+مخزون "{v1}" مش كفاية للكمية الجديدة	"{v1}" stock isn't enough for the new quantity
+مخزون قليل (أقل من 10)	Low stock (under 10)
+مدة الترخيص	License duration
+مدفوع	Paid
+مدفوع + آجل − مصروفات	Paid + credit − expenses
+مدفوع جزئيًا	Partially paid
+مدفوع جزئيًا: {v1}   |   الباقي: {v2}	Partially paid: {v1}   |   remaining: {v2}
+مدفوع جزئيًا: {v1}  |  الباقي: {v2}	Partially paid: {v1}  |  remaining: {v2}
+مدفوع:	Paid:
+مدفوع: {v1} {v2}	Paid: {v1} {v2}
+مدفوع: {v1} {v2}  |  خصم: {v3} {v4}  |  بتاريخ: {v5}	Paid: {v1} {v2}  |  discount: {v3} {v4}  |  date: {v5}
+مرحباً، {v1}	Hi, {v1}
+مرفوض	Rejected
+مزامنة المنيو مع Supabase	Sync menu with Supabase
+مسار	Path
+مستحق الشهر الحالي: {v1} {v2}	This month's due: {v1} {v2}
+مستحق: {v1} {v2}	Due: {v1} {v2}
+مستحقات الموظفين	Employee dues
+مستلم الفلتر	Filtered received
+مسح	Clear
+مسح الفلتر	Clear filter
+مسح الكل	Clear all
+مسح بيانات الشيفت	Clear shift data
+مسح حسابات الآجل (الديون) أيضاً	Also clear credit (debt) accounts
+مسح فواتير {v1} لهذا الشهر	Clear {v1}'s invoices for this month
+مسح كل البيانات	Clear all data
+مسح كل العمليات	Clear all transactions
+مسح كل المصروفات	Clear all expenses
+مسح مبيعات الفترة	Clear period sales
+مسح مبيعات الفترة المعروضة	Clear the displayed period's sales
+مسح نهائياً	Clear permanently
+مسح نهائيًا	Clear permanently
+مسحوب	Withdrawn
+مش دلوقتي	Not now
+مش هينفع تحذف «{v1}» — فيه {v2} منتج مسجل عليها. 	You can't delete "{v1}" — {v2} products are registered on it.
+مش هينفع تحذف «{v1}» — فيه {v2} منتج. 	You can't delete "{v1}" — {v2} products on it.
+مشروب غير معروف	Unknown drink
+مشروبات	Drinks
+مشروبات الفاتورة #{v1}	Drinks of invoice #{v1}
+مشروبات: {v1}	Drinks: {v1}
+مشغول	Busy
+مصروف	Expense
+مصروفات الشيفت	Shift expenses
+مصروفات الشيفتات	Shifts expenses
+مصروفات الكاشير - {v1}	Cashier expenses - {v1}
+مطلوب للوصول إلى طلبات التفعيل	Required to access activation requests
+معالج التهيئة	Setup wizard
+معاينة ورقة الكروت	Cards sheet preview
+معلومات اكتر علي الدخل	More income info
+معلومات اكتر عن الدخل	More income info
+معلومة فقط	Info only
+مفعّل	Enabled
+مفعّل — هتظهر في شاشة البيع وإدارة المشروبات	Enabled — it'll show on the sales screen and drink management
+مفيش أجهزة مضافة	No devices added
+مفيش أصناف	No items
+مفيش أصناف في القسم ده دلوقتي.	No items in this section right now.
+مفيش أي مبالغ آجلة مسجّلة على العملاء.	No credit amounts recorded on customers.
+مفيش بيانات شيفتات	No shift data
+مفيش تفاصيل تحصيل في الفترة دي	No collection details in this period
+مفيش تفاصيل في الفترة دي	No details in this period
+مفيش خامات للجرد	No materials to stock count
+مفيش خامات مسجلة	No materials recorded
+مفيش خامات ناقصة	No missing materials
+مفيش شيفتات مسجلة في الفترة المحددة	No shifts recorded in the selected period
+مفيش طلبات جديدة دلوقتي	No new requests right now
+مفيش طلبات مقبولة	No accepted requests
+مفيش طلبات ملغية	No cancelled requests
+مفيش فواتير مسجلة في الفترة المعروضة.	No invoices recorded in the displayed period.
+مفيش فواتير مسجّلة على أي عميل في شهر {_month}.	No invoices recorded on any customer in {_month}.
+مفيش قوائم فرعية في القسم ده — ضيفها من لوحة السوبر ادمن	No submenus in this section — add them from the super admin dashboard
+مفيش مستخدمين	No users
+مفيش مشروبات على الفاتورة	No drinks on the invoice
+مفيش ملف	No file
+مفيش منتجات	No products
+مفيش موظفي طلبات متاحين للتعيين — أنشئ حساب 	No orders employees available to assign — create an account
+مفيش موظفين بصلاحيات ستاف	No employees with staff permissions
+مفيش موظفين تانيين مسجلين.	No other employees registered.
+مفيش موظفين فرعيين	No subordinate employees
+مفيش نتائج	No results
+مفيش نتائج للبحث	No search results
+مفيش نتائج مطابقة	No matching results
+مقبول	Accepted
+مقفول	Closed
+مقفولة	Closed
+مكتملة	Completed
+مل	ml
+ملاحظة للطلب (اختياري)	Note for the order (optional)
+ملحوظة (اختياري)	Note (optional)
+ملحوظة: الديون (الآجل) المرتبطة بأي فاتورة هتتمسح مش هتتأثر — هتفضل موجودة لوحدها.	Note: debts (credit) linked to any invoice won't be affected — they stay on their own.
+ملحوظة: الديون (الآجل) نفسها هتفضل موجودة، لكن أي دفعة كاش مرتبطة بالفواتير دي هتتمسح.	Note: the debts (credit) themselves stay, but any cash payment linked to these invoices is cleared.
+ملحوظة: هتمسح الفاتورة كلها، مش المنتجات بس.	Note: the whole invoice is deleted, not just the products.
+ملخص إجمالي	Overall summary
+ملخص الشيفت	Shift summary
+ملخص الشيفت:	Shift summary:
+ملخص الشيفتات — {v1}	Shifts summary — {v1}
+ملخص الطلبات	Orders summary
+ملخص الفاتورة	Invoice summary
+ملخص الفلتر:	Filtered summary:
+ملخص اليوم	Today's summary
+ملخص سريع لدخل اليوم والشيفت والدخل الكلي	Quick summary of today, shift and gross income
+ملخص شهر {_month}	{_month} summary
+ملخص يومي	Daily summary
+ملخص يومي — {v1} شيفت	Daily summary — {v1} shifts
+ملغي	Cancelled
+ملغية	Cancelled
+ملف PDF فارغ أو غير صالح	Empty or invalid PDF file

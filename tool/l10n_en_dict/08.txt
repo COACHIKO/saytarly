@@ -1,0 +1,225 @@
+من	From
+من {start} إلى {end}	From {start} to {end}
+من {v1} 	from {v1}
+من {v1}  إلى  {v2}	From {v1}  to  {v2}
+من آجل قديم خارج الفترة	From old credit outside the period
+من تاريخ	From date
+من فضلك أدخل كلمة السر لاسترجاع النسخة الاحتياطية.	Please enter the password to restore the backup.
+من لوحة السوبر ادمن	From the super admin dashboard
+من هنا بتظبط النظام يناسب مكانك: الاسم، النوع، 	Here you tune the system to fit your place: name, type,
+من هنا بتظبط النظام يناسب مكانك: الاسم، النوع، وبعدها بتنشئ الحسابات والأقسام.	Here you tune the system to fit your place: name, type, then create the accounts and sections.
+من: البداية	From: Beginning
+منتجات	Products
+منتجات / مأكولات :	Products / food:
+منتجات إضافية	Extra products
+منتجات: {v1}	Products: {v1}
+منتهي	Expired
+منذ {v1} د	{v1} min ago
+منذ {v1} س	{v1} h ago
+مواصفات هذا الجهاز	This device's specs
+موظف الطلبات	Orders employee
+موظف طلبات	Orders employee
+موظف طلبات (ويتر)	Orders employee (Waiter)
+موظف فرعي عند {supervisorName}	Subordinate of {supervisorName}
+موظفين الشهر	Employees of the month
+موظفين مستحقين	Employees with dues
+مولتو	Molto
+مولد أكواد التفعيل	Activation code generator
+مولد كود التفعيل	Activation code generator
+مولّد أكواد التفعيل	Activation code generator
+ناقص	Shortage
+نسخ	Copy
+نسخ احتياطي الآن	Back up now
+نسخ احتياطي كامل	Full backup
+نسخ التقرير الكامل	Copy the full report
+نسخ كود التفعيل	Copy activation code
+نسخ كود الجهاز	Copy device code
+نسخة احتياطية	Backup
+نصوص الفاتورة	Invoice texts
+نصيب البلايستيشن من المدفوع	PlayStation share of paid
+نصيب المشروبات من المدفوع	Drinks share of paid
+نظام إدارة الكافيه	Cafe management system
+نظام البلايستيشن مفعّل	PlayStation system enabled
+نعم، اطبع	Yes, print
+نفد من المخزون	Out of stock
+نقطة الكاشير	Cashier station
+نهاية :	End:
+نهاية الوقت	End time
+نوع الدفع	Payment type
+نوع الفاتورة:	Invoice type:
+نوع النشاط	Business type
+نوفمبر	November
+هتتحذف قائمة «{v1}» نهائيًا.	Menu "{v1}" will be permanently deleted.
+هترجع لشاشة تسجيل الدخول.	You'll return to the login screen.
+هذه الصفحة للمهندس فقط	This page is for the engineer only
+هذه الصفحة متاحة فقط من جهاز المهندس المعتمد	This page is available only from the authorized engineer device
+هل أنت متأكد أنك تريد مسح كل العمليات؟	Are you sure you want to clear all transactions?
+هل أنت متأكد أنك تريد مسح كل المصروفات؟ هذا الإجراء لا يمكن التراجع عنه.	Are you sure you want to clear all expenses? This action can't be undone.
+هل أنت متأكد من حذف المستخدم "{username}"؟	Are you sure you want to delete user "{username}"?
+هل أنت متأكد من حذف هذا الدين؟	Are you sure you want to delete this debt?
+هل أنت متأكد من مسح جميع الفواتير؟	Are you sure you want to clear all invoices?
+هل أنت متأكد من مسح كل فواتير العميل "{customerName}" لهذا الشهر؟	Are you sure you want to clear all invoices of customer "{customerName}" for this month?
+هل تريد إلغاء هذا الطلب؟	Cancel this order?
+هل تريد استبدال البيانات الحالية أم الإضافة عليها؟	Replace current data or add to it?
+هل تريد استبدال الخامات الحالية أم الإضافة عليها؟	Replace current materials or add to them?
+هل تريد المتابعة؟	Continue?
+هل تريد تأكيد قفل الشيفت وطباعة التقرير؟	Confirm closing the shift and printing the report?
+هل تريد طباعة فاتورة السداد؟	Print the settlement invoice?
+هل تريد مسح كل البيانات (ما عدا المشروبات والأجهزة)؟	Clear all data (except drinks and devices)?
+هل تريد مسح كل بيانات هذا الشيفت؟	Clear all data of this shift?
+هيتحذف قسم «{v1}» وكل القوائم الفرعية اللي جواه.	Section "{v1}" and all its submenus will be deleted.
+هيتم إرجاع كل الأصناف للمخزون والفاتورة هتتحوّل لـ "ملغي".	All items will return to stock and the invoice becomes "cancelled".
+والخامات مخزون مشترك بيظهر كارت واحد لكل الأقسام. 	And materials are a shared stock shown as one card for all sections.
+وبعدها بتنشئ الحسابات والأقسام.	then you create the accounts and sections.
+وبعدها رجع هنا ويعينه للشيفت ده.	Then come back here and assign them to this shift.
+وبعدين مرتباتهم هتظهر هنا للصرف.	Then their salaries show up here for payout.
+وحدات الخامات	Material units
+وساعات العمل اليومية.	and daily working hours.
+وصف المصروف	Expense description
+وصفة المشروب	Drink recipe
+وصلت للحد الأدنى أو أقل	At the minimum or below
+وضيف القوائم.	and add the menus.
+وقت الاستخدام: {displayDuration}	Usage time: {displayDuration}
+وقت الانتهاء: {v1}	End time: {v1}
+وقت البدء: {v1}	Start time: {v1}
+وقت البداية	Start time
+وقت الدفع	Payment time
+وقت بلايستيشن	PlayStation time
+وقت: {start}	Time: {start}
+ومعاهم زراير بدء/إنهاء الشيفت وحساب الأجرة تلقائيًا.	Plus start/end shift buttons and automatic wage calculation.
+وهتظهر كـ تابات جوه إدارة القسم وشاشة الكاشير.	They show up as tabs inside section management and the cashier screen.
+وهتظهر هنا مع الإجماليات.	They'll appear here with the totals.
+وهيتحسب هنا فورًا.	It'll be calculated here instantly.
+وهيطلع له تلقائي في لوحة الأدمن: إدارة + تقرير.	It automatically gets manage + report in the admin dashboard.
+ويتر	Waiter
+يجيب آخر نسخة مرفوعة من أي مكان فيه إنترنت	Fetches the latest uploaded copy from anywhere with internet
+يوجد أجهزة بلايستيشن تعمل حالياً:	PlayStation devices running now:
+يوجد ترابيزات مفتوحة:	Open tables:
+يوجد شيفت مفتوح لمستخدم آخر، لا يمكن فتح شيفت جديد	Another user has an open shift — can't open a new one
+يوليو	July
+يوم	Day
+يوم {v1}-{v2}-{v3}	Day {v1}-{v2}-{v3}
+يومي	Daily
+يونيو	June
+— وكل ترابيزة هتعرض حالتها وجلساتها هنا.	— and each table shows its status and sessions here.
+• {v1}: أجر: {v2} ج | صافي: {v3} ج	• {v1}: wage: {v2} EGP | net: {v3} EGP
+• إجمالي الأصناف المباعة: {totalItemsSoldQty} قطعة	• Total items sold: {totalItemsSoldQty} pieces
+• إجمالي المبيعات: {v1} {v2}	• Total sales: {v1} {v2}
+• الأجهزة: {v1} {v2}	• Devices: {v1} {v2}
+• الخامات مخزون مشترك لكله	• Materials are a shared stock for everything
+• السجائر: {v1} {v2}	• Cigarettes: {v1} {v2}
+• الشيشة: {v1} {v2}	• Hookah: {v1} {v2}
+• المشروبات: {v1} {v2}	• Drinks: {v1} {v2}
+• المصروفات المسجلة: {v1} {v2}	• Recorded expenses: {v1} {v2}
+• المنتجات/المأكولات: {v1} {v2}	• Products/food: {v1} {v2}
+• جهاز رقم {v1}	• device #{v1}
+↳ خصم على التحصيل: {v1} {v2}	↳ Discount on collection: {v1} {v2}
+⏱ مدة الجلسة: {v1} ساعة	⏱ Session duration: {v1} hours
+⏱️ {v1} ساعة	⏱️ {v1} hours
+⏱️ إجمالي الساعات: {v1}   |   🔢 عدد الشيفتات: {v2}	⏱️ Total hours: {v1}   |   🔢 shift count: {v2}
+⏱️ عدد الساعات: {v1}	⏱️ Hours count: {v1}
+⏳ آجل لسه متبقي: {v1} {v2}	⏳ Credit still remaining: {v1} {v2}
+☕ المشروبات	☕ Drinks
+⚠️ فيه مبلغ اتحصّل سابقًا: {v1}  {v2} — الإلغاء ده هيرجّعه تلقائيًا.	⚠️ An amount was already collected: {v1}  {v2} — cancelling returns it automatically.
+⚠️ لا يمكن الرجوع قبل قفل جميع الترابيزات والبلايستيشن	⚠️ Can't go back until all tables and PlayStation are closed
+⚠️ لا يمكن قفل الشيفت	⚠️ Can't close the shift
+⚠️ لا يوجد شيفت مفتوح حالياً	⚠️ No open shift right now
+⚠️ لازم تسيب وحدة واحدة صالحة على الأقل	⚠️ Keep at least one valid unit
+✅ تم إلغاء الدين وإرجاع المخزون بالكامل	✅ Debt cancelled and stock fully returned
+✅ تم إلغاء الفاتورة وإرجاع المخزون بالكامل	✅ Invoice cancelled and stock fully returned
+✅ تم اختيار وضع الكاشير	✅ Cashier mode selected
+✅ تم استرجاع النسخة بنجاح، يفضل إعادة تشغيل البرنامج	✅ Backup restored successfully, restarting the app is recommended
+✅ تم استرجاع النسخة من السيرفر بنجاح، يفضل إعادة تشغيل البرنامج	✅ Copy restored from server successfully, restarting the app is recommended
+✅ تم استيراد الخامات بنجاح	✅ Materials imported successfully
+✅ تم استيراد المشروبات والخامات والوصفات	✅ Drinks, materials and recipes imported
+✅ تم استيراد النسخة من الكاشير بنجاح	✅ Copy imported from the cashier successfully
+✅ تم الاسترجاع بنجاح	✅ Restored successfully
+✅ تم التفعيل بنجاح — رخصة دائمة مدى الحياة	✅ Activated successfully — lifetime permanent license
+✅ تم الرجوع للون الافتراضي	✅ Back to the default color
+✅ تم الرفع بنجاح	✅ Uploaded successfully
+✅ تم تحديث البيانات	✅ Data updated
+✅ تم تحديث الدين	✅ Debt updated
+✅ تم تحديث المنيو بنجاح	✅ Menu updated successfully
+✅ تم تحصيل {v1} {v2}	✅ Collected {v1} {v2}
+✅ تم تحصيل دين {customer}، المدفوع: {v2} {v3}، الخصم: {v4} {v5}	✅ {customer}'s debt collected, paid: {v2} {v3}, discount: {v4} {v5}
+✅ تم تسجيل الأوردر على الحساب — الإجمالي: {v1} {v2}	✅ Order recorded on the account — total: {v1} {v2}
+✅ تم تسديد شحن الرصيد بالكامل	✅ Balance top-up settled in full
+✅ تم تسليم الشيفت{label} للموظف {targetName}	✅ Shift{label} handed over to {targetName}
+✅ تم تصدير الخامات بنجاح	✅ Materials exported successfully
+✅ تم تصدير المشروبات والوصفات والخامات	✅ Drinks, recipes and materials exported
+✅ تم تطبيق لون الهوية	✅ Brand color applied
+✅ تم تعديل الكمية وتحديث المخزون	✅ Quantity edited and stock updated
+✅ تم تفعيل بيع السجائر	✅ Cigarette sales enabled
+✅ تم تفعيل بيع الشيشة	✅ Hookah sales enabled
+✅ تم حذف المشروب وإرجاع الكمية للمخزون	✅ Drink deleted and quantity returned to stock
+✅ تم حفظ إعدادات العملة والطباعة	✅ Currency and printing settings saved
+✅ تم حفظ نصوص الفاتورة — هتظهر في الطباعة من دلوقتي	✅ Invoice texts saved — they'll show in printing from now on
+✅ تم حفظ وحدات الخامات	✅ Material units saved
+✅ تم رفع النسخة على السيرفر بنجاح	✅ Copy uploaded to the server successfully
+✅ تم رفع نسخة محدّثة على الشبكة — الموبايل يقدر يستوردها الآن	✅ Updated copy uploaded to the network — mobile can import it now
+✅ تم قبول الطلب وإضافته للفاتورة	✅ Order accepted and added to the invoice
+✅ تم مسح {v1} فاتورة بلايستيشن وبنودها	✅ Cleared {v1} PlayStation invoices and their items
+✅ تم مسح {v1} فاتورة وبنودها	✅ Cleared {v1} invoices and their items
+✅ تم مسح البيانات بنجاح	✅ Data cleared successfully
+✅ تمت إضافة "{v1}"	✅ "{v1}" added
+✅ تمت إضافة {successCount} صنف للفاتورة	✅ {successCount} items added to the invoice
+✅ تمت الإضافة	✅ Added
+✅ محصّل من الآجل: {v1} {v2}	✅ Collected from credit: {v1} {v2}
+✅ مقبول	✅ Accepted
+✔ متاحة	✔ Available
+❌ اختر قسم واحد على الأقل	❌ Pick at least one section
+❌ حصل خطأ أثناء المسح: {e}	❌ Error during clearing: {e}
+❌ حصل خطأ: {e}	❌ Error occurred: {e}
+❌ فشل إرسال الطلب، حاول مرة تانية	❌ Failed to send the order, try again
+❌ فشل الاسترجاع: {e}	❌ Restore failed: {e}
+❌ فشل الاستيراد: {e}	❌ Import failed: {e}
+❌ فشل التحميل: {v1}	❌ Download failed: {v1}
+❌ فشل التصدير: {e}	❌ Export failed: {e}
+❌ فشل الرفع: {e}	❌ Upload failed: {e}
+❌ فشل الرفع: {v1}	❌ Upload failed: {v1}
+❌ فشل المزامنة: {e}	❌ Sync failed: {e}
+❌ فشل النسخ الاحتياطي: {e}	❌ Backup failed: {e}
+❌ فشل رفع النسخة: {e}	❌ Failed to upload copy: {e}
+❌ مش لاقي جهاز الكاشير — تأكد إنكم على نفس الواي فاي والعنوان صحيح	❌ Cashier device not found — make sure you're on the same Wi-Fi and the address is correct
+🎮 {consoleName} ({v2} ساعة)	🎮 {consoleName} ({v2} hours)
+🎮 {consoleName} (سعر ثابت {v2} {v3})	🎮 {consoleName} (fixed price {v2} {v3})
+🎮 الأجهزة	🎮 Devices
+🎮 الجهاز: {v1}	🎮 Device: {v1}
+🎮 تفاصيل الجهاز	🎮 Device details
+🏆 المدفوع + المحصّل	🏆 Paid + Collected
+🏆 المدفوع + المحصّل: {v1} {v2}	🏆 Paid + collected: {v1} {v2}
+🏠 الرئيسية	🏠 Home
+👤 المستخدمين	👤 Users
+👤 الموظف: {v1}	👤 Employee: {v1}
+👥 أجور الموظفين:	👥 Employee wages:
+💚 صافي الكاش	💚 Cash net
+💰 الجهاز: {v1}	💰 Device: {v1}
+💰 الدخل الكلي	💰 Gross income
+💰 المتبقي: {v1} {v2}	💰 Remaining: {v1} {v2}
+💰 تكلفة الجهاز: {v1}	💰 Device cost: {v1}
+💰 تم دفع {v1} {v2}، المتبقي {v3} {v4}	💰 Paid {v1} {v2}, remaining {v3} {v4}
+💰 دخل	💰 Income
+💵 إجمالي المدفوع (كاش): {v1} {v2}	💵 Total paid (cash): {v1} {v2}
+💵 دفع  {v1}	💵 Pay  {v1}
+💵 مدفوع: {v1} {v2}	💵 Paid: {v1} {v2}
+📅 التاريخ: {v1}	📅 Date: {v1}
+📊 التقارير	📊 Reports
+📊 ملخص مبيعات الشيفت:	📊 Shift sales summary:
+📋 المنيو	📋 Menu
+📦 طلبات المنيو	📦 Menu requests
+📱 QR كودات الترابيزات	📱 Table QR codes
+🔔 جديد	🔔 New
+🔔 طلب جديد وصل!	🔔 New order arrived!
+🔢 {v1} شيفت	🔢 {v1} shifts
+🔹 اجمالي الفواتير	🔹 Total invoices
+🔹 دخل اليوم	🔹 Today's income
+🕐 بدأ: {v1}	🕐 Started: {v1}
+🕓 انتهى: {v1}	🕓 Ended: {v1}
+🚪 تسجيل خروج	🚪 Log out
+🚫 تم إلغاء الطلب	🚫 Order cancelled
+🚫 ملغي	🚫 Cancelled
+🟢 دخل الشيفت	🟢 Shift income
+🤝 تسليم الشيفت	🤝 Shift handover
+🤝 تسليم الشيفت لموظف تاني	🤝 Hand the shift over to another employee
+🥤 المشروبات: {v1}	🥤 Drinks: {v1}
+🥤 تكلفة المشروبات: {v1}	🥤 Drinks cost: {v1}

@@ -1,0 +1,231 @@
+ (+ خصم {v1})	(with discount {v1})
+ ({v1} عملية)	({v1} transactions)
+ (غير مضاف للصافي) دفع جزء من تربيزات	(Not added to net) partial table payment
+ + خصم {v1}	+ discount {v1}
+ = {v1} ج	= {v1} EGP
+ ال سامى	 El Samy
+ المتبقي: {v1} {v2}	 Remaining: {v1} {v2}
+ المشروبات	 Drinks
+ بتاريخ {formattedDate}	 On {formattedDate}
+ دفع {v1} بتاريخ {v2}	 Paid {v1} on {v2}
+ دفع الدين ({v1} {v2})	 Debt payment ({v1} {v2})
+ فاتورة بلايستيشن 	PlayStation invoice
+ محصّل من الآجل: {v1} {v2}	 Collected from credit: {v1} {v2}
+ مدفوع: {v1} {v2}	 Paid: {v1} {v2}
+ مشروبات :	 Drinks:
+ مع {moved} فاتورة مفتوحة	 with {moved} open invoices
+ من {_pdfPageCount} صفحة	 of {_pdfPageCount} pages
+(المبيعات + المحصل - المصاريف)	(Sales + collected - expenses)
+(خصم)	(discount)
+(سعر التداول)	(trade price)
+(سعر المستهلك)	(consumer price)
+(ضريبة الجدول)	(schedule tax)
+(ضريبة)	(tax)
+(قائمة الأسعار)	(price list)
+(كمية)	(qty)
+(كود المنتج)	(product code)
+(مستحق الدفع)	(payable)
+(ناقص) {name}	(shortage) {name}
+(وصف المنتج)	(product description)
+- {v1} ج	- {v1} EGP
+Discount / الخصم	Discount
+EEEE، d MMMM yyyy - HH:mm	EEEE, d MMMM yyyy - HH:mm
+Invoice Total / قيمة الفاتورة	Invoice Total
+PDF جاهز • {_pdfPageCount} صفحة	PDF ready • {_pdfPageCount} pages
+PDF • {_pdfPageCount} صفحة	PDF • {_pdfPageCount} pages
+Printed On: 20/11/2025 15:58  تم الطباعة بتاريخ:	Printed On: 20/11/2025 15:58  Printed at:
+QR كودات الترابيزات	QR table codes
+Salesman / أجل المندوب	Salesman
+Schedule / ض. جدول	Schedule / Table
+VAT / القيمة المضافة	VAT
+[{"label":"الكل","temp":null}]	[{"label":"All","temp":null}]
+؟	?
+، 	,
+{_cartTotal} صنف	{_cartTotal} items
+{_cartTotal} صنف  |  {v2} ج	{_cartTotal} items  |  {v2} EGP
+{_placeName} • نظرة شاملة على النظام	{_placeName} • System overview
+{activeConsolesCount} جهاز • {v2}	{activeConsolesCount} devices • {v2}
+{collectedCount} عملية	{collectedCount} transactions
+{collectedCount} عملية تحصيل	{collectedCount} collections
+{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}	{dayName}, {v2} {monthName} {v4} - {hour}:{minute} {ampm}
+{d} أيام	{d} days
+{h} س	{h} h
+{h} س {m} د	{h} h {m} min
+{invoiceCount} فاتورة	{invoiceCount} invoices
+{itemName}: من {oldQty} إلى {newQty}	{itemName}: from {oldQty} to {newQty}
+{mm} مم	{mm} mm
+{m} د	{m} min
+{pendingCount} طلب مستني	{pendingCount} orders waiting
+{queueCount} كارت	{queueCount} cards
+{soldItemsCount} صنف	{soldItemsCount} items
+{totalInvoices} فاتورة	{totalInvoices} invoices
+{v1}  x{v2}	{v1}  x{v2}
+{v1} (المتاح: {v2})	{v1} (available: {v2})
+{v1} - بواسطة: {v2}	{v1} - by: {v2}
+{v1} / سعر ماتش	{v1} / match price
+{v1} {v2} (خصم {v3})	{v1} {v2} (discount {v3})
+{v1} × {v2} ج	{v1} × {v2} EGP
+{v1} آجل	{v1} credit
+{v1} أعمدة × {v2} صف	{v1} columns × {v2} rows
+{v1} أنواع	{v1} types
+{v1} تعديل	{v1} edits
+{v1} ج	{v1} EGP
+{v1} ج × {v2}	{v1} EGP × {v2}
+{v1} ج × {v2} = {v3} ج	{v1} EGP × {v2} = {v3} EGP
+{v1} جهاز — اضغط على أي جهاز لتحديده	{v1} devices — click any device to select it
+{v1} جهاز • {busyCount} مشغول • {v3} متاح	{v1} devices • {busyCount} busy • {v3} available
+{v1} حركة	{v1} entries
+{v1} دفعة	{v1} payments
+{v1} دين	{v1} debt
+{v1} ساعة • {v2} شيفت	{v1} hours • {v2} shifts
+{v1} سنة	{v1} years
+{v1} شيفت معروض	{v1} shifts shown
+{v1} صنف	{v1} items
+{v1} صنف • أي تعديل في الكمية يتحدّث 	{v1} items • any quantity change updates
+{v1} صنف • شامل كل المشروبات	{v1} items • includes all drinks
+{v1} عملية	{v1} transactions
+{v1} عملية تحصيل	{v1} collections
+{v1} عملية شحن	{v1} top-ups
+{v1} فاتورة	{v1} invoices
+{v1} فاتورة مفتوحة	{v1} open invoices
+{v1} قائمة فرعية • {totalDrinks} منتج — 	{v1} submenus • {totalDrinks} products —
+{v1} قائمة فرعية • {v2} منتج	{v1} submenus • {v2} products
+{v1} كارت في شبكة {v2} × {v3}	{v1} cards in {v2} × {v3} grid
+{v1} كارت لكل صفحة مصدر	{v1} cards per source page
+{v1} كارت لكل صفحة • شبكة {v2} × {v3}	{v1} cards per page • {v2} × {v3} grid
+{v1} مستخدم — أدوار وإعدادات الرواتب	{v1} users — roles and salary settings
+{v1} مصروف	{v1} expenses
+{v1} من {v2} تعديل	{v1} of {v2} edits
+{v1} من {v2} شيفت	{v1} of {v2} shifts
+{v1} منتج	{v1} products
+{v1} منتج • {v2} قائمة فرعية	{v1} products • {v2} submenus
+{v1} موظف تابع — إدارة الراتب والشيفتات	{v1} subordinate employee — manage salary and shifts
+{v1} موظف عليهم مستحقات غير مصروفة	{v1} employees with unpaid dues
+{v1} — شهر {month}	{v1} — {month}
+{v1} • {activeConsolesCount} جهاز • {v3}	{v1} • {activeConsolesCount} devices • {v3}
+{v1} • {soldItemsCount} صنف	{v1} • {soldItemsCount} items
+{v1} • {v2} صنف	{v1} • {v2} items
+{v1} • {v2} طلب	{v1} • {v2} orders
+{v1} • متابعة الجلسات المفتوحة على الترابيزات	{v1} • track open table sessions
+«موظف طلبات (ويتر)» الأول من إدارة المستخدمين، 	"Orders employee (Waiter)" is the first entry in User Management,
+؟	?
+آجل	Credit
+آجل {v1}	Credit {v1}
+آجل باقي	Remaining credit
+آجل باقي (غير محصّل)	Remaining credit (not collected)
+آجل: {v1}	Credit: {v1}
+آخر	Last
+آخر العمليات	Recent transactions
+آخر تاريخ: {v1}	Last date: {v1}
+أبريل	April
+أجر موظف: {v1}	Employee wage: {v1}
+أجهزة اشتغلت في الفترة	Devices active during the period
+أجهزة البلايستيشن	PlayStation devices
+أخرى	Others
+أداة المهندس — توليد كود تفعيل لأي جهاز	Engineer tool — generate an activation code for any device
+أدخل Device ID	Enter Device ID
+أدخل العدد	Enter the number
+أدخل المبلغ	Enter the amount
+أدخل المبلغ المستلم	Enter the received amount
+أدخل الوصف	Enter the description
+أدخل تكلفة صحيحة	Enter a valid cost
+أدخل رقم صحيح	Enter a valid number
+أدخل كلمة المرور	Enter the password
+أدخل كلمة سر المهندس للوصول إلى مولّد الأكواد	Enter the engineer password to access the code generator
+أدخل كلمة مرور الكاشير لعرض تفاصيل المبيعات والتحصيل.	Enter the cashier password to view sales and collection details.
+أدخل كود التفعيل أولاً	Enter the activation code first
+أدخل كود الجهاز أولاً	Enter the device code first
+أدخل كود جهاز العميل أولاً	Enter the customer device code first
+أدمن	Admin
+أدمن — مدير النظام	Admin — system manager
+أرسل الطلب	Send request
+أصناف عليها زيادة	Items with surplus
+أصناف عليها عجز	Items with shortage
+أضف	Add
+أضف رصيد للمكنة	Add balance to the top-up machine
+أغسطس	August
+أقسام المنتجات	Product sections
+أقسام مفعّلة	Enabled sections
+أقسام منتجات المطبخ	Kitchen product sections
+أقسام ومنتجات قابلة للتخصيص	Customizable sections and products
+أكتوبر	October
+أهلًا بيك في تهيئة النظام 👋	Welcome to system setup 👋
+أو أدخل عدد الأيام يدوياً	Or enter the number of days manually
+أو أدخل عميل جديد	Or enter a new customer
+أو أضف عميل جديد	Or add a new customer
+أو اختر مدة التجربة:	Or choose the trial duration:
+أو تسلّم شيفتك — أما الأدمن والسوبر أدمن بيدخلوا براحتهم.	Or take over your shift — Admins and super admins can log in freely.
+أو حدد عدد الأيام يدوياً	Or set the number of days manually
+أوامر القائمة	Menu commands
+أوامر القسم	Section commands
+أول ما يجي طلب جديد هيظهر هنا فوراً.	New orders will appear here the moment they arrive.
+أي جهاز جديد هيظهر هنا أول ما يطلب تفعيل	Any new device will appear here once it requests activation
+أي عملية شحن تسجّلها هتظهر هنا فورًا.	Every top-up you record will appear here instantly.
+أي مصروف تسجّله هنا هيتحسب على الشيفت الحالي.	Any expense you record here is charged to the current shift.
+إجراءات	Actions
+إجراءات الشيفت	Shift actions
+إجمالي الآجل	Total credit
+إجمالي الأجهزة	Total devices
+إجمالي الأجهزة: {v1} {v2}	Total devices: {v1} {v2}
+إجمالي الأصناف: {totalMaterials}	Total items: {totalMaterials}
+إجمالي الأقسام	Total sections
+إجمالي الإيراد	Total revenue
+إجمالي الاجل	Total credit
+إجمالي الترابيزات	Total tables
+إجمالي التكلفة (المفلترة): {v1}	Total cost (filtered): {v1}
+إجمالي التكلفة (خصم من المكنة)	Total cost (deducted from machine)
+إجمالي التكلفة (خصم من المكنة): {totalCost}	Total cost (deducted from machine): {totalCost}
+إجمالي التكلفة: {v1}	Total cost: {v1}
+إجمالي الحركات	Total entries
+إجمالي الحساب حتى الآن: {v1} ج	Total so far: {v1} EGP
+إجمالي الخامات	Total materials
+إجمالي الخصم	Total discount
+إجمالي الخصومات: {v1} {v2}	Total discounts: {v1} {v2}
+إجمالي الدخل	Total income
+إجمالي الدين: {v1} {v2}	Total debt: {v1} {v2}
+إجمالي الربح	Total profit
+إجمالي الربح (المفلترة): {v1}	Total profit (filtered): {v1}
+إجمالي الربح: {totalProfit}	Total profit: {totalProfit}
+إجمالي الربح: {v1}	Total profit: {v1}
+إجمالي الساعات	Total hours
+إجمالي السجائر	Total cigarettes
+إجمالي السجائر: {v1} {v2}	Total cigarettes: {v1} {v2}
+إجمالي السجل	Total log
+إجمالي الشحنات (Topups)	Total top-ups
+إجمالي الشيشة	Total hookah
+إجمالي الشيشة: {v1} {v2}	Total hookah: {v1} {v2}
+إجمالي الصافي	Total net
+إجمالي الفاتورة	Invoice total
+إجمالي الفواتير (مدفوعة)	Total invoices (paid)
+إجمالي القطع المباعة: {totalQty}	Total pieces sold: {totalQty}
+إجمالي القيمة: {v1}	Total value: {v1}
+إجمالي الكلي: {v1} {v2}	Grand total: {v1} {v2}
+إجمالي المبيعات	Total sales
+إجمالي المتأخرات	Total overdue
+إجمالي المتاح	Total available
+إجمالي المتبقي على {customerName}: 	Total remaining for {customerName}:
+إجمالي المحصّل من الآجل	Total collected from credit
+إجمالي المدفوع	Total paid
+إجمالي المدفوع (كاش): {v1} {v2}	Total paid (cash): {v1} {v2}
+إجمالي المستحق	Total due
+إجمالي المستلم	Total received
+إجمالي المستلم (المفلترة): {v1}	Total received (filtered): {v1}
+إجمالي المستلم: {totalReceived}	Total received: {totalReceived}
+إجمالي المستلم: {v1}	Total received: {v1}
+إجمالي المشروبات	Total drinks
+إجمالي المشروبات: {v1} {v2}	Total drinks: {v1} {v2}
+إجمالي المصروفات	Total expenses
+إجمالي الملغي (غير محسوب): {v1} {v2}	Total cancelled (not counted): {v1} {v2}
+إجمالي المنتجات	Total products
+إجمالي المنتجات/المأكولات	Total products/food
+إجمالي المنتجات/المأكولات: {v1} {v2}	Total products/food: {v1} {v2}
+إجمالي دفعات الديون	Total debt payments
+إجمالي عدد الخامات: {v1}	Total material count: {v1}
+إجمالي عدد الفواتير المسجلة	Total recorded invoices
+إجمالي عدد المنتجات: {v1}	Total product count: {v1}
+إجمالي مبيعات الشهر	Total monthly sales
+إجمالي مصروفات الشيفت	Total shift expenses
+إخفاء الأرقام	Hide numbers
+إخفاء الإحصائيات	Hide statistics
+إخفاء الملخص	Hide summary
+إدارة + تقرير في لوحة الأدمن، وتقدر تضيف جواه قوائم فرعية. 	Manage + report in the admin dashboard, and you can add submenus inside it.

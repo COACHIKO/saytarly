@@ -1,0 +1,203 @@
+إدارة {v1}	Manage {v1}
+إدارة الأجهزة	Manage devices
+إدارة الأجهزة والجلسات	Device and session management
+إدارة الخامات	Manage materials
+إدارة المستخدمين	Manage users
+إدارة بلايستيشن وترابيزات	Manage PlayStation and tables
+إدارة تراخيص العملاء	Customer license management
+إدارة تراخيص العملاء • {v1} طلب	Customer license management • {v1} requests
+إزالة	Remove
+إزالة {v1} من الشيفت ده	Remove {v1} from this shift
+إزالة اللوجو المخصوص	Remove custom logo
+إزالة من الشيفت	Remove from shift
+إضافة	Add
+إضافة {materialName}	Add {materialName}
+إضافة إلى حسابو	Add to their account
+إضافة المصروف	Add expense
+إضافة جهاز	Add device
+إضافة خامة	Add material
+إضافة رصيد للمكنة	Add balance to the top-up machine
+إضافة صنف	Add item
+إضافة عدد التربيزات	Add table count
+إضافة على الموجود	Add to existing
+إضافة فودافون كاش	Add Vodafone Cash
+إضافة مستخدم	Add user
+إضافة مشروب	Add drink
+إضافة مشروبات	Add drinks
+إضافة مصروف	Add expense
+إضافة مصروف جديد	Add new expense
+إضافة مصروف ومتابعة مصروفات الفترة	Add expense and track period expenses
+إضافة ملحوظة فودافون كاش	Add Vodafone Cash note
+إضافة منتج	Add product
+إضافة موظف فرعي	Add subordinate employee
+إضافة وحدة	Add unit
+إعادة المحاولة	Retry
+إعادة تشغيل خطوات التهيئة	Restart setup steps
+إعادة حساب الجرد	Recalculate stock count
+إعدادات الراتب	Salary settings
+إغلاق	Close
+إغلاق الشيفت وطباعة التقرير	Close shift and print report
+إلغاء	Cancel
+إلغاء التفعيل	Deactivate
+إلغاء الدين نهائيًا	Cancel debt permanently
+إلغاء الدين نهائيًا؟	Cancel debt permanently?
+إلغاء الطلب	Cancel order
+إلغاء الفاتورة	Cancel invoice
+إلغاء الفاتورة الآجلة نهائيًا؟	Cancel the credit invoice permanently?
+إلغاء الفاتورة نهائيًا	Cancel invoice permanently
+إلى {v1}	To {v1}
+إلى تاريخ	To date
+إلى: {end}	To: {end}
+إلى: النهاية	To: End
+إنقاص	Decrement
+إنهاء	End
+إيراد	Revenue
+إيراد: {v1}	Revenue: {v1}
+إيقاف	Pause
+ابحث باسم الخامة...	Search by material name...
+ابحث باسم العميل أو الموظف أو التفاصيل...	Search by customer, employee or details...
+ابحث باسم العميل...	Search by customer name...
+ابحث باسم المستخدم...	Search by user name...
+ابحث عن أداة...	Search for a tool...
+ابحث عن الترابيزة أو العميل...	Search table or customer...
+ابحث عن جهاز	Search device
+ابحث عن جهاز...	Search device...
+ابحث عن صنف	Search item
+ابحث عن مشروب أو منتج	Search drink or product
+ابحث عن منتج	Search product
+ابحث عن منتج...	Search product...
+ابدأ	Start
+ابدأ اعمل قسم زي «مشروبات» أو «ماكولات» — 	Start by creating a section like "Drinks" or "Food" —
+ابدأ العمل 🚀	Start working 🚀
+ابدأ بإضافة عدد الترابيزات وابعت الطلبات عليها 	Start by adding the table count and send orders to it
+ابدأ جلسة	Start session
+ابعت الكود ده كامل للمهندس عند التفعيل أو لو حصلت مشكلة بعد تغيير قطعة في الجهاز.	Send this full code to the engineer at activation, or if a problem occurs after replacing a device part.
+اتباع	Follow
+اتحصّل {v1}	Collected {v1}
+اتحصّل فعليًا (كاش)	Actually collected (cash)
+اتحصّل فعليًا من آجل قديم (كاش)	Actually collected from old credit (cash)
+اجمالي الفواتير	Total invoices
+اجهزه	Devices
+اختار أصناف من المنيو وهتظهر هنا.	Pick items from the menu and they'll show up here.
+اختار خامة من "الخامات المتاحة" تحت وحدد الكمية.	Pick a material from "Available materials" below and set the quantity.
+اختار شيفت الأول	Pick the first shift
+اختر أو أضف عميل	Choose or add customer
+اختر أي يوم في الشهر المطلوب	Pick any day in the desired month
+اختر الأقسام للطباعة	Choose sections to print
+اختر تاريخ	Choose date
+اختر صورة أو ملف PDF أولاً	Choose an image or PDF file first
+اختر صورة ورقة الكروت	Choose the cards sheet image
+اختر صورة ورقة كروت واستخرجها — الكروت هتتحفظ هنا وتقدر تطبع منها في أي وقت.	Choose the cards sheet image and extract it — cards are saved here and you can print them anytime.
+اختر عميل موجود	Choose existing customer
+اختر مدة الترخيص والكود يطلع جاهز للإرسال للعميل	Choose the license duration and the code comes out ready to send to the customer
+اختر مكان حفظ النسخة الاحتياطية	Choose where to save the backup
+اختر ملف النسخة الاحتياطية	Choose the backup file
+اختيار صورة	Choose image
+اختيار صورة أو PDF	Choose image or PDF
+اختيار صورة اللوجو	Choose logo image
+اختيار طريقة الدفع	Choose payment method
+اختيار يوم	Choose day
+ادخل العدد	Enter the number
+ادخل قيمة اكبر من صفر	Enter a value greater than zero
+استئناف	Resume
+استبدال	Replace
+استبدال البيانات الحالية بنسخة محفوظة	Replace current data with a saved copy
+استبدال الكل	Replace all
+استخدمه عشان تقدر تسترجع من أي موبايل من أي مكان	Use it to restore from any phone, from anywhere
+استرجاع من السيرفر (كلاود)	Restore from server (cloud)
+استرجاع نسخة احتياطية	Restore backup
+استرجاع نسخة من السيرفر	Restore from server
+استعادة نسخة	Restore backup
+استيراد البيانات	Import data
+استيراد الخامات	Import materials
+استيراد من جهاز الكاشير	Import from cashier device
+استيراد نسخة من الكاشير	Import a copy from the cashier
+اسم الجهاز	Device name
+اسم الخامة	Material name
+اسم العميل	Customer name
+اسم العميل :	Customer name:
+اسم القائمة (زي: سخن)	Menu name (e.g. Hot)
+اسم القسم (زي: مشروبات)	Section name (e.g. Drinks)
+اسم المستخدم	Username
+اسم المستخدم «{u}» موجود بالفعل	Username "{u}" already exists
+اسم المكان	Place name
+اسم المكان (زي: كافيه الجراند)	Place name (e.g. The Grand Cafe)
+اسم المكان • نوع النشاط • تشغيل أو إيقاف نظام البلايستيشن	Place name • business type • enable or disable PlayStation mode
+اسم المنتج	Product name
+اسم الموظف	Employee name
+اسم طابعة الفواتير	Invoice printer name
+اضغط على أي فاتورة لعرض تفاصيلها	Click any invoice to view its details
+اضغط على أي قسم عشان تضيف جواه قوائم فرعية (سخن / بارد / إلخ).	Click any section to add submenus inside it (Hot / Cold / etc.).
+اضغط على القسم عشان تضيف جواه قوائم فرعية (سخن/بارد/إلخ).	Click the section to add submenus inside it (Hot/Cold/etc.).
+اضغط لعرض التفاصيل الكاملة	Click to view full details
+اضغط لعرض تفاصيل اليوم	Click to view day details
+اضغط لعرض حركات الشيفت	Click to view shift entries
+اضغط للإخفاء	Click to hide
+اعتماد الجرد	Approve stock count
+اكتب اسم القائمة	Type the menu name
+اكتب اسم القسم	Type the section name
+اكتب اسم القسم الأول	Type the first section name
+اكتب اسم المستخدم وكلمة المرور	Enter the username and password
+اكتب اسم المكان	Type the place name
+اكتب اسم المكان الأول	Type the place name first
+اكتب اسم المنتج واختار القائمة	Type the product name and choose the menu
+اكتب كلمة السر	Type the password
+الآجل	Credit
+الآجل الكلي: {v1} {v2}	Grand total credit: {v1} {v2}
+الأجرة: {v1} {v2}	Rate: {v1} {v2}
+الأجهزة	Devices
+الأحد	Sunday
+الأدمن هو اللي هيدير المكان يوميًا: المشروبات، التقارير، المستخدمين.	The admin runs the place day to day: drinks, reports, users.
+الأربعاء	Wednesday
+الأصناف	Items
+الأصناف المباعة	Sold items
+الأصناف والمنتجات المباعة	Sold items and products
+الأصناف والمنتجات المباعة:	Sold items and products:
+الأقسام	Sections
+الأيقونة	Icon
+الإجمالي	Total
+الإجمالي الجديد	New total
+الإجمالي الكلي: {v1} {v2}	Grand total: {v1} {v2}
+الإجمالي النهائي	Final total
+الإجمالي النهائي:	Final total:
+الإجمالي بعد الخصم: {v1} ج	Total after discount: {v1} EGP
+الإجمالي:	Total:
+الإجمالي: {v1}	Total: {v1}
+الإجمالي: {v1} {v2}	Total: {v1} {v2}
+الإجمالي: {v1} ج	Total: {v1} EGP
+الإجماليات	Totals
+الإعدادات	Settings
+الإيراد	Revenue
+الإيراد − الخصم − الآجل + المحصّل	Revenue − discount − credit + collected
+الإيميل	Email
+الاثنين	Monday
+الاجل الجديد:	New credit:
+الاجل الجديد: {v1} {v2}	New credit: {v1} {v2}
+الاستهلاك	Consumption
+الاسم ده محجوز للسوبر ادمن	This name is reserved for the super admin
+الباقي (آجل)	Remaining (credit)
+الباقي:	Remaining:
+البلايستيشن	PlayStation
+البلايستيشن في لوحة الأدمن	PlayStation in the admin dashboard
+التاريخ	Date
+التاريخ: {formattedDate}	Date: {formattedDate}
+التاريخ: {formatted}	Date: {formatted}
+التاريخ: {v1}	Date: {v1}
+الترابيزات	Tables
+التصميم الحالي	Current design
+التعديلات	Edits
+التكلفة	Cost
+التكلفة: {v1}  المستلم: {v2}	Cost: {v1}  Received: {v2}
+التكلفة: {v1} - المستلم: {v2}	Cost: {v1} - Received: {v2}
+الثلاثاء	Tuesday
+الجزئية	Partial
+الجلسة متوقفة مؤقتًا	Session paused
+الجمعة	Friday
+الجهاز	Device
+الجهاز:	Device:
+الجهاز: {consoleName}	Device: {consoleName}
+الجهاز: {v1}	Device: {v1}
+الحالة	Status
+الحد الأدنى	Minimum
+الحد الأدنى : {v1}	Minimum: {v1}
+الحساب	Account

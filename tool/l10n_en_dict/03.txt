@@ -1,0 +1,239 @@
+الحساب نفسه مش هيتحذف — هيبقى متاح للتعيين عند أي كاشير تاني من إدارة المستخدمين.	The account itself won't be deleted — it stays available for assignment to another cashier from User Management.
+الحساب وتكمّل، وكاشير تاني مش هيقدر يفتح شيفت غير لما تقفل 	account and finish it, and another cashier can't open a shift until you close
+الخامات	Materials
+الخامات المتاحة	Available materials
+الخامات المتاحة: {v1}	Available materials: {v1}
+الخامات المستخدمة: {v1} • 	Used materials: {v1} •
+الخامات المشتركة بين كل الأقسام	Materials shared by all sections
+الخامات الناقصة	Missing materials
+الخامات مخزون مشترك لكل الأقسام.	Materials are a shared stock for all sections.
+الخامة	Material
+الخصم	Discount
+الخصم:	Discount:
+الخصم: {v1}	Discount: {v1}
+الخصم: {v1} {v2}	Discount: {v1} {v2}
+الخطوة 1 — كود الجهاز (من العميل)	Step 1 — device code (from customer)
+الخطوة 1: كود الجهاز (من العميل)	Step 1: device code (from customer)
+الخطوة 2 — مدة الترخيص	Step 2 — license duration
+الخطوة 2: مدة الترخيص	Step 2: license duration
+الخميس	Thursday
+الدخل الكلي	Gross income
+الدور	Role
+الدور: {v1}	Role: {v1}
+الديون المتبقية	Remaining debts
+الديون المسجلة	Recorded debts
+الرئيسية	Home
+الراتب بالساعة	Hourly wage
+الراتب بالساعة: 	Hourly wage:
+الراتب بالساعة: {v1}	Hourly wage: {v1}
+الربح	Profit
+الربح الحالي	Current profit
+الربح: {v1} ج	Profit: {v1} EGP
+الربح: {v1} • {v2}	Profit: {v1} • {v2}
+الرخصة منتهية	License expired
+الرصيد الحالي قبل الخصم	Current balance before deduction
+الرصيد الحالي للمكنة	Top-up machine current balance
+الرصيد الفعلي	Actual balance
+الرقم الضريبي (اختياري)	Tax number (optional)
+الرقم الضريبي: {v1}	Tax number: {v1}
+الزبون: {customerName}{v2}	Customer: {customerName}{v2}
+الزقازيق هرية الطريق الرئيسي  الزقازيق 46512 01220022607 	Zagazig, El-Harria main road  Zagazig 46512 01220022607
+الزيادة: {v1}	Surplus: {v1}
+السابق	Previous
+الساعات: {v1} • 	Hours: {v1} •
+السبت	Saturday
+السجائر	Cigarettes
+السعر	Price
+السعر الثابت	Fixed price
+السعر: {v1}	Price: {v1}
+السعر: {v1} | الكمية: {v2}	Price: {v1} | quantity: {v2}
+السعر: {v1} ج	Price: {v1} EGP
+السلة فاضية	Cart is empty
+السوبر ادمن	Super admin
+السوبر ادمن لسه مضافش أقسام — من الأقسام دي بتظهر إدارة المنتجات وتقاريرها، والخامات المشتركة	The super admin hasn't added sections yet — product management and its reports appear from these sections, plus shared materials
+الشحنات	Top-ups
+الشحنات 	Top-ups
+الشهر: {_month}	Month: {_month}
+الشهر: {_month} • {v2} عميل	Month: {_month} • {v2} customers
+الشيشة	Hookah
+الشيفت	Shift
+الشيفت المختار	Selected shift
+الشيفت رقم {v1} يفضل مفتوح باسمك: تقدر ترجع بنفس 	Shift #{v1} is still open under your name: you can return with the same
+الشيفتات	Shifts
+الصافي المتوقع	Expected net
+الصافي اليومي	Daily net
+الصق كود الجهاز هنا...	Paste device code here...
+الصنف	Item
+الصورة جاهزة	Image ready
+الطباعة من المخزون	Print from inventory
+الطلبات	Orders
+الطلبات اللي بتتقبل من الكاشير هتظهر هنا.	Orders accepted by the cashier will appear here.
+العجز: {v1}	Shortage: {v1}
+العملاء	Customers
+العملة والطباعة	Currency and printing
+العميل	Customer
+العميل اشترى السيستم نهائياً	Customer has purchased the system
+العميل: {customerName}	Customer: {customerName}
+العنوان (اختياري)	Address (optional)
+الفاتورة #{v1}	Invoice #{v1}
+الفاتورة النهائية	Final invoice
+الفاتورة لسه مفيهاش أصناف — ابدأ بإضافة مشروب 	The invoice has no items yet — start by adding a drink
+الفاتورة متحصّلة بالكامل بالفعل	Invoice is already fully collected
+الفترة المختارة	Selected period
+الفرق	Difference
+الفرق : 	Difference:
+الفلوس الاجله (لـ {v1})	Credit money (for {v1})
+الفلوس الاجله تم دفعها	Credit money has been paid
+الفواتير	Invoices
+الفواتير (مدفوعة)	Invoices (paid)
+الفواتير الآجلة	Credit invoices
+الفواتير المسجلة:	Recorded invoices:
+الفواتير الملغية:	Cancelled invoices:
+الفواتير بتاريخ: {v1}	Invoices dated: {v1}
+الفواتير • الأصناف • المصروفات • الآجل	Invoices • items • expenses • credit
+الفواتير:	Invoices:
+القائمة الفرعية	Submenu
+القسم ده لسه مفيهوش قوائم فرعية (زي: سخن/بارد)	This section has no submenus yet (e.g. Hot/Cold)
+القسم ده مفيهوش قوائم فرعية — ضيفها الأول من لوحة السوبر ادمن	This section has no submenus — add them first from the super admin dashboard
+القسم:	Section:
+القوائم الفرعية	Submenus
+القوائم دي بتظهر كـ تابات جوه إدارة القسم وفي شاشة الكاشير، وبترتب حسب اللي انت عايزه من الأزرار.	These menus appear as tabs inside section management and on the cashier screen, and are ordered by the buttons you choose.
+الكاشير	Cashier
+الكاشير - {v1}	Cashier - {v1}
+الكاشير بيدير الصالة وشيفتات الموظفين	The cashier manages the floor and employee shifts
+الكاشير — {v1}	Cashier — {v1}
+الكل	All
+الكمية	Quantity
+الكمية ({qty}) أكبر من المتاح ({currentStock}) لـ {v3}	Quantity ({qty}) exceeds available ({currentStock}) for {v3}
+الكمية أكبر من المتاح ({v1})	Quantity exceeds available ({v1})
+الكمية الحالية	Current quantity
+الكمية الحالية: {qty}	Current quantity: {qty}
+الكمية المتاحة	Available quantity
+الكمية المستخدمة	Used quantity
+الكمية المطلوبة ({v1}) أكبر من المتاحة ({v2})	Requested quantity ({v1}) exceeds available ({v2})
+الكمية المطلوبة أكبر من المتاح ({v1})	Requested quantity exceeds available ({v1})
+الكونسول: {v1}	Console: {v1}
+اللوجو الافتراضي مستخدم — بيظهر في الفواتير وسايدبار الوندوز	Default logo in use — shows in invoices and the Windows sidebar
+اللون	Color
+اللي لسه على العملاء	Still owed by customers
+المبلغ	Amount
+المبلغ المتبقي: {v1} {v2}	Remaining amount: {v1} {v2}
+المبلغ المدفوع	Amount paid
+المبلغ المدفوع (اتركه فارغ لتسديد الكل)	Amount paid (leave empty to pay all)
+المبلغ المدفوع الآن	Amount paid now
+المبلغ المستلم من الزبون	Amount received from customer
+المبلغ المستلم: {v1} ج	Amount received: {v1} EGP
+المبلغ بعد الخصم: {v1}	Amount after discount: {v1}
+المتاح : {v1} {v2}	Available: {v1} {v2}
+المتاح: {queueCount} كارت	Available: {queueCount} cards
+المتاح: {v1} • السعر: {v2} ج	Available: {v1} • price: {v2} EGP
+المتبقي (آجل)	Remaining (credit)
+المتبقي {v1} {unit} • الحد الأدنى {v3}	Remaining {v1} {unit} • minimum {v3}
+المتبقي {v1} {v2}	Remaining {v1} {v2}
+المتبقي بعد الخصم: {v1} {v2}	Remaining after discount: {v1} {v2}
+المتبقي: {v1} {v2}  |  تاريخ: {v3}	Remaining: {v1} {v2}  |  date: {v3}
+المتبقي: {v1} ج	Remaining: {v1} EGP
+المجموع	Sum
+المجموع الكلي	Grand total
+المجموع الكلي (بعد الخصم+الاجل): 	Grand total (after discount+credit):
+المجموع الكلي للشيفت	Shift grand total
+المجموع الكلي: {v1} {v2}	Grand total: {v1} {v2}
+المجموع المتبقي على العملاء	Total still owed by customers
+المجموع بعد الخصومات	Total after discounts
+المخزون المتاح	Available stock
+المخزون فاضي	Inventory is empty
+المخزون: {queueCount} كارت متاح	Inventory: {queueCount} cards available
+المخزون: {v1} {v2}	Inventory: {v1} {v2}
+المدة: {v1} ساعة	Duration: {v1} hours
+المدة: {v1} ساعة • 	Duration: {v1} hours •
+المدفوع	Paid
+المدفوع + المحصّل - المصروفات	Paid + collected - expenses
+المدفوع + المحصّل: {v1} {v2}	Paid + collected: {v1} {v2}
+المرتبات	Salaries
+المستخدمون	Users
+المستلم	Received
+المستلم - التكلفة	Received - cost
+المستلم سريع:	Quick received:
+المستهلك	Consumer
+المشروب غير موجود	Drink not found
+المشروبات	Drinks
+المشروبات: {v1}	Drinks: {v1}
+المصاريف	Expenses
+المصروفات	Expenses
+المصروفات ({v1}) — الإجمالي: {v2}	Expenses ({v1}) — total: {v2}
+المصروفات المسجّلة	Recorded expenses
+المصروفات:	Expenses:
+المصروفات: {v1} {v2}	Expenses: {v1} {v2}
+المضاف	Added
+المضاف للمخزن	Added to stock
+المظهر العام	General appearance
+المظهر والبيانات والنسخ الاحتياطي وخصائص الجهاز	Appearance, data, backups and device features
+الملخص	Summary
+الملخص المالي محمي	Financial summary is protected
+الملف التجاري	Commercial profile
+الملف المختار	Selected file
+الملف تالف أو غير صالح	The file is corrupted or invalid
+الملف ده مش نسخة احتياطية صالحة	This file is not a valid backup
+المنتجات	Products
+المنتجات / مأكولات	Products / food
+المنتجات المباعة	Sold products
+المندوب	Salesman
+المنيو	Menu
+الموظف: {staffName}	Employee: {staffName}
+الموظف: {v1}	Employee: {v1}
+الموظفين التابعين للحساب ده هيظهروا هنا، 	Subordinate employees of this account will appear here,
+الموظفين الفرعيين	Subordinate employees
+النسخ الاحتياطي والبيانات	Backups and data
+النسخ عبر الانترنت	Online copying
+النظام فيه بلايستيشن (أجهزة/شاشات)؟	Does the system have PlayStation (devices/screens)?
+النقدية الموجودة في الدرج	Cash in the drawer
+النوع	Type
+الوحدة	Unit
+الوحدة الجزئية للعرض الدقيق (كيلو ← جرام ×1000). سيبها فاضية لو الوحدة بسيطة زي «قطعة».	Sub-unit for precise display (kg → g ×1000). Leave empty for simple units like "pieces".
+الوحدة: {v1}	Unit: {v1}
+الوصفة	Recipe
+الوصفة الحالية	Current recipe
+الوصول السريع	Quick access
+الوضع الليلي	Dark mode
+الوضع الليلي مفعّل الآن	Dark mode is on now
+الوضع النهاري	Light mode
+الوقت: {v1}	Time: {v1}
+انتهت مدة الترخيص	License duration ended
+انتهت: 	Until:
+انتهت: {v1}	Until: {v1}
+اندومي	Indomie
+انقل المنتجات لقائمة تانية الأول، أو اقفلها من الزرار.	Move products to another menu first, or close it from the button.
+انقلهم أو امسحهم الأول، أو اقفل القسم من الزرار.	Move or delete them first, or close the section from the button.
+باقي	Remaining
+بالظبط زي اسمها في «الأجهزة والطابعات» بويندوز — فاضي يعني الافتراضية	Exactly as it's named in Windows Devices and Printers — empty means the default printer
+بتاريخ: {v1}	Dated: {v1}
+بحث باسم العميل	Search by customer name
+بحث عن عميل موجود	Search for an existing customer
+بحث...	Search...
+بدء جلسة جديدة	Start new session
+بدأت العمل: 	Started at:
+بدأت العمل: {v1}	Started at: {v1}
+بداية الوقت	Start time
+بداية الوقت:	Start time:
+بدون اسم	Unnamed
+بسيط	Simple
+بعد التعيين، بدء/إنهاء شيفته بيكون من شاشة شيفتات الموظفين	After assignment, starting/ending their shift is done from the employee shifts screen
+بعد الخصومات: {v1}	After discounts: {v1}
+بعد فلتر "{selectedAction}" والبحث	After filter "{selectedAction}" and search
+بلايستيشن	PlayStation
+بلايستيشن: {v1}	PlayStation: {v1}
+بواسطة: {v1} - {v2}	By: {v1} - {v2}
+بيانات الجهاز	Device data
+بيانات الفاتورة	Invoice data
+بيانات المكان	Place data
+بيبدأ لهم الشيفت من شاشة «شيفتات الموظفين».	Their shift starts from the "Employee shifts" screen.
+بيبسي 360 مل	Pepsi 360 ml
+بيتحكم في ظهور كروت إدارة الأجهزة وتقرير 	Controls visibility of the device management card and report
+بيتحكم في ظهور كروت إدارة الأجهزة وتقرير البلايستيشن في لوحة الأدمن	Controls visibility of the device management card and the PlayStation report in the admin dashboard
+بيتم تحميل بيانات الفاتورة...	Loading invoice data...
+بيظهر آخر الفاتورة — فاضي يعني بيتشال	Shows the invoice tail — empty means it's cleared
+بيع السجائر	Cigarette sales
+بيع الشيشة	Hookah sales
+بيغير ألوان الأزرار والسويتشات وأغلفة ويندوز كلها.	Changes the colors of buttons, switches and all Windows window frames.
+بيغيّر ألوان الثيم كلها باللون اللي تختاره	Changes all theme colors to your chosen color
+بيغيّر الوان الثيم كله باللون اللي تختاره	Changes all theme colors to your chosen color

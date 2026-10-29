@@ -1,0 +1,85 @@
+part of '../SubStaffScreen.dart';
+
+/// جسم الموظفين الفرعيين — نسخة الموبايل (زي ما كانت بالظبط).
+extension _SubStaffScreenMobileBody on _SubStaffScreenState {
+
+  Widget _buildShiftButton(Map<String, dynamic> u) {
+    final isWorking = u['shift_start'] != null && u['shift_end'] == null;
+
+    return ElevatedButton(
+      onPressed: () async {
+        final now = DateTime.now();
+        if (!isWorking) {
+          await DBHelper.startStaffShift(u['id'], now);
+        } else {
+          await DBHelper.endStaffShift(u['id'], now);
+        }
+        _loadSubStaff();
+      },
+      child: Text(isWorking ? 'إنهاء'.tr() : 'بدء'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isWorking ? Colors.red : Colors.green,
+      ),
+    );
+  }
+
+  Widget _buildMobileBody(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('الموظفين الفرعيين'.tr())),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: subStaff.length,
+                itemBuilder: (_, i) {
+                  final u = subStaff[i];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    elevation: 3,
+                    child: ListTile(
+                      title: Text(u['username']),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('الراتب بالساعة: {v1}'.tr({'v1': u['salary_per_hour'] ?? 'غير محدد'.tr()})),
+                          if (u['shift_start'] != null)
+                            Text(
+                                'بدأت العمل: {v1}'.tr({'v1': DateFormat('HH:mm').format(DateTime.parse(u['shift_start']))})),
+                          if (u['shift_end'] != null)
+                            Text(
+                                'انتهت: {v1}'.tr({'v1': DateFormat('HH:mm').format(DateTime.parse(u['shift_end']))})),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildShiftButton(u),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _showForm(edit: u),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.link_off),
+                            tooltip: 'إزالة من الشيفت'.tr(),
+                            onPressed: () => _removeSubStaff(u),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => _showForm(),
+              icon: Icon(Icons.add),
+              label: Text('إضافة موظف فرعي'.tr()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
