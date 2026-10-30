@@ -17,7 +17,11 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
 
     return DesktopPageScaffold(
       title: 'تهيئة النظام'.tr(),
-      subtitle: 'خطوة {v1} من {v2} — {v3}'.tr({'v1': _step + 1, 'v2': _winSteps.length, 'v3': _winSteps[_step]}),
+      subtitle: 'خطوة {v1} من {v2} — {v3}'.tr({
+        'v1': _step + 1,
+        'v2': _winSteps.length,
+        'v3': _winSteps[_step],
+      }),
       showBackButton: widget.fromDashboard,
       maxWidth: 1000,
       headerBottom: _winStepper(context, palette),
@@ -55,9 +59,10 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
                     duration: DesktopTokens.fast,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: i < _step
-                          ? palette.success
-                          : (i == _step ? palette.accent : palette.border),
+                      color:
+                          i < _step
+                              ? palette.success
+                              : (i == _step ? palette.accent : palette.border),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -81,11 +86,12 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
                             fontSize: 11.5,
                             fontWeight:
                                 i == _step ? FontWeight.w800 : FontWeight.w600,
-                            color: i < _step
-                                ? palette.success
-                                : (i == _step
-                                    ? palette.textPrimary
-                                    : palette.textMuted),
+                            color:
+                                i < _step
+                                    ? palette.success
+                                    : (i == _step
+                                        ? palette.textPrimary
+                                        : palette.textMuted),
                           ),
                         ),
                       ),
@@ -215,7 +221,9 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
             context,
             palette,
             'أهلًا بيك في تهيئة النظام 👋'.tr(),
-            subtitle: ('من هنا بتظبط النظام يناسب مكانك: الاسم، النوع، '.tr() + 'وبعدها بتنشئ الحسابات والأقسام.'.tr()),
+            subtitle:
+                ('من هنا بتظبط النظام يناسب مكانك: الاسم، النوع، '.tr() +
+                    'وبعدها بتنشئ الحسابات والأقسام.'.tr()),
           ),
           _winTextField(
             controller: _nameCtl,
@@ -234,9 +242,10 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
           Wrap(
             spacing: DesktopTokens.gapSm,
             runSpacing: DesktopTokens.gapSm,
-            children: BusinessProfile.typeLabels.entries.map((e) {
-              return _winTypeChip(context, palette, e.key, e.value);
-            }).toList(),
+            children:
+                BusinessProfile.typeLabels.entries.map((e) {
+                  return _winTypeChip(context, palette, e.key, e.value);
+                }).toList(),
           ),
           const SizedBox(height: DesktopTokens.gapLg),
           Container(
@@ -272,7 +281,8 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        ('لو مفعّل هيظهر كروت إدارة الأجهزة وتقرير '.tr() + 'البلايستيشن في لوحة الأدمن'.tr()),
+                        ('لو مفعّل هيظهر كروت إدارة الأجهزة وتقرير '.tr() +
+                            'البلايستيشن في لوحة الأدمن'.tr()),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: palette.textMuted,
                           fontSize: 12,
@@ -308,11 +318,14 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
           _winSectionTitle(
             context,
             palette,
-            isAdmin ? 'حساب الأدمن'.tr() : 'حساب الكاشير (اختياري)',
-            subtitle: isAdmin
-                ? 'الأدمن هو اللي هيدير المكان يوميًا: المشروبات، التقارير، المستخدمين.'.tr()
-                : 'الكاشير هو مدير الصالة اللي بياخد الطلبات ويفتح الشيفت ويبدأ شغل موظفي الطلبات. '
-                    'تقدر تسيبه دلوقتي وتضيفه بعدين.',
+            isAdmin ? 'حساب الأدمن'.tr() : 'حساب الكاشير (اختياري)'.tr(),
+            subtitle:
+                isAdmin
+                    ? 'الأدمن هو اللي هيدير المكان يوميًا: المشروبات، التقارير، المستخدمين.'
+                        .tr()
+                    : ('الكاشير هو مدير الصالة اللي بياخد الطلبات ويفتح الشيفت ويبدأ شغل موظفي الطلبات. '
+                            .tr() +
+                        'تقدر تسيبه دلوقتي وتضيفه بعدين.'.tr()),
           ),
           _winTextField(
             controller: userCtl,
@@ -344,7 +357,12 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
             context,
             palette,
             'أقسام منتجات المطبخ'.tr(),
-            subtitle: ('زي: مشروبات، ماكولات، حلويات... كل قسم هيطلع له تلقائي: '.tr() + 'إدارة + تقرير في لوحة الأدمن، وتقدر تضيف جواه قوائم فرعية. '.tr() + 'الخامات مخزون مشترك لكل الأقسام.'.tr()),
+            subtitle:
+                ('زي: مشروبات، ماكولات، حلويات... كل قسم هيطلع له تلقائي: '
+                        .tr() +
+                    'إدارة + تقرير في لوحة الأدمن، وتقدر تضيف جواه قوائم فرعية. '
+                        .tr() +
+                    'الخامات مخزون مشترك لكل الأقسام.'.tr()),
           ),
           Row(
             children: [
@@ -368,7 +386,8 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
           const SizedBox(height: DesktopTokens.gapMd),
           if (_addedModules.isEmpty)
             Text(
-              ('لسه مفيش أقسام — تقدر تكمّل من غيرها وتضيفها بعدين '.tr() + 'من لوحة السوبر ادمن'.tr()),
+              ('لسه مفيش أقسام — تقدر تكمّل من غيرها وتضيفها بعدين '.tr() +
+                  'من لوحة السوبر ادمن'.tr()),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: palette.textMuted,
                 fontSize: 13,
@@ -392,7 +411,11 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle, size: 18, color: palette.success),
+                      Icon(
+                        Icons.check_circle,
+                        size: 18,
+                        color: palette.success,
+                      ),
                       const SizedBox(width: DesktopTokens.gapSm),
                       Expanded(
                         child: Text(
@@ -423,7 +446,7 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
             icon: Icons.chevron_right,
             onPressed: _saving ? null : () => _refresh(() => _step--),
           ),
-         Spacer(),
+        Spacer(),
         if (_step == 1)
           DesktopButton.ghost(
             label: 'مش دلوقتي'.tr(),
@@ -451,16 +474,17 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            child: _saving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(isLast ? 'ابدأ العمل 🚀'.tr() : 'التالي'),
+            child:
+                _saving
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : Text(isLast ? 'ابدأ العمل 🚀'.tr() : 'التالي'.tr()),
           ),
         ),
       ],
@@ -478,45 +502,53 @@ extension _SetupWizardWindowsBody on _SetupWizardScreenState {
     final selected = _businessType == key;
 
     return HoverBuilder(
-      builder: (context, hovering) => GestureDetector(
-        onTap: () => _refresh(() {
-          _businessType = key;
-          if (key == 'playstation_cafe') _playstation = true;
-        }),
-        child: AnimatedContainer(
-          duration: DesktopTokens.fast,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: selected
-                ? palette.accentSoft
-                : (hovering ? palette.surfaceSoft : palette.surface),
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
-            border: Border.all(
-              color: selected
-                  ? palette.accent.withValues(alpha: 0.6)
-                  : (hovering ? palette.borderStrong : palette.border),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (selected) ...[
-                Icon(Icons.check_circle, size: 16, color: palette.accentText),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                label,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13.5,
-                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+      builder:
+          (context, hovering) => GestureDetector(
+            onTap:
+                () => _refresh(() {
+                  _businessType = key;
+                  if (key == 'playstation_cafe') _playstation = true;
+                }),
+            child: AnimatedContainer(
+              duration: DesktopTokens.fast,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color:
+                    selected
+                        ? palette.accentSoft
+                        : (hovering ? palette.surfaceSoft : palette.surface),
+                borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
+                border: Border.all(
                   color:
-                      selected ? palette.accentText : palette.textSecondary,
+                      selected
+                          ? palette.accent.withValues(alpha: 0.6)
+                          : (hovering ? palette.borderStrong : palette.border),
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selected) ...[
+                    Icon(
+                      Icons.check_circle,
+                      size: 16,
+                      color: palette.accentText,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 13.5,
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                      color:
+                          selected ? palette.accentText : palette.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 }

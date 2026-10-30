@@ -33,7 +33,9 @@ class _DrinksScreenModeButtonState extends State<DrinksScreenModeButton> {
 
     if (!mounted) return;
 
-    AppToast.show(value ? '✅ تم اختيار وضع الكاشير'.tr() : '✅ تم اختيار وضع القائمة',);
+    AppToast.show(
+      value ? '✅ تم اختيار وضع الكاشير'.tr() : '✅ تم اختيار وضع القائمة'.tr(),
+    );
   }
 
   @override
@@ -44,34 +46,35 @@ class _DrinksScreenModeButtonState extends State<DrinksScreenModeButton> {
         _selectedPosMode ? Icons.grid_view_rounded : Icons.view_list_rounded,
       ),
       onSelected: _changeMode,
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: false,
-          child: Row(
-            children: [
-              if (!_selectedPosMode)
-                const Icon(Icons.check, color: Colors.green),
-              if (!_selectedPosMode) const SizedBox(width: 8),
-              const Icon(Icons.view_list_rounded),
-              const SizedBox(width: 10),
-               Text('قائمة'.tr()),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: true,
-          child: Row(
-            children: [
-              if (_selectedPosMode)
-                const Icon(Icons.check, color: Colors.green),
-              if (_selectedPosMode) const SizedBox(width: 8),
-              const Icon(Icons.grid_view_rounded),
-              const SizedBox(width: 10),
-               Text('كاشير'.tr()),
-            ],
-          ),
-        ),
-      ],
+      itemBuilder:
+          (_) => [
+            PopupMenuItem(
+              value: false,
+              child: Row(
+                children: [
+                  if (!_selectedPosMode)
+                    const Icon(Icons.check, color: Colors.green),
+                  if (!_selectedPosMode) const SizedBox(width: 8),
+                  const Icon(Icons.view_list_rounded),
+                  const SizedBox(width: 10),
+                  Text('قائمة'.tr()),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: true,
+              child: Row(
+                children: [
+                  if (_selectedPosMode)
+                    const Icon(Icons.check, color: Colors.green),
+                  if (_selectedPosMode) const SizedBox(width: 8),
+                  const Icon(Icons.grid_view_rounded),
+                  const SizedBox(width: 10),
+                  Text('كاشير'.tr()),
+                ],
+              ),
+            ),
+          ],
     );
   }
 }

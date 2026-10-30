@@ -55,8 +55,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   }
 
   /// الأدوار اللي بتاخد إعدادات راتب (staff_settings) — كاشير وموظف طلبات.
-  bool _roleHasSalary(dynamic role) =>
-      role == 'cashier' || role == 'waiter';
+  bool _roleHasSalary(dynamic role) => role == 'cashier' || role == 'waiter';
 
   /// تسمية الدور بالعربي — بتستخدمها جسم الموبايل وجسم الويندوز.
   String _roleLabel(dynamic role) {
@@ -88,183 +87,193 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     final hoursCtl = TextEditingController(
       text: settings?['work_hours_per_day']?.toString() ?? '',
     );
-    final daysOffCtl = TextEditingController(
-      text: settings?['days_off'] ?? '',
-    );
+    final daysOffCtl = TextEditingController(text: settings?['days_off'] ?? '');
 
     showDialog(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AppDialog(
-          title: Text(edit == null ? 'إضافة مستخدم'.tr() : 'تعديل مستخدم'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: userCtl,
-                  decoration: InputDecoration(labelText: 'اسم المستخدم'.tr()),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: passCtl,
-                  decoration: InputDecoration(labelText: 'كلمة المرور'.tr()),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                DropdownButtonFormField<String>(
-                  value: role,
-                  isExpanded: true,
-                  decoration:  InputDecoration(
-                    labelText: 'الدور'.tr(),
-                    helperText: 'الكاشير بيدير الصالة وشيفتات الموظفين'.tr(),
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder:
+                (dialogContext, setDialogState) => AppDialog(
+                  title: Text(
+                    edit == null ? 'إضافة مستخدم'.tr() : 'تعديل مستخدم'.tr(),
                   ),
-                  items:  [
-                    DropdownMenuItem(
-                      value: 'admin',
-                      child: Text('أدمن — مدير النظام'.tr()),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: userCtl,
+                          decoration: InputDecoration(
+                            labelText: 'اسم المستخدم'.tr(),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextField(
+                          controller: passCtl,
+                          decoration: InputDecoration(
+                            labelText: 'كلمة المرور'.tr(),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          value: role,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: 'الدور'.tr(),
+                            helperText:
+                                'الكاشير بيدير الصالة وشيفتات الموظفين'.tr(),
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: 'admin',
+                              child: Text('أدمن — مدير النظام'.tr()),
+                            ),
+                            DropdownMenuItem(
+                              value: 'cashier',
+                              child: Text('كاشير — مدير الصالة'.tr()),
+                            ),
+                            DropdownMenuItem(
+                              value: 'waiter',
+                              child: Text('موظف طلبات (ويتر)'.tr()),
+                            ),
+                          ],
+                          onChanged: (v) {
+                            if (v != null) setDialogState(() => role = v);
+                          },
+                        ),
+                        SizedBox(height: 5),
+                        if (_roleHasSalary(role)) ...[
+                          Divider(),
+                          Text(
+                            'إعدادات الراتب'.tr(),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            controller: salaryCtl,
+                            decoration: InputDecoration(
+                              labelText: 'الراتب بالساعة'.tr(),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            controller: hoursCtl,
+                            decoration: InputDecoration(
+                              labelText: 'عدد ساعات العمل اليومية'.tr(),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(height: 10),
+                        ],
+                      ],
                     ),
-                    DropdownMenuItem(
-                      value: 'cashier',
-                      child: Text('كاشير — مدير الصالة'.tr()),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('إلغاء'.tr()),
                     ),
-                    DropdownMenuItem(
-                      value: 'waiter',
-                      child: Text('موظف طلبات (ويتر)'.tr()),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final u = userCtl.text.trim();
+                        final p = passCtl.text.trim();
+                        if (u.isEmpty || p.isEmpty) return;
+
+                        final db = await DBHelper.database;
+                        int userId;
+
+                        if (edit == null) {
+                          userId = await DBHelper.insertUser({
+                            'username': u,
+                            'password': p,
+                            'role': role,
+                          });
+                        } else {
+                          userId = edit['id'];
+                          await db.update(
+                            'users',
+                            {'password': p, 'role': role},
+                            where: 'id=?',
+                            whereArgs: [userId],
+                          );
+                        }
+
+                        // لو الدور كاشير أو موظف طلبات أضف إعدادات العمل
+                        if (_roleHasSalary(role)) {
+                          final salary = double.tryParse(salaryCtl.text) ?? 0.0;
+                          final hours = int.tryParse(hoursCtl.text) ?? 8;
+                          final daysOff = daysOffCtl.text.trim();
+
+                          final existing = await DBHelper.getStaffSettings(
+                            userId,
+                          );
+                          if (existing == null) {
+                            await DBHelper.insertStaffSettings(
+                              userId: userId,
+                              salaryPerHour: salary,
+                              workHoursPerDay: hours,
+                              daysOff: daysOff,
+                            );
+                          } else {
+                            await db.update(
+                              'staff_settings',
+                              {
+                                'salary_per_hour': salary,
+                                'work_hours_per_day': hours,
+                                'days_off': daysOff,
+                              },
+                              where: 'user_id=?',
+                              whereArgs: [userId],
+                            );
+                          }
+                        }
+
+                        Navigator.pop(context);
+                        _load();
+                      },
+                      child: Text('حفظ'.tr()),
                     ),
                   ],
-                  onChanged: (v) {
-                    if (v != null) setDialogState(() => role = v);
-                  },
                 ),
-                SizedBox(
-                  height: 5,
-                ),
-                if (_roleHasSalary(role)) ...[
-                Divider(),
-                Text('إعدادات الراتب'.tr(),
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: salaryCtl,
-                  decoration: InputDecoration(labelText: 'الراتب بالساعة'.tr()),
-                  keyboardType: TextInputType.number,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: hoursCtl,
-                  decoration:
-                      InputDecoration(labelText: 'عدد ساعات العمل اليومية'.tr()),
-                  keyboardType: TextInputType.number,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-              ],
-            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final u = userCtl.text.trim();
-              final p = passCtl.text.trim();
-              if (u.isEmpty || p.isEmpty) return;
-
-              final db = await DBHelper.database;
-              int userId;
-
-              if (edit == null) {
-                userId = await DBHelper.insertUser({
-                  'username': u,
-                  'password': p,
-                  'role': role,
-                });
-              } else {
-                userId = edit['id'];
-                await db.update(
-                  'users',
-                  {'password': p, 'role': role},
-                  where: 'id=?',
-                  whereArgs: [userId],
-                );
-              }
-
-              // لو الدور كاشير أو موظف طلبات أضف إعدادات العمل
-              if (_roleHasSalary(role)) {
-                final salary = double.tryParse(salaryCtl.text) ?? 0.0;
-                final hours = int.tryParse(hoursCtl.text) ?? 8;
-                final daysOff = daysOffCtl.text.trim();
-
-                final existing = await DBHelper.getStaffSettings(userId);
-                if (existing == null) {
-                  await DBHelper.insertStaffSettings(
-                    userId: userId,
-                    salaryPerHour: salary,
-                    workHoursPerDay: hours,
-                    daysOff: daysOff,
-                  );
-                } else {
-                  await db.update(
-                    'staff_settings',
-                    {
-                      'salary_per_hour': salary,
-                      'work_hours_per_day': hours,
-                      'days_off': daysOff,
-                    },
-                    where: 'user_id=?',
-                    whereArgs: [userId],
-                  );
-                }
-              }
-
-              Navigator.pop(context);
-              _load();
-            },
-            child: Text('حفظ'.tr()),
-          ),
-        ],
-      ),
-      ),
     );
   }
 
   void _confirmDeleteUser(int userId, String username) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('تأكيد الحذف'.tr()),
-        content: Text('هل أنت متأكد من حذف المستخدم "{username}"؟'.tr({'username': username})),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء'.tr()),
+      builder:
+          (_) => AppDialog(
+            title: Text('تأكيد الحذف'.tr()),
+            content: Text(
+              'هل أنت متأكد من حذف المستخدم "{username}"؟'.tr({
+                'username': username,
+              }),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('حذف'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('حذف'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (confirm == true) {
       final db = await DBHelper.database;
       await db.delete('users', where: 'id=?', whereArgs: [userId]);
       // لو فيه إعدادات الموظف، نحذفها أيضًا
-      await db
-          .delete('staff_settings', where: 'user_id=?', whereArgs: [userId]);
+      await db.delete(
+        'staff_settings',
+        where: 'user_id=?',
+        whereArgs: [userId],
+      );
 
       AppToast.show('تم حذف المستخدم "{username}"'.tr({'username': username}));
       _load(); // إعادة تحميل قائمة المستخدمين
@@ -279,4 +288,3 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         : _buildMobileBody(context);
   }
 }
-

@@ -10,10 +10,7 @@ part 'desktop/chargetopup_windows_body.dart';
 
 class chargetop extends StatefulWidget {
   final int shiftId;
-  const chargetop({
-    super.key,
-    required this.shiftId,
-  });
+  const chargetop({super.key, required this.shiftId});
 
   @override
   State<chargetop> createState() => _CashierScreenState();
@@ -45,18 +42,18 @@ class _CashierScreenState extends State<chargetop> {
   }
 
   String formatArabicDate(DateTime date) {
-     final days = [
+    final days = [
       "الاثنين",
       'الثلاثاء'.tr(),
       'الأربعاء'.tr(),
       'الخميس'.tr(),
       'الجمعة'.tr(),
       'السبت'.tr(),
-      'الأحد'.tr()
+      'الأحد'.tr(),
     ];
 
-     final months = [
-      "يناير",
+    final months = [
+      "يناير".tr(),
       'فبراير'.tr(),
       'مارس'.tr(),
       'أبريل'.tr(),
@@ -67,18 +64,26 @@ class _CashierScreenState extends State<chargetop> {
       'سبتمبر'.tr(),
       'أكتوبر'.tr(),
       'نوفمبر'.tr(),
-      'ديسمبر'.tr()
+      'ديسمبر'.tr(),
     ];
 
     final dayName = days[date.weekday - 1];
     final monthName = months[date.month - 1];
 
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
-    final ampm = date.hour >= 12 ? 'م'.tr() : "ص";
+    final ampm = date.hour >= 12 ? 'م'.tr() : "ص".tr();
 
     final minute = date.minute.toString().padLeft(2, '0');
 
-    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({'dayName': dayName, 'v2': date.day, 'monthName': monthName, 'v4': date.year, 'hour': hour, 'minute': minute, 'ampm': ampm});
+    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({
+      'dayName': dayName,
+      'v2': date.day,
+      'monthName': monthName,
+      'v4': date.year,
+      'hour': hour,
+      'minute': minute,
+      'ampm': ampm,
+    });
   }
 
   Future<void> _record() async {
@@ -91,26 +96,29 @@ class _CashierScreenState extends State<chargetop> {
     // 🔥 اختيار طريقة الدفع
     final paymentChoice = await showDialog<String>(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('اختيار طريقة الدفع'.tr()),
-        content: Text('المبلغ المستلم: {v1} ج'.tr({'v1': received.toStringAsFixed(2)})),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, "cancel"),
-            child: Text('إلغاء'.tr()),
+      builder:
+          (_) => AppDialog(
+            title: Text('اختيار طريقة الدفع'.tr()),
+            content: Text(
+              'المبلغ المستلم: {v1} ج'.tr({'v1': received.toStringAsFixed(2)}),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, "cancel"),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, "debt"),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                child: Text('على الحساب'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, "paid"),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: Text('دفع كامل'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, "debt"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            child: Text('على الحساب'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, "paid"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: Text('دفع كامل'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (paymentChoice == "cancel" || paymentChoice == null) return;
@@ -127,61 +135,68 @@ class _CashierScreenState extends State<chargetop> {
 
       final customerName = await showDialog<String>(
         context: context,
-        builder: (_) => AppDialog(
-          title: Text('تسجيل الشحن كدين'.tr()),
-          content: FutureBuilder<List<String>>(
-            future: DBHelper.getDebtorsNames(), // 👈 أسماء مسجلة
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return SizedBox(
-                  height: 60,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              return Autocomplete<String>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return snapshot.data!;
+        builder:
+            (_) => AppDialog(
+              title: Text('تسجيل الشحن كدين'.tr()),
+              content: FutureBuilder<List<String>>(
+                future: DBHelper.getDebtorsNames(), // 👈 أسماء مسجلة
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox(
+                      height: 60,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
                   }
-                  return snapshot.data!.where((name) => name
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase()));
-                },
-                onSelected: (selection) {
-                  selectedName = selection;
-                },
-                fieldViewBuilder:
-                    (context, textController, focusNode, onSubmit) {
-                  return TextField(
-                    controller: textController,
-                    focusNode: focusNode,
-                    decoration: InputDecoration(
-                      labelText: 'اسم العميل'.tr(),
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (val) {
-                      selectedName = val; // 👈 اسم جديد أو موجود
+
+                  return Autocomplete<String>(
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      if (textEditingValue.text.isEmpty) {
+                        return snapshot.data!;
+                      }
+                      return snapshot.data!.where(
+                        (name) => name.toLowerCase().contains(
+                          textEditingValue.text.toLowerCase(),
+                        ),
+                      );
+                    },
+                    onSelected: (selection) {
+                      selectedName = selection;
+                    },
+                    fieldViewBuilder: (
+                      context,
+                      textController,
+                      focusNode,
+                      onSubmit,
+                    ) {
+                      return TextField(
+                        controller: textController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          labelText: 'اسم العميل'.tr(),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (val) {
+                          selectedName = val; // 👈 اسم جديد أو موجود
+                        },
+                      );
                     },
                   );
                 },
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: Text('إلغاء'.tr()),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, null),
+                  child: Text('إلغاء'.tr()),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (selectedName.trim().isEmpty) return;
+                    Navigator.pop(context, selectedName.trim());
+                  },
+                  child: Text('حفظ'.tr()),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (selectedName.trim().isEmpty) return;
-                Navigator.pop(context, selectedName.trim());
-              },
-              child: Text('حفظ'.tr()),
-            ),
-          ],
-        ),
       );
 
       if (customerName == null || customerName.isEmpty) {
@@ -191,11 +206,10 @@ class _CashierScreenState extends State<chargetop> {
 
       // ⬇️ استخدم customerName هنا
 
-// خصم من المكنة
-      await db.rawUpdate(
-        "UPDATE machine_balance SET balance = balance - ?",
-        [cost],
-      );
+      // خصم من المكنة
+      await db.rawUpdate("UPDATE machine_balance SET balance = balance - ?", [
+        cost,
+      ]);
       final int invoiceId = await db.insert("invoices", {
         "start_time": DateTime.now().toIso8601String(),
         "end_time": DateTime.now().toIso8601String(),
@@ -215,7 +229,7 @@ class _CashierScreenState extends State<chargetop> {
         "shift_id": widget.shiftId,
       });
 
-// سجل عنصر افتراضي للشحن ليظهر في التفاصيل
+      // سجل عنصر افتراضي للشحن ليظهر في التفاصيل
       await db.insert("debt_items", {
         "debt_id": debtId,
         "drink_name": "شحن رصيد",
@@ -232,7 +246,12 @@ class _CashierScreenState extends State<chargetop> {
         "date": DateTime.now().toIso8601String(),
       });
 
-      AppToast.show('تم تسجيل شحن {received} ج كدين باسم {customerName}'.tr({'received': received, 'customerName': customerName}));
+      AppToast.show(
+        'تم تسجيل شحن {received} ج كدين باسم {customerName}'.tr({
+          'received': received,
+          'customerName': customerName,
+        }),
+      );
 
       _costController.clear();
       _receivedController.clear();

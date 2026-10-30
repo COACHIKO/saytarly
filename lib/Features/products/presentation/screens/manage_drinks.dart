@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:saytarly/core/database/db_helper.dart';
+import 'package:saytarly/core/models/app_modules.dart';
 import 'package:saytarly/core/models/models.dart';
 import 'package:saytarly/Features/materials/presentation/print/PrintStockInvoice.dart';
 
@@ -60,12 +61,13 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
       defaultTargetPlatform == TargetPlatform.iOS;
 
   /// القوائم الفرعية الظاهرة (مع مراعاة تشغيل/إيقاف السجائر والشيشة)
-  List<Map<String, dynamic>> get _visibleCategories => _categories.where((c) {
-    final key = c['key'] as String? ?? '';
-    if (key == 'cigarette' && !_cigarettesEnabled) return false;
-    if (key == 'shisha' && !_shishaEnabled) return false;
-    return (c['is_enabled'] ?? 1) == 1;
-  }).toList();
+  List<Map<String, dynamic>> get _visibleCategories =>
+      _categories.where((c) {
+        final key = c['key'] as String? ?? '';
+        if (key == 'cigarette' && !_cigarettesEnabled) return false;
+        if (key == 'shisha' && !_shishaEnabled) return false;
+        return (c['is_enabled'] ?? 1) == 1;
+      }).toList();
 
   Future<void> _load() async {
     List<Map<String, dynamic>> rows;
@@ -164,31 +166,34 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
   ) async {
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('استيراد البيانات'.tr()),
-        content: Text('هل تريد استبدال البيانات الحالية أم الإضافة عليها؟'.tr()),
-        actions: [
-          TextButton(
-            child: Text('إلغاء'.tr()),
-            onPressed: () => Navigator.pop(context),
+      builder:
+          (_) => AppDialog(
+            title: Text('استيراد البيانات'.tr()),
+            content: Text(
+              'هل تريد استبدال البيانات الحالية أم الإضافة عليها؟'.tr(),
+            ),
+            actions: [
+              TextButton(
+                child: Text('إلغاء'.tr()),
+                onPressed: () => Navigator.pop(context),
+              ),
+              ElevatedButton(
+                child: Text('إضافة على الموجود'.tr()),
+                onPressed: () {
+                  Navigator.pop(context);
+                  importDrinks(context, replace: false, reload: reload);
+                },
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text('استبدال الكل'.tr()),
+                onPressed: () {
+                  Navigator.pop(context);
+                  importDrinks(context, replace: true, reload: reload);
+                },
+              ),
+            ],
           ),
-          ElevatedButton(
-            child: Text('إضافة على الموجود'.tr()),
-            onPressed: () {
-              Navigator.pop(context);
-              importDrinks(context, replace: false, reload: reload);
-            },
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('استبدال الكل'.tr()),
-            onPressed: () {
-              Navigator.pop(context);
-              importDrinks(context, replace: true, reload: reload);
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -322,72 +327,84 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
   void _showStockReport() {
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('تقرير الجرد'.tr()),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: drinks.map((c) {
-              Color qtyColor;
-              if (c.qty <= 0) {
-                qtyColor = Colors.grey;
-              } else if (c.qty < 10) {
-                qtyColor = Colors.redAccent;
-              } else {
-                qtyColor = Colors.green;
-              }
+      builder:
+          (_) => AppDialog(
+            title: Text('تقرير الجرد'.tr()),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children:
+                    drinks.map((c) {
+                      Color qtyColor;
+                      if (c.qty <= 0) {
+                        qtyColor = Colors.grey;
+                      } else if (c.qty < 10) {
+                        qtyColor = Colors.redAccent;
+                      } else {
+                        qtyColor = Colors.green;
+                      }
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(c.name, style: TextStyle(fontWeight: FontWeight.bold)),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: qtyColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: qtyColor),
-                      ),
-                      child: Text(
-                        '${c.qty}',
-                        style: TextStyle(
-                          color: qtyColor,
-                          fontWeight: FontWeight.bold,
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              c.displayName,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: qtyColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: qtyColor),
+                              ),
+                              child: Text(
+                                '${c.qty}',
+                                style: TextStyle(
+                                  color: qtyColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                      );
+                    }).toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إغلاق'.tr()),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إغلاق'.tr()),
-          ),
-        ],
-      ),
     );
   }
 
   void _showForm({DrinkModel? edit}) {
     final cats = _visibleCategories;
     if (cats.isEmpty) {
-      AppToast.show('القسم ده مفيهوش قوائم فرعية — ضيفها الأول من لوحة السوبر ادمن'.tr(),);
+      AppToast.show(
+        'القسم ده مفيهوش قوائم فرعية — ضيفها الأول من لوحة السوبر ادمن'.tr(),
+      );
       return;
     }
 
-    final nameCtl = TextEditingController(text: edit?.name ?? '');
+    final nameArCtl = TextEditingController(text: edit?.name ?? '');
+    final nameEnCtl = TextEditingController(text: edit?.nameEn ?? '');
     final priceCtl = TextEditingController(
       text: edit != null ? edit.price.toString() : '',
     );
     final qtyCtl = TextEditingController(
       text: edit != null ? edit.qty.toString() : '',
     );
+    String? validationError;
 
     final catKeys = cats.map((c) => c['key'] as String? ?? '').toSet();
     String selectedTemp =
@@ -400,162 +417,246 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        titlePadding: EdgeInsets.zero,
-        title: Container(
-          padding:  EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            borderRadius:  BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            ),
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.secondary,
-              ],
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                edit == null ? Icons.local_cafe : Icons.edit_note,
-                color: Colors.white,
-              ),
-               SizedBox(width: 10),
-              Text(
-                edit == null ? 'إضافة منتج'.tr() : "تعديل منتج",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        content: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameCtl,
-                  decoration:  InputDecoration(
-                    labelText: 'اسم المنتج'.tr(),
-                    prefixIcon: Icon(Icons.local_drink),
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder:
+                (dialogContext, setDialogState) => AppDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  controller: priceCtl,
-                  keyboardType: TextInputType.number,
-                  decoration:  InputDecoration(
-                    labelText: 'السعر'.tr(),
-                    prefixIcon: Icon(Icons.attach_money),
+                  titlePadding: EdgeInsets.zero,
+                  title: Container(
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          edit == null ? Icons.local_cafe : Icons.edit_note,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          edit == null ? 'إضافة منتج'.tr() : "تعديل منتج".tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  controller: qtyCtl,
-                  keyboardType: TextInputType.number,
-                  decoration:  InputDecoration(
-                    labelText: 'الكمية المتاحة'.tr(),
-                    prefixIcon: Icon(Icons.inventory),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                DropdownButtonFormField<String>(
-                  value: selectedTemp.isEmpty ? null : selectedTemp,
-                  decoration:  InputDecoration(
-                    labelText: 'القائمة الفرعية'.tr(),
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                  items: [
-                    for (final c in cats)
-                      DropdownMenuItem(
-                        value: c['key'] as String? ?? '',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.label_outline,
-                              color: Theme.of(context).colorScheme.primary,
+                  content: SizedBox(
+                    width: 500,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: nameArCtl,
+                            textDirection: TextDirection.rtl,
+                            onChanged: (_) {
+                              if (validationError != null) {
+                                setDialogState(() => validationError = null);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'الاسم بالعربي'.tr(),
+                              hintText: 'مثال: شاي'.tr(),
+                              prefixIcon: Icon(Icons.local_drink),
                             ),
-                            const SizedBox(width: 10),
-                            Text(c['name'] as String? ?? ''),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: nameEnCtl,
+                            textDirection: TextDirection.ltr,
+                            onChanged: (_) {
+                              if (validationError != null) {
+                                setDialogState(() => validationError = null);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'الاسم بالإنجليزي'.tr(),
+                              hintText: 'e.g. Tea',
+                              prefixIcon: Icon(Icons.local_drink),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'اسم واحد على الأقل مطلوب — العربي أو الإنجليزي.'
+                                .tr(),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color:
+                                  Theme.of(
+                                    dialogContext,
+                                  ).textTheme.bodySmall?.color,
+                            ),
+                          ),
+                          if (validationError != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              validationError!,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color:
+                                    Theme.of(dialogContext).colorScheme.error,
+                              ),
+                            ),
                           ],
-                        ),
+                          const SizedBox(height: 15),
+                          TextField(
+                            controller: priceCtl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'السعر'.tr(),
+                              prefixIcon: Icon(Icons.attach_money),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          TextField(
+                            controller: qtyCtl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'الكمية المتاحة'.tr(),
+                              prefixIcon: Icon(Icons.inventory),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          DropdownButtonFormField<String>(
+                            value: selectedTemp.isEmpty ? null : selectedTemp,
+                            decoration: InputDecoration(
+                              labelText: 'القائمة الفرعية'.tr(),
+                              prefixIcon: Icon(Icons.category),
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                            items: [
+                              for (final c in cats)
+                                DropdownMenuItem(
+                                  value: c['key'] as String? ?? '',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.label_outline,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        AppModuleCategory.displayNameFromMap(c),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              if (uncategorized)
+                                DropdownMenuItem(
+                                  value: edit!.temperature,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.help_outline,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text('غير مصنف (تصنيف قديم)'.tr()),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                            onChanged: (v) {
+                              setDialogState(() {
+                                selectedTemp = v ?? '';
+                                if (validationError != null) {
+                                  validationError = null;
+                                }
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                    if (uncategorized)
-                      DropdownMenuItem(
-                        value: edit!.temperature,
-                        child:  Row(
-                          children: [
-                            Icon(Icons.help_outline, color: Colors.grey),
-                            SizedBox(width: 10),
-                            Text('غير مصنف (تصنيف قديم)'.tr()),
-                          ],
-                        ),
-                      ),
-                  ],
-                  onChanged: (v) => selectedTemp = v ?? '',
-                ),
-              ],
-            ),
-          ),
-        ),
-        actionsPadding: const EdgeInsets.all(15),
-        actions: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.close),
-            label:  Text('إلغاء'.tr()),
-            onPressed: () => Navigator.pop(context),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.save),
-            label:  Text('حفظ'.tr()),
-            style: ElevatedButton.styleFrom(minimumSize: const Size(120, 45)),
-            onPressed: () async {
-              final n = nameCtl.text.trim();
-              final p = double.tryParse(priceCtl.text.trim()) ?? 0;
-              final q = int.tryParse(qtyCtl.text.trim()) ?? 0;
-
-              if (n.isEmpty || selectedTemp.isEmpty) {
-                AppToast.show('اكتب اسم المنتج واختار القائمة'.tr());
-                return;
-              }
-
-              if (edit == null) {
-                await DBHelper.insertDrink(
-                  DrinkModel(
-                    name: n,
-                    price: p,
-                    qty: q,
-                    temperature: selectedTemp,
-                    moduleId: widget.moduleId,
+                    ),
                   ),
-                );
-              } else {
-                edit.name = n;
-                edit.price = p;
-                edit.qty = q;
-                edit.temperature = selectedTemp;
-                if (widget.moduleId != null) {
-                  edit.moduleId = widget.moduleId;
-                }
+                  actionsPadding: const EdgeInsets.all(15),
+                  actions: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.close),
+                      label: Text('إلغاء'.tr()),
+                      onPressed: () => Navigator.pop(dialogContext),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.save),
+                      label: Text('حفظ'.tr()),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(120, 45),
+                      ),
+                      onPressed: () async {
+                        final nameAr = nameArCtl.text.trim();
+                        final nameEn = nameEnCtl.text.trim();
+                        final p = double.tryParse(priceCtl.text.trim()) ?? 0;
+                        final q = int.tryParse(qtyCtl.text.trim()) ?? 0;
 
-                await DBHelper.updateDrink(edit);
-              }
+                        if (nameAr.isEmpty && nameEn.isEmpty) {
+                          setDialogState(
+                            () =>
+                                validationError =
+                                    'اكتب اسم المنتج بالعربي أو الإنجليزي'.tr(),
+                          );
+                          return;
+                        }
+                        if (selectedTemp.isEmpty) {
+                          setDialogState(
+                            () =>
+                                validationError = 'اختار القائمة الفرعية'.tr(),
+                          );
+                          return;
+                        }
 
-              Navigator.pop(context);
-              _load();
-            },
+                        if (edit == null) {
+                          await DBHelper.insertDrink(
+                            DrinkModel(
+                              name: nameAr,
+                              nameEn: nameEn,
+                              price: p,
+                              qty: q,
+                              temperature: selectedTemp,
+                              moduleId: widget.moduleId,
+                            ),
+                          );
+                        } else {
+                          edit.name = nameAr;
+                          edit.nameEn = nameEn;
+                          edit.price = p;
+                          edit.qty = q;
+                          edit.temperature = selectedTemp;
+                          if (widget.moduleId != null) {
+                            edit.moduleId = widget.moduleId;
+                          }
+
+                          await DBHelper.updateDrink(edit);
+                        }
+
+                        if (!dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        _load();
+                      },
+                    ),
+                  ],
+                ),
           ),
-        ],
-      ),
     );
   }
 
@@ -628,14 +729,16 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
   // تسميات العرض بالعربي — بتيجي ديناميك من إعدادات السوبر ادمن
   Map<String, String> get sectionNames => {
     for (final c in _visibleCategories)
-      (c['key'] as String? ?? ''): c['name'] as String? ?? '',
+      (c['key'] as String? ?? ''): AppModuleCategory.displayNameFromMap(c),
   };
 
   Map<String, bool> selectedSections = {};
 
   void _showPrintSectionDialog() {
     if (sections.isEmpty) {
-      AppToast.show('مفيش قوائم فرعية في القسم ده — ضيفها من لوحة السوبر ادمن'.tr());
+      AppToast.show(
+        'مفيش قوائم فرعية في القسم ده — ضيفها من لوحة السوبر ادمن'.tr(),
+      );
       return;
     }
     // إعادة تهيئة الأقسام قبل كل مرة
@@ -643,54 +746,59 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setStateDialog) => AppDialog(
-          title: Text('اختر الأقسام للطباعة'.tr()),
-          content: SingleChildScrollView(
-            child: Column(
-              children: sections.map((s) {
-                return CheckboxListTile(
-                  title: Text(sectionNames[s]!),
-                  value: selectedSections[s],
-                  onChanged: (val) {
-                    setStateDialog(() {
-                      selectedSections[s] = val ?? false;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setStateDialog) => AppDialog(
+                  title: Text('اختر الأقسام للطباعة'.tr()),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      children:
+                          sections.map((s) {
+                            return CheckboxListTile(
+                              title: Text(sectionNames[s]!),
+                              value: selectedSections[s],
+                              onChanged: (val) {
+                                setStateDialog(() {
+                                  selectedSections[s] = val ?? false;
+                                });
+                              },
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final selected =
+                            sections
+                                .where((s) => selectedSections[s] == true)
+                                .toList();
+
+                        if (selected.isEmpty) {
+                          AppToast.show('❌ اختر قسم واحد على الأقل'.tr());
+                          return;
+                        }
+
+                        // تصفية المشروبات حسب الأقسام المحددة
+                        final drinksToPrint =
+                            drinks
+                                .where((d) => selected.contains(d.temperature))
+                                .toList();
+
+                        PrintStockInvoice.printStockInvoice(drinksToPrint);
+
+                        Navigator.pop(context);
+                      },
+                      child: Text('طباعة'.tr()),
+                    ),
+                  ],
+                ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final selected = sections
-                    .where((s) => selectedSections[s] == true)
-                    .toList();
-
-                if (selected.isEmpty) {
-                  AppToast.show('❌ اختر قسم واحد على الأقل'.tr());
-                  return;
-                }
-
-                // تصفية المشروبات حسب الأقسام المحددة
-                final drinksToPrint = drinks
-                    .where((d) => selected.contains(d.temperature))
-                    .toList();
-
-                PrintStockInvoice.printStockInvoice(drinksToPrint);
-
-                Navigator.pop(context);
-              },
-              child: Text('طباعة'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

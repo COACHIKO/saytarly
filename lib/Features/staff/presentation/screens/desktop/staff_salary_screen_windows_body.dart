@@ -14,7 +14,10 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
 
     return DesktopPageScaffold(
       title: 'صرف مرتبات الموظفين'.tr(),
-      subtitle: 'شهر {month} • {v2} موظف'.tr({'month': month, 'v2': staff.length}),
+      subtitle: 'شهر {month} • {v2} موظف'.tr({
+        'month': month,
+        'v2': staff.length,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -22,47 +25,53 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
           onPressed: () => loadStaff(),
         ),
       ],
-      child: staff.isEmpty
-          ?  DesktopEmptyState(
-              icon: Icons.badge_outlined,
-              title: 'مفيش موظفين بصلاحيات ستاف'.tr(),
-              message: ('ضيف موظفين الستاف الأول من إدارة المستخدمين، '.tr() + 'وبعدين مرتباتهم هتظهر هنا للصرف.'.tr()),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ==================== مؤشرات سريعة ====================
-                  DesktopResponsiveGrid(
-                    minTileWidth: 240,
-                    children: [
-                      DesktopStatCard(
-                        label: 'موظفين الشهر'.tr(),
-                        value: '${staff.length}',
-                        icon: Icons.groups_outlined,
-                        color: palette.accent,
-                      ),
-                      DesktopStatCard(
-                        label: 'إجمالي المستحق'.tr(),
-                        value: total.toStringAsFixed(2),
-                        icon: Icons.payments_outlined,
-                        color: palette.success,
-                        hint: '{v1} — شهر {month}'.tr({'v1': Money.txt, 'month': month}),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: DesktopTokens.gapLg),
+      child:
+          staff.isEmpty
+              ? DesktopEmptyState(
+                icon: Icons.badge_outlined,
+                title: 'مفيش موظفين بصلاحيات ستاف'.tr(),
+                message:
+                    ('ضيف موظفين الستاف الأول من إدارة المستخدمين، '.tr() +
+                        'وبعدين مرتباتهم هتظهر هنا للصرف.'.tr()),
+              )
+              : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ==================== مؤشرات سريعة ====================
+                    DesktopResponsiveGrid(
+                      minTileWidth: 240,
+                      children: [
+                        DesktopStatCard(
+                          label: 'موظفين الشهر'.tr(),
+                          value: '${staff.length}',
+                          icon: Icons.groups_outlined,
+                          color: palette.accent,
+                        ),
+                        DesktopStatCard(
+                          label: 'إجمالي المستحق'.tr(),
+                          value: total.toStringAsFixed(2),
+                          icon: Icons.payments_outlined,
+                          color: palette.success,
+                          hint: '{v1} — شهر {month}'.tr({
+                            'v1': Money.txt,
+                            'month': month,
+                          }),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: DesktopTokens.gapLg),
 
-                  DesktopSectionTitle(
-                    title: 'المرتبات'.tr(),
-                    count: staff.length,
-                  ),
-                  const SizedBox(height: DesktopTokens.gapXs),
+                    DesktopSectionTitle(
+                      title: 'المرتبات'.tr(),
+                      count: staff.length,
+                    ),
+                    const SizedBox(height: DesktopTokens.gapXs),
 
-                  for (final u in staff) _winSalaryRow(context, palette, u),
-                ],
+                    for (final u in staff) _winSalaryRow(context, palette, u),
+                  ],
+                ),
               ),
-            ),
     );
   }
 
@@ -109,7 +118,10 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'مستحق الشهر الحالي: {v1} {v2}'.tr({'v1': net.toStringAsFixed(2), 'v2': Money.txt}),
+                    'مستحق الشهر الحالي: {v1} {v2}'.tr({
+                      'v1': net.toStringAsFixed(2),
+                      'v2': Money.txt,
+                    }),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -122,10 +134,11 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
             ),
             const SizedBox(width: DesktopTokens.gapSm),
             DesktopInfoChip(
-              label: net > 0 ? 'لسه متصرفش'.tr() : 'اتصرف',
-              icon: net > 0
-                  ? Icons.hourglass_bottom_outlined
-                  : Icons.check_circle_outline,
+              label: net > 0 ? 'لسه متصرفش'.tr() : 'اتصرف'.tr(),
+              icon:
+                  net > 0
+                      ? Icons.hourglass_bottom_outlined
+                      : Icons.check_circle_outline,
               color: net > 0 ? palette.warning : palette.success,
             ),
             const SizedBox(width: DesktopTokens.gapSm),
@@ -136,27 +149,35 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
                 final hist = await _history(u['id']);
                 showDialog(
                   context: context,
-                  builder: (dialogContext) => AppDialog(
-                    title: Text('تاريخ الصرف - {v1}'.tr({'v1': u['username']})),
-                    content: SizedBox(
-                      width: double.maxFinite,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: hist.map((h) {
-                          return ListTile(
-                            title: Text('شهر: {v1}'.tr({'v1': h['month']})),
-                            subtitle: Text('تاريخ: {v1}'.tr({'v1': h['paid_at']})),
-                          );
-                        }).toList(),
+                  builder:
+                      (dialogContext) => AppDialog(
+                        title: Text(
+                          'تاريخ الصرف - {v1}'.tr({'v1': u['username']}),
+                        ),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children:
+                                hist.map((h) {
+                                  return ListTile(
+                                    title: Text(
+                                      'شهر: {v1}'.tr({'v1': h['month']}),
+                                    ),
+                                    subtitle: Text(
+                                      'تاريخ: {v1}'.tr({'v1': h['paid_at']}),
+                                    ),
+                                  );
+                                }).toList(),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: Text('إغلاق'.tr()),
+                          ),
+                        ],
                       ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child:  Text('إغلاق'.tr()),
-                      ),
-                    ],
-                  ),
                 );
               },
             ),

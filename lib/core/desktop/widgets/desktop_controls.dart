@@ -8,7 +8,7 @@ import 'package:saytarly/core/localization/messages.dart';
 
 /// زر أيقونة في شريط الأدوات — دائري، لهوفر ناعم وتلميح (tooltip).
 class DesktopToolbarIconButton extends StatefulWidget {
-   DesktopToolbarIconButton({
+  DesktopToolbarIconButton({
     super.key,
     required this.icon,
     required this.tooltip,
@@ -37,7 +37,7 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
 
     return Tooltip(
       message: widget.tooltip,
-      waitDuration:  Duration(milliseconds: 500),
+      waitDuration: Duration(milliseconds: 500),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovering = true),
@@ -50,7 +50,7 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
             height: 40,
             decoration: BoxDecoration(
               color: _hovering ? palette.surfaceSoft : Colors.transparent,
-              borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+              borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
               border: Border.all(
                 color: _hovering ? palette.border : Colors.transparent,
               ),
@@ -60,19 +60,21 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
               children: [
                 Icon(
                   widget.icon,
-                  size: 20,
-                  color: widget.onPressed == null
-                      ? palette.textMuted.withValues(alpha: 0.5)
-                      : palette.textSecondary,
+                  size: 19,
+                  color:
+                      widget.onPressed == null
+                          ? palette.textMuted.withValues(alpha: 0.5)
+                          : _hovering
+                          ? palette.textPrimary
+                          : palette.textSecondary,
                 ),
                 if (widget.badgeCount > 0)
                   Positioned(
                     top: 6,
                     left: 6,
                     child: Container(
-                      padding:  EdgeInsets.all(3),
-                      constraints:
-                           BoxConstraints(minWidth: 16, minHeight: 16),
+                      padding: EdgeInsets.all(3),
+                      constraints: BoxConstraints(minWidth: 16, minHeight: 16),
                       decoration: BoxDecoration(
                         color: palette.danger,
                         shape: BoxShape.circle,
@@ -80,7 +82,7 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
                       alignment: Alignment.center,
                       child: Text(
                         widget.badgeCount > 99 ? '99+' : '${widget.badgeCount}',
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
@@ -99,7 +101,7 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
 
 /// خانة بحث سطح المكتب — ناعمة، بأيقونة، وبدون حدود تقليدية.
 class DesktopSearchField extends StatelessWidget {
-   DesktopSearchField({
+  DesktopSearchField({
     super.key,
     this.controller,
     this.onChanged,
@@ -120,35 +122,39 @@ class DesktopSearchField extends StatelessWidget {
 
     return SizedBox(
       width: width,
-      height: 42,
+      height: 40,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         autofocus: autofocus,
         style: TextStyle(
-          fontSize: 13.5,
+          fontSize: 13,
           color: palette.textPrimary,
           fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
         ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(fontSize: 13, color: palette.textMuted),
-          prefixIcon: Icon(Icons.search, size: 19, color: palette.textMuted),
-          prefixIconConstraints: const BoxConstraints(minWidth: 42),
+          hintStyle: TextStyle(fontSize: 12.5, color: palette.textMuted),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            size: 18,
+            color: palette.textMuted,
+          ),
+          prefixIconConstraints: const BoxConstraints(minWidth: 40),
           filled: true,
           fillColor: palette.surfaceSoft,
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(vertical: 9),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
             borderSide: BorderSide(color: palette.border),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
             borderSide: BorderSide(color: palette.border),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
             borderSide: BorderSide(color: palette.accent, width: 1.4),
           ),
         ),
@@ -159,7 +165,11 @@ class DesktopSearchField extends StatelessWidget {
 
 /// عنصر واحد جوه [DesktopSegmented].
 class DesktopSegmentItem<T> {
-  const DesktopSegmentItem({required this.value, required this.label, this.icon});
+  const DesktopSegmentItem({
+    required this.value,
+    required this.label,
+    this.icon,
+  });
 
   final T value;
   final String label;
@@ -227,22 +237,29 @@ class _SegmentButton<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final content = AnimatedContainer(
       duration: DesktopTokens.fast,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
       decoration: BoxDecoration(
-        color: selected ? palette.surface : Colors.transparent,
+        color:
+            selected
+                ? (palette.isDark ? palette.accentSoft : palette.surface)
+                : Colors.transparent,
         borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
         border: Border.all(
-          color: selected ? palette.border : Colors.transparent,
+          color:
+              selected
+                  ? palette.accent.withValues(alpha: 0.22)
+                  : Colors.transparent,
         ),
-        boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: palette.shadow.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ]
-            : null,
+        boxShadow:
+            selected && !palette.isDark
+                ? [
+                  BoxShadow(
+                    color: palette.shadow.withValues(alpha: 0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+                : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -259,7 +276,8 @@ class _SegmentButton<T> extends StatelessWidget {
             item.label,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              color: selected ? palette.textPrimary : palette.textMuted,
+              color: selected ? palette.accentText : palette.textMuted,
+              fontSize: 12,
             ),
           ),
         ],
@@ -300,21 +318,21 @@ class DesktopInfoChip extends StatelessWidget {
         vertical: dense ? 3 : 5,
       ),
       decoration: BoxDecoration(
-        color: palette.soft(tint).withValues(alpha: palette.isDark ? 0.35 : 1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: tint.withValues(alpha: 0.25)),
+        color: palette.soft(tint),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: tint.withValues(alpha: 0.20)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: dense ? 12 : 14, color: tint),
+            Icon(icon, size: dense ? 12 : 14, color: palette.onSoft(tint)),
             const SizedBox(width: 5),
           ],
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: tint,
+              color: palette.onSoft(tint),
               fontWeight: FontWeight.w700,
               fontSize: dense ? 10.5 : 11.5,
             ),
@@ -351,7 +369,11 @@ class DesktopEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DesktopIconBadge(icon: icon, size: 64, radius: DesktopTokens.radiusLg),
+            DesktopIconBadge(
+              icon: icon,
+              size: 64,
+              radius: DesktopTokens.radiusLg,
+            ),
             const SizedBox(height: DesktopTokens.gapLg),
             Text(
               title,
@@ -393,7 +415,7 @@ class DesktopClock extends StatefulWidget {
 
 class _DesktopClockState extends State<DesktopClock> {
   static List<String> get _months => [
-    'يناير',
+    'يناير'.tr(),
     'فبراير'.tr(),
     'مارس'.tr(),
     'أبريل'.tr(),
@@ -408,7 +430,7 @@ class _DesktopClockState extends State<DesktopClock> {
   ];
 
   static List<String> get _weekdays => [
-    'الأحد',
+    'الأحد'.tr(),
     'الاثنين'.tr(),
     'الثلاثاء'.tr(),
     'الأربعاء'.tr(),

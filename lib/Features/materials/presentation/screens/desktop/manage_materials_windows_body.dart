@@ -10,22 +10,29 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
     final palette = DesktopPalette.of(context);
 
     final query = _searchQuery.trim().toLowerCase();
-    final visible = query.isEmpty
-        ? materials
-        : materials
-            .where((m) =>
-                (m['name'] as String? ?? '').toLowerCase().contains(query))
-            .toList();
+    final visible =
+        query.isEmpty
+            ? materials
+            : materials
+                .where(
+                  (m) => (m['name'] as String? ?? '').toLowerCase().contains(
+                    query,
+                  ),
+                )
+                .toList();
 
     final totalMaterials = materials.length;
-    final lowStockCount = materials.where((e) {
-      return (e['qty'] as num) <= (e['min_qty'] as num);
-    }).length;
+    final lowStockCount =
+        materials.where((e) {
+          return (e['qty'] as num) <= (e['min_qty'] as num);
+        }).length;
     final availableCount = totalMaterials - lowStockCount;
 
     return DesktopPageScaffold(
       title: 'إدارة الخامات'.tr(),
-      subtitle: 'إجمالي الأصناف: {totalMaterials}'.tr({'totalMaterials': totalMaterials}),
+      subtitle: 'إجمالي الأصناف: {totalMaterials}'.tr({
+        'totalMaterials': totalMaterials,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -99,7 +106,7 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg),
+          SizedBox(height: DesktopTokens.gapLg),
 
           // ==================== قائمة الخامات ====================
           DesktopSectionTitle(
@@ -122,7 +129,7 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
               ),
             )
           else if (visible.isEmpty)
-             DesktopEmptyState(
+            DesktopEmptyState(
               icon: Icons.search_off,
               title: 'مفيش نتائج للبحث'.tr(),
               message: 'جرّب اسم تاني أو امسح كلمة البحث.'.tr(),
@@ -247,7 +254,9 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
                       if (cost > 0) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'سعر الشراء: {v1}'.tr({'v1': cost.toStringAsFixed(2)}),
+                          'سعر الشراء: {v1}'.tr({
+                            'v1': cost.toStringAsFixed(2),
+                          }),
                           style: TextStyle(
                             fontSize: 11,
                             color: palette.textMuted,
@@ -288,10 +297,11 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
             width: 110,
             child: Center(
               child: DesktopInfoChip(
-                label: lowStock ? 'ناقص'.tr() : 'متوفر',
-                icon: lowStock
-                    ? Icons.trending_down_outlined
-                    : Icons.check_circle_outline,
+                label: lowStock ? 'ناقص'.tr() : 'متوفر'.tr(),
+                icon:
+                    lowStock
+                        ? Icons.trending_down_outlined
+                        : Icons.check_circle_outline,
                 color: lowStock ? palette.danger : palette.success,
                 dense: true,
               ),
@@ -331,22 +341,23 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AppDialog(
-        title:  Text('تأكيد الحذف'.tr()),
-        content:  Text(
-          'سيتم حذف الخامة من المخزون ومن جميع الوصفات المرتبطة بها'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => navigator.pop(false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (_) => AppDialog(
+            title: Text('تأكيد الحذف'.tr()),
+            content: Text(
+              'سيتم حذف الخامة من المخزون ومن جميع الوصفات المرتبطة بها'.tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => navigator.pop(false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => navigator.pop(true),
+                child: Text('حذف'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => navigator.pop(true),
-            child:  Text('حذف'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (confirm == true) {
@@ -392,7 +403,8 @@ extension _ManageMaterialsScreenWindowsBody on _ManageMaterialsScreenState {
   }
 
   /// رقم مرتّب — من غير كسور زيادة عن اللزوم.
-  String _windowsNum(num value) => value == value.roundToDouble()
-      ? value.toInt().toString()
-      : value.toString();
+  String _windowsNum(num value) =>
+      value == value.roundToDouble()
+          ? value.toInt().toString()
+          : value.toString();
 }

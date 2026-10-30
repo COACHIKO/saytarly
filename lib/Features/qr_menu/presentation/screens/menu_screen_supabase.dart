@@ -15,11 +15,8 @@ class MenuScreen extends StatefulWidget {
   final int tableId;
   final String tableName;
 
-  const MenuScreen({
-    Key? key,
-    required this.tableId,
-    required this.tableName,
-  }) : super(key: key);
+  const MenuScreen({Key? key, required this.tableId, required this.tableName})
+    : super(key: key);
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -36,12 +33,12 @@ class _MenuScreenState extends State<MenuScreen>
   String _note = '';
   String? _error;
 
-  static const _categories = [
-    {'label': 'الكل', 'temps': null},
-    {'label': '☕ ساخن', 'temps': 'hot'},
-    {'label': '🧊 بارد', 'temps': 'cold'},
-    {'label': '🥤 عادي', 'temps': 'normal'},
-    {'label': '🛍 منتجات', 'temps': 'prodect'},
+  static List<Map<String, Object?>> get _categories => [
+    {'label': 'الكل'.tr(), 'temps': null},
+    {'label': '☕ ساخن'.tr(), 'temps': 'hot'},
+    {'label': '🧊 بارد'.tr(), 'temps': 'cold'},
+    {'label': '🥤 عادي'.tr(), 'temps': 'normal'},
+    {'label': '🛍 منتجات'.tr(), 'temps': 'prodect'},
   ];
 
   @override
@@ -86,8 +83,10 @@ class _MenuScreenState extends State<MenuScreen>
   double get _cartPrice {
     double total = 0;
     for (final e in _cart.entries) {
-      final drink =
-          _allDrinks.firstWhere((d) => d['id'] == e.key, orElse: () => {});
+      final drink = _allDrinks.firstWhere(
+        (d) => d['id'] == e.key,
+        orElse: () => {},
+      );
       if (drink.isNotEmpty) {
         total += (drink['price'] as num).toDouble() * e.value;
       }
@@ -114,15 +113,16 @@ class _MenuScreenState extends State<MenuScreen>
     setState(() => _submitting = true);
 
     try {
-      final items = _cart.entries.map((e) {
-        final drink = _allDrinks.firstWhere((d) => d['id'] == e.key);
-        return {
-          'drink_id': e.key,
-          'drink_name': drink['name'],
-          'qty': e.value,
-          'price': (drink['price'] as num).toDouble(),
-        };
-      }).toList();
+      final items =
+          _cart.entries.map((e) {
+            final drink = _allDrinks.firstWhere((d) => d['id'] == e.key);
+            return {
+              'drink_id': e.key,
+              'drink_name': drink['name'],
+              'qty': e.value,
+              'price': (drink['price'] as num).toDouble(),
+            };
+          }).toList();
 
       await SupabaseOrdersService.createOrderInSupabase(
         tableId: widget.tableId,
@@ -137,7 +137,10 @@ class _MenuScreenState extends State<MenuScreen>
       });
     } catch (e) {
       setState(() => _submitting = false);
-      AppToast.show('❌ فشل إرسال الطلب، حاول مرة تانية'.tr(), kind: FeedbackKind.error);
+      AppToast.show(
+        '❌ فشل إرسال الطلب، حاول مرة تانية'.tr(),
+        kind: FeedbackKind.error,
+      );
     }
   }
 

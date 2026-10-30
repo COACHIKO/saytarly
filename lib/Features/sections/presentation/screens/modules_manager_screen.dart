@@ -38,107 +38,188 @@ class _ModulesManagerView extends StatelessWidget {
 
   Future<void> _openForm(BuildContext context, {SectionModuleRow? edit}) async {
     final viewModel = context.read<ModulesManagerCubit>();
-    final nameCtl = TextEditingController(text: edit?.module.name ?? '');
+    final nameArCtl = TextEditingController(text: edit?.module.name ?? '');
+    final nameEnCtl = TextEditingController(text: edit?.module.nameEn ?? '');
     String icon = edit?.module.icon ?? 'category';
     int color = edit?.module.color ?? ModuleColors.presets.first;
+    String? validationError;
 
     final saved = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AppDialog(
-          title: Text(edit == null ? 'قسم جديد'.tr() : 'تعديل القسم'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: nameCtl,
-                  autofocus: true,
-                  decoration:  InputDecoration(
-                    labelText: 'اسم القسم (زي: مشروبات)'.tr(),
-                    border: OutlineInputBorder(),
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder:
+                (dialogContext, setDialogState) => AppDialog(
+                  title: Text(
+                    edit == null ? 'قسم جديد'.tr() : 'تعديل القسم'.tr(),
                   ),
-                ),
-                const SizedBox(height: 16),
-                 Text('الأيقونة'.tr(), style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: ModuleIcons.presets.entries.map((e) {
-                    final selected = icon == e.key;
-                    return InkWell(
-                      onTap: () => setDialogState(() => icon = e.key),
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: selected
-                              ? Color(color).withValues(alpha: 0.25)
-                              : Colors.black12,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: selected ? Color(color) : Colors.transparent,
-                            width: 2,
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: nameArCtl,
+                          autofocus: true,
+                          textDirection: TextDirection.rtl,
+                          onChanged: (_) {
+                            if (validationError != null) {
+                              setDialogState(() => validationError = null);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'الاسم بالعربي'.tr(),
+                            hintText: 'مثال: مشروبات'.tr(),
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                        child: Icon(e.value, size: 22),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                 Text('اللون'.tr(), style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: ModuleColors.presets.map((c) {
-                    final selected = color == c;
-                    return InkWell(
-                      onTap: () => setDialogState(() => color = c),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Color(c),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selected ? Colors.white : Colors.transparent,
-                            width: 3,
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: nameEnCtl,
+                          textDirection: TextDirection.ltr,
+                          onChanged: (_) {
+                            if (validationError != null) {
+                              setDialogState(() => validationError = null);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'الاسم بالإنجليزي'.tr(),
+                            hintText: 'e.g. Drinks',
+                            border: OutlineInputBorder(),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                        const SizedBox(height: 8),
+                        Text(
+                          'اسم واحد على الأقل مطلوب — العربي أو الإنجليزي.'
+                              .tr(),
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                        if (validationError != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            validationError!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Text(
+                          'الأيقونة'.tr(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children:
+                              ModuleIcons.presets.entries.map((e) {
+                                final selected = icon == e.key;
+                                return InkWell(
+                                  onTap:
+                                      () => setDialogState(() => icon = e.key),
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          selected
+                                              ? Color(
+                                                color,
+                                              ).withValues(alpha: 0.25)
+                                              : Colors.black12,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color:
+                                            selected
+                                                ? Color(color)
+                                                : Colors.transparent,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Icon(e.value, size: 22),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'اللون'.tr(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children:
+                              ModuleColors.presets.map((c) {
+                                final selected = color == c;
+                                return InkWell(
+                                  onTap: () => setDialogState(() => color = c),
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: Color(c),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color:
+                                            selected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 3,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final ar = nameArCtl.text.trim();
+                        final en = nameEnCtl.text.trim();
+                        if (ar.isEmpty && en.isEmpty) {
+                          setDialogState(
+                            () =>
+                                validationError =
+                                    'اكتب اسم القسم بالعربي أو الإنجليزي'.tr(),
+                          );
+                          return;
+                        }
+                        Navigator.pop(dialogContext, true);
+                      },
+                      child: Text('حفظ'.tr()),
+                    ),
+                  ],
                 ),
-              ],
-            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child:  Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child:  Text('حفظ'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
 
     if (saved != true) return;
-    if (nameCtl.text.trim().isEmpty) {
-      _snack(context, 'اكتب اسم القسم'.tr(), error: true);
+    final nameAr = nameArCtl.text.trim();
+    final nameEn = nameEnCtl.text.trim();
+    if (nameAr.isEmpty && nameEn.isEmpty) {
+      _snack(context, 'اكتب اسم القسم بالعربي أو الإنجليزي'.tr(), error: true);
       return;
     }
 
     if (edit == null) {
       await viewModel.addModule(
-        name: nameCtl.text.trim(),
+        nameAr: nameAr,
+        nameEn: nameEn,
         icon: icon,
         color: color,
       );
@@ -146,7 +227,8 @@ class _ModulesManagerView extends StatelessWidget {
     } else {
       await viewModel.editModule(
         id: edit.module.id!,
-        name: nameCtl.text.trim(),
+        nameAr: nameAr,
+        nameEn: nameEn,
         icon: icon,
         color: color,
       );
@@ -160,7 +242,11 @@ class _ModulesManagerView extends StatelessWidget {
     if (!viewModel.canDelete(row)) {
       _snack(
         context,
-        ('مش هينفع تحذف «{v1}» — فيه {v2} منتج. '.tr({'v1': row.module.name, 'v2': row.drinks}) + 'انقلهم أو امسحهم الأول، أو اقفل القسم من الزرار.'.tr()),
+        ('مش هينفع تحذف «{v1}» — فيه {v2} منتج. '.tr({
+              'v1': row.module.displayName,
+              'v2': row.drinks,
+            }) +
+            'انقلهم أو امسحهم الأول، أو اقفل القسم من الزرار.'.tr()),
         error: true,
       );
       return;
@@ -168,22 +254,25 @@ class _ModulesManagerView extends StatelessWidget {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AppDialog(
-        title:  Text('حذف القسم؟'.tr()),
-        content: Text(
-          'هيتحذف قسم «{v1}» وكل القوائم الفرعية اللي جواه.'.tr({'v1': row.module.name}),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (dialogContext) => AppDialog(
+            title: Text('حذف القسم؟'.tr()),
+            content: Text(
+              'هيتحذف قسم «{v1}» وكل القوائم الفرعية اللي جواه.'.tr({
+                'v1': row.module.displayName,
+              }),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text('حذف'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child:  Text('حذف'.tr()),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
 

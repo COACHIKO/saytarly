@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'package:saytarly/core/localization/messages.dart';
+
 /// موديل قسم منتجات (زي: مشروبات، ماكولات، حلويات...)
 class AppModule {
   final int? id;
+
+  /// الاسم العربي (أو الاسم الأساسي القديم).
   final String name;
+
+  /// الاسم الإنجليزي — اختياري، وبيستخدم في الواجهة الإنجليزية.
+  final String nameEn;
   final String icon;
   final int color;
   final int sortOrder;
@@ -12,6 +19,7 @@ class AppModule {
   AppModule({
     this.id,
     required this.name,
+    this.nameEn = '',
     this.icon = 'category',
     this.color = 0xFF14B8A6,
     this.sortOrder = 0,
@@ -21,6 +29,7 @@ class AppModule {
   factory AppModule.fromMap(Map<String, dynamic> m) => AppModule(
     id: m['id'] as int?,
     name: m['name'] as String? ?? '',
+    nameEn: m['name_en'] as String? ?? '',
     icon: m['icon'] as String? ?? 'category',
     color: (m['color'] as num?)?.toInt() ?? 0xFF14B8A6,
     sortOrder: m['sort_order'] as int? ?? 0,
@@ -30,11 +39,26 @@ class AppModule {
   Map<String, dynamic> toMap() => {
     if (id != null) 'id': id,
     'name': name,
+    'name_en': nameEn,
     'icon': icon,
     'color': color,
     'sort_order': sortOrder,
     'is_enabled': isEnabled ? 1 : 0,
   };
+
+  /// الاسم المناسب للغة الواجهة الحالية، مع fallback للاسم الآخر.
+  String get displayName {
+    final ar = name.trim();
+    final en = nameEn.trim();
+    return Str.isRtl ? (ar.isNotEmpty ? ar : en) : (en.isNotEmpty ? en : ar);
+  }
+
+  /// نفس قواعد [displayName] لصفوف قاعدة البيانات الخام.
+  static String displayNameFromMap(Map<String, dynamic> m) {
+    final ar = (m['name'] ?? '').toString().trim();
+    final en = (m['name_en'] ?? '').toString().trim();
+    return Str.isRtl ? (ar.isNotEmpty ? ar : en) : (en.isNotEmpty ? en : ar);
+  }
 
   IconData get iconData => ModuleIcons.iconData(icon);
   Color get accentColor => Color(color);
@@ -44,7 +68,12 @@ class AppModule {
 class AppModuleCategory {
   final int? id;
   final int moduleId;
+
+  /// الاسم العربي (أو الاسم الأساسي القديم).
   final String name;
+
+  /// الاسم الإنجليزي — اختياري، وبيستخدم في الواجهة الإنجليزية.
+  final String nameEn;
   final String key;
   final int sortOrder;
   final bool isEnabled;
@@ -53,6 +82,7 @@ class AppModuleCategory {
     this.id,
     required this.moduleId,
     required this.name,
+    this.nameEn = '',
     required this.key,
     this.sortOrder = 0,
     this.isEnabled = true,
@@ -63,6 +93,7 @@ class AppModuleCategory {
         id: m['id'] as int?,
         moduleId: m['module_id'] as int? ?? 0,
         name: m['name'] as String? ?? '',
+        nameEn: m['name_en'] as String? ?? '',
         key: m['key'] as String? ?? '',
         sortOrder: m['sort_order'] as int? ?? 0,
         isEnabled: (m['is_enabled'] ?? 1) == 1,
@@ -72,10 +103,25 @@ class AppModuleCategory {
     if (id != null) 'id': id,
     'module_id': moduleId,
     'name': name,
+    'name_en': nameEn,
     'key': key,
     'sort_order': sortOrder,
     'is_enabled': isEnabled ? 1 : 0,
   };
+
+  /// الاسم المناسب للغة الواجهة الحالية، مع fallback للاسم الآخر.
+  String get displayName {
+    final ar = name.trim();
+    final en = nameEn.trim();
+    return Str.isRtl ? (ar.isNotEmpty ? ar : en) : (en.isNotEmpty ? en : ar);
+  }
+
+  /// نفس قواعد [displayName] لصفوف قاعدة البيانات الخام.
+  static String displayNameFromMap(Map<String, dynamic> m) {
+    final ar = (m['name'] ?? '').toString().trim();
+    final en = (m['name_en'] ?? '').toString().trim();
+    return Str.isRtl ? (ar.isNotEmpty ? ar : en) : (en.isNotEmpty ? en : ar);
+  }
 }
 
 /// أيقونات جاهزة يختار منها السوبر ادمن

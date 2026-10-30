@@ -2,7 +2,6 @@ part of '../ShiftDetailsPage.dart';
 
 /// جسم تفاصيل الشيفت — نسخة الموبايل (زي ما كانت بالظبط).
 extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
-
   Widget _buildMobileBody(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
@@ -25,7 +24,9 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('حدث خطأ: {v1}'.tr({'v1': snapshot.error})));
+            return Center(
+              child: Text('حدث خطأ: {v1}'.tr({'v1': snapshot.error})),
+            );
           }
 
           return SingleChildScrollView(
@@ -74,7 +75,13 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                 else
                   ...expenses.map((e) => _expenseCard(cs, tt, e)),
                 const SizedBox(height: 20),
-                _sectionHeader(cs, tt, 'الآجل'.tr(), Icons.schedule, debts.length),
+                _sectionHeader(
+                  cs,
+                  tt,
+                  'الآجل'.tr(),
+                  Icons.schedule,
+                  debts.length,
+                ),
                 const SizedBox(height: 8),
                 if (debts.isEmpty)
                   _emptyState(cs, tt, 'لا توجد ديون آجلة'.tr())
@@ -162,7 +169,9 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4, right: 34),
             child: Text(
-              canViewSummary ? 'اضغط للإخفاء'.tr() : 'اضغط لعرض التفاصيل المالية',
+              canViewSummary
+                  ? 'اضغط للإخفاء'.tr()
+                  : 'اضغط لعرض التفاصيل المالية'.tr(),
               style: TextStyle(
                 color: cs.onPrimary.withOpacity(0.7),
                 fontSize: 12,
@@ -551,8 +560,8 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                   onPressed: () async {
                     try {
                       final consoleId = inv['console_id'] as int?;
-                      final deviceCost = ((inv['device_cost'] ?? 0) as num)
-                          .toDouble();
+                      final deviceCost =
+                          ((inv['device_cost'] ?? 0) as num).toDouble();
 
                       if (consoleId != null && deviceCost > 0) {
                         final db = await DBHelper.database;
@@ -574,10 +583,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                           duration = effectiveSeconds / 3600.0;
                         }
 
-                        final drinksCost = ((inv['drinks_cost'] ?? 0) as num)
-                            .toDouble();
-                        final discount = ((inv['discount'] ?? 0) as num)
-                            .toDouble();
+                        final drinksCost =
+                            ((inv['drinks_cost'] ?? 0) as num).toDouble();
+                        final discount =
+                            ((inv['discount'] ?? 0) as num).toDouble();
                         final total = deviceCost + drinksCost;
 
                         final drinkItemsRaw = await db.query(
@@ -585,15 +594,16 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                           where: 'invoice_id = ? AND item_type != ?',
                           whereArgs: [inv['id'], 'playstation'],
                         );
-                        final drinksList = drinkItemsRaw
-                            .map(
-                              (e) => {
-                                'name': e['drink_name'] ?? 'غير معروف'.tr(),
-                                'qty': e['qty'] ?? 1,
-                                'total': e['total'] ?? 0.0,
-                              },
-                            )
-                            .toList();
+                        final drinksList =
+                            drinkItemsRaw
+                                .map(
+                                  (e) => {
+                                    'name': e['drink_name'] ?? 'غير معروف'.tr(),
+                                    'qty': e['qty'] ?? 1,
+                                    'total': e['total'] ?? 0.0,
+                                  },
+                                )
+                                .toList();
 
                         final consoleName =
                             consoleNames[consoleId] ?? 'غير معروف'.tr();
@@ -634,19 +644,19 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => AuditLogScreen(
-                          invoiceId: inv['id'] as int,
-                          title: 'سجل تعديلات الفاتورة #{v1}'.tr({'v1': inv['id']}),
-                        ),
+                        builder:
+                            (_) => AuditLogScreen(
+                              invoiceId: inv['id'] as int,
+                              title: 'سجل تعديلات الفاتورة #{v1}'.tr({
+                                'v1': inv['id'],
+                              }),
+                            ),
                       ),
                     );
                   },
                 ),
                 Container(
-                  padding:  EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -655,7 +665,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(statusIcon, size: 13, color: statusColor),
-                       SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Text(
                         statusLabel,
                         style: TextStyle(
@@ -669,7 +679,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                 ),
               ],
             ),
-             SizedBox(height: 10),
+            SizedBox(height: 10),
             Wrap(
               spacing: 14,
               runSpacing: 6,
@@ -701,9 +711,19 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                     fmt(inv['cigarettes_cost']),
                   ),
                 if (((inv['shisha_cost'] ?? 0) as num).toDouble() != 0)
-                  _miniStat(cs, Icons.blur_on, 'شيشة'.tr(), fmt(inv['shisha_cost'])),
+                  _miniStat(
+                    cs,
+                    Icons.blur_on,
+                    'شيشة'.tr(),
+                    fmt(inv['shisha_cost']),
+                  ),
                 if ((inv['discount'] ?? 0) != 0)
-                  _miniStat(cs, Icons.discount, 'خصم'.tr(), fmt(inv['discount'])),
+                  _miniStat(
+                    cs,
+                    Icons.discount,
+                    'خصم'.tr(),
+                    fmt(inv['discount']),
+                  ),
                 _miniStat(
                   cs,
                   Icons.payments,
@@ -724,7 +744,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    'من {v1}  إلى  {v2}'.tr({'v1': formatDate(inv['start_time']), 'v2': formatDate(inv['end_time'])}),
+                    'من {v1}  إلى  {v2}'.tr({
+                      'v1': formatDate(inv['start_time']),
+                      'v2': formatDate(inv['end_time']),
+                    }),
                     style: TextStyle(
                       fontSize: 11.5,
                       color: cs.onSurface.withOpacity(0.55),
@@ -747,11 +770,18 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, size: 15, color: _ShiftDetailsPageState.debtColor),
+                    const Icon(
+                      Icons.info_outline,
+                      size: 15,
+                      color: _ShiftDetailsPageState.debtColor,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'مدفوع جزئيًا: {v1}   |   الباقي: {v2}'.tr({'v1': fmt(inv['paid_partial']), 'v2': fmt(inv['remaining_debt'])}),
+                        'مدفوع جزئيًا: {v1}   |   الباقي: {v2}'.tr({
+                          'v1': fmt(inv['paid_partial']),
+                          'v2': fmt(inv['remaining_debt']),
+                        }),
                         style: const TextStyle(
                           fontSize: 12,
                           color: _ShiftDetailsPageState.debtColor,
@@ -786,7 +816,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'محصّل جزئيًا (والترابيزة لسه شغالة): {v1} {v2}'.tr({'v1': fmt(inv['paid_partial']), 'v2': Money.txt}),
+                        'محصّل جزئيًا (والترابيزة لسه شغالة): {v1} {v2}'.tr({
+                          'v1': fmt(inv['paid_partial']),
+                          'v2': Money.txt,
+                        }),
                         style: const TextStyle(
                           fontSize: 12,
                           color: _ShiftDetailsPageState.collectedColor,
@@ -862,8 +895,12 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                     const Icon(Icons.inventory_2_outlined, size: 18),
                     const SizedBox(width: 6),
                     Text(
-                      'إجمالي القطع المباعة: {totalQty}'.tr({'totalQty': totalQty}),
-                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      'إجمالي القطع المباعة: {totalQty}'.tr({
+                        'totalQty': totalQty,
+                      }),
+                      style: tt.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -915,7 +952,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                             ),
                           ),
                           Text(
-                            'سعر الوحدة: {v1} {v2}'.tr({'v1': unitPrice.toStringAsFixed(2), 'v2': Money.txt}),
+                            'سعر الوحدة: {v1} {v2}'.tr({
+                              'v1': unitPrice.toStringAsFixed(2),
+                              'v2': Money.txt,
+                            }),
                             style: TextStyle(
                               fontSize: 11,
                               color: cs.onSurface.withOpacity(0.55),
@@ -982,7 +1022,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
           ),
         ),
         subtitle: Text(
-          'تمت في: {v1} بواسطة: {v2}'.tr({'v1': formatDate(e['date']), 'v2': e['added_by']}),
+          'تمت في: {v1} بواسطة: {v2}'.tr({
+            'v1': formatDate(e['date']),
+            'v2': e['added_by'],
+          }),
           style: TextStyle(
             fontSize: 11.5,
             color: cs.onSurface.withOpacity(0.55),
@@ -1004,9 +1047,8 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
   Widget _debtCard(ColorScheme cs, TextTheme tt, Map<String, dynamic> d) {
     final totalAmount = (d['total_amount'] as num?)?.toDouble() ?? 0.0;
 
-    final debtPaymentsForRow = transactions
-        .where((t) => t['debt_id'] == d['id'])
-        .toList();
+    final debtPaymentsForRow =
+        transactions.where((t) => t['debt_id'] == d['id']).toList();
 
     final totalPaidPartial = (d['paid_partial'] as double?) ?? 0.0;
     final remaining =
@@ -1035,7 +1077,11 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 3),
           child: Text(
-            'المتبقي: {v1} {v2}\nتاريخ: {v3}'.tr({'v1': remaining.toStringAsFixed(2), 'v2': Money.txt, 'v3': formatDate(d['date'])}),
+            'المتبقي: {v1} {v2}\nتاريخ: {v3}'.tr({
+              'v1': remaining.toStringAsFixed(2),
+              'v2': Money.txt,
+              'v3': formatDate(d['date']),
+            }),
             style: const TextStyle(
               fontSize: 12,
               color: _ShiftDetailsPageState.debtColor,
@@ -1081,17 +1127,19 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                   final debtDetails = <Map<String, dynamic>>[
                     {
                       'date': d['date'],
-                      'items': items
-                          .map((e) => Map<String, dynamic>.from(e))
-                          .toList(),
+                      'items':
+                          items
+                              .map((e) => Map<String, dynamic>.from(e))
+                              .toList(),
                       'total': totalAmount,
                       'original':
                           (d['original_amount'] as num?)?.toDouble() ??
                           totalAmount,
                       'paid': totalPaidPartial,
-                      'payments': payments
-                          .map((p) => Map<String, dynamic>.from(p))
-                          .toList(),
+                      'payments':
+                          payments
+                              .map((p) => Map<String, dynamic>.from(p))
+                              .toList(),
                     },
                   ];
 
@@ -1144,14 +1192,23 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: _ShiftDetailsPageState.collectedColor.withOpacity(0.5), width: 1),
+        side: BorderSide(
+          color: _ShiftDetailsPageState.collectedColor.withOpacity(0.5),
+          width: 1,
+        ),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: CircleAvatar(
           radius: 18,
-          backgroundColor: _ShiftDetailsPageState.collectedColor.withOpacity(0.15),
-          child: const Icon(Icons.price_check, color: _ShiftDetailsPageState.collectedColor, size: 18),
+          backgroundColor: _ShiftDetailsPageState.collectedColor.withOpacity(
+            0.15,
+          ),
+          child: const Icon(
+            Icons.price_check,
+            color: _ShiftDetailsPageState.collectedColor,
+            size: 18,
+          ),
         ),
         title: Text(
           customerName,
@@ -1164,7 +1221,13 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
           padding: const EdgeInsets.only(top: 3),
           child: Text(
             discount > 0
-                ? 'مدفوع: {v1} {v2}  |  خصم: {v3} {v4}\nبتاريخ: {v5}'.tr({'v1': amount.toStringAsFixed(2), 'v2': Money.txt, 'v3': discount.toStringAsFixed(2), 'v4': Money.txt, 'v5': formatDate(p['paid_at'] as String?)})
+                ? 'مدفوع: {v1} {v2}  |  خصم: {v3} {v4}\nبتاريخ: {v5}'.tr({
+                  'v1': amount.toStringAsFixed(2),
+                  'v2': Money.txt,
+                  'v3': discount.toStringAsFixed(2),
+                  'v4': Money.txt,
+                  'v5': formatDate(p['paid_at'] as String?),
+                })
                 : 'مدفوع: ${amount.toStringAsFixed(2)} ${Money.txt}\nبتاريخ: ${formatDate(p['paid_at'] as String?)}',
             style: const TextStyle(
               fontSize: 12,
@@ -1178,7 +1241,11 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.print, size: 18, color: _ShiftDetailsPageState.collectedColor),
+              icon: Icon(
+                Icons.print,
+                size: 18,
+                color: _ShiftDetailsPageState.collectedColor,
+              ),
               tooltip: 'طباعة إيصال التحصيل'.tr(),
               onPressed: () async {
                 try {
@@ -1194,9 +1261,10 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                   final debtDetails = <Map<String, dynamic>>[
                     {
                       'date': p['paid_at'],
-                      'items': items
-                          .map((e) => Map<String, dynamic>.from(e))
-                          .toList(),
+                      'items':
+                          items
+                              .map((e) => Map<String, dynamic>.from(e))
+                              .toList(),
                       'total': amount,
                       'original': amount,
                       'paid': amount,

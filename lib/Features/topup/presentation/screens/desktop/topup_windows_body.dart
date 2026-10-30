@@ -17,7 +17,10 @@ extension _TopupWindowsBody on _AdminScreenState {
 
     return DesktopPageScaffold(
       title: 'ماكينة الشحن'.tr(),
-      subtitle: 'رصيد الشحن: {_balance} ج • {v2} عملية ضمن الفلتر'.tr({'_balance': _balance, 'v2': _filteredTransactions.length}),
+      subtitle: 'رصيد الشحن: {_balance} ج • {v2} عملية ضمن الفلتر'.tr({
+        '_balance': _balance,
+        'v2': _filteredTransactions.length,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -31,20 +34,23 @@ extension _TopupWindowsBody on _AdminScreenState {
           onPressed: () async {
             final confirmed = await showDialog<bool>(
               context: context,
-              builder: (_) => AppDialog(
-                title:  Text('تأكيد الحذف'.tr()),
-                content:  Text('هل أنت متأكد أنك تريد مسح كل العمليات؟'.tr()),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child:  Text('إلغاء'.tr()),
+              builder:
+                  (_) => AppDialog(
+                    title: Text('تأكيد الحذف'.tr()),
+                    content: Text(
+                      'هل أنت متأكد أنك تريد مسح كل العمليات؟'.tr(),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text('إلغاء'.tr()),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text('تأكيد'.tr()),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child:  Text('تأكيد'.tr()),
-                  ),
-                ],
-              ),
             );
 
             if (confirmed == true) {
@@ -58,22 +64,27 @@ extension _TopupWindowsBody on _AdminScreenState {
       headerBottom: Row(
         children: [
           DesktopInfoChip(
-            label: _fromDate == null
-                ? 'من: البداية'.tr()
-                : 'من: ${formatArabicDate(_fromDate!)}',
+            label:
+                _fromDate == null
+                    ? 'من: البداية'.tr()
+                    : 'من: ${formatArabicDate(_fromDate!)}',
             icon: Icons.event_outlined,
             color: palette.info,
           ),
-           SizedBox(width: DesktopTokens.gapSm),
+          SizedBox(width: DesktopTokens.gapSm),
           DesktopInfoChip(
             label:
-                _toDate == null ? 'إلى: النهاية'.tr() : 'إلى: ${formatArabicDate(_toDate!)}',
+                _toDate == null
+                    ? 'إلى: النهاية'.tr()
+                    : 'إلى: ${formatArabicDate(_toDate!)}',
             icon: Icons.event_available_outlined,
             color: palette.info,
           ),
           const SizedBox(width: DesktopTokens.gapSm),
           DesktopInfoChip(
-            label: 'عمليات الفلتر: {v1}'.tr({'v1': _filteredTransactions.length}),
+            label: 'عمليات الفلتر: {v1}'.tr({
+              'v1': _filteredTransactions.length,
+            }),
             icon: Icons.filter_alt_outlined,
           ),
         ],
@@ -119,11 +130,11 @@ extension _TopupWindowsBody on _AdminScreenState {
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== فلترة + إضافة رصيد ====================
           DesktopCard(
-            padding:  EdgeInsets.all(DesktopTokens.gapLg),
+            padding: EdgeInsets.all(DesktopTokens.gapLg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -131,17 +142,19 @@ extension _TopupWindowsBody on _AdminScreenState {
                 Row(
                   children: [
                     DesktopButton.ghost(
-                      label: _fromDate == null
-                          ? 'من تاريخ'.tr()
-                          : formatArabicDate(_fromDate!),
+                      label:
+                          _fromDate == null
+                              ? 'من تاريخ'.tr()
+                              : formatArabicDate(_fromDate!),
                       icon: Icons.event_outlined,
                       onPressed: _pickFromDate,
                     ),
-                     SizedBox(width: DesktopTokens.gapSm),
+                    SizedBox(width: DesktopTokens.gapSm),
                     DesktopButton.ghost(
-                      label: _toDate == null
-                          ? 'إلى تاريخ'.tr()
-                          : formatArabicDate(_toDate!),
+                      label:
+                          _toDate == null
+                              ? 'إلى تاريخ'.tr()
+                              : formatArabicDate(_toDate!),
                       icon: Icons.event_available_outlined,
                       onPressed: _pickToDate,
                     ),
@@ -165,9 +178,9 @@ extension _TopupWindowsBody on _AdminScreenState {
                     ),
                   ],
                 ),
-                 SizedBox(height: DesktopTokens.gapLg),
-                 Divider(height: 1),
-                 SizedBox(height: DesktopTokens.gapLg),
+                SizedBox(height: DesktopTokens.gapLg),
+                Divider(height: 1),
+                SizedBox(height: DesktopTokens.gapLg),
                 DesktopSectionTitle(title: 'إضافة رصيد للمكنة'.tr()),
                 Row(
                   children: [
@@ -175,7 +188,7 @@ extension _TopupWindowsBody on _AdminScreenState {
                       width: 340,
                       child: TextField(
                         controller: _addController,
-                        keyboardType:  TextInputType.numberWithOptions(
+                        keyboardType: TextInputType.numberWithOptions(
                           decimal: true,
                         ),
                         style: TextStyle(
@@ -197,25 +210,29 @@ extension _TopupWindowsBody on _AdminScreenState {
                           filled: true,
                           fillColor: palette.surfaceSoft,
                           isDense: true,
-                          contentPadding:  EdgeInsets.symmetric(
+                          contentPadding: EdgeInsets.symmetric(
                             horizontal: 14,
                             vertical: 16,
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(DesktopTokens.radiusMd),
+                            borderRadius: BorderRadius.circular(
+                              DesktopTokens.radiusMd,
+                            ),
                             borderSide: BorderSide(color: palette.border),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(DesktopTokens.radiusMd),
-                            borderSide:
-                                BorderSide(color: palette.accent, width: 1.5),
+                            borderRadius: BorderRadius.circular(
+                              DesktopTokens.radiusMd,
+                            ),
+                            borderSide: BorderSide(
+                              color: palette.accent,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                     SizedBox(width: DesktopTokens.gapSm),
+                    SizedBox(width: DesktopTokens.gapSm),
                     DesktopButton.primary(
                       label: 'إضافة'.tr(),
                       icon: Icons.add,
@@ -223,7 +240,7 @@ extension _TopupWindowsBody on _AdminScreenState {
                     ),
                   ],
                 ),
-                 SizedBox(height: DesktopTokens.gapMd),
+                SizedBox(height: DesktopTokens.gapMd),
                 Wrap(
                   spacing: DesktopTokens.gapSm,
                   runSpacing: DesktopTokens.gapSm,
@@ -236,7 +253,13 @@ extension _TopupWindowsBody on _AdminScreenState {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    for (final amount in const [50.0, 100.0, 200.0, 500.0, 1000.0])
+                    for (final amount in const [
+                      50.0,
+                      100.0,
+                      200.0,
+                      500.0,
+                      1000.0,
+                    ])
                       _windowsQuickAmountChip(context, amount),
                   ],
                 ),
@@ -244,7 +267,7 @@ extension _TopupWindowsBody on _AdminScreenState {
             ),
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== ملخص كُلها (نفس بيانات الموبايل) ====================
           DesktopSectionTitle(title: 'تقارير المكنة'.tr()),
@@ -297,25 +320,33 @@ extension _TopupWindowsBody on _AdminScreenState {
                 ),
                 const SizedBox(height: DesktopTokens.gapXs),
                 Text(
-                  'عدد العمليات (المفلترة): {v1}'.tr({'v1': _filteredTransactions.length}),
+                  'عدد العمليات (المفلترة): {v1}'.tr({
+                    'v1': _filteredTransactions.length,
+                  }),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: palette.textSecondary,
                   ),
                 ),
                 Text(
-                  'إجمالي التكلفة (المفلترة): {v1}'.tr({'v1': _totalCostFiltered.toStringAsFixed(2)}),
+                  'إجمالي التكلفة (المفلترة): {v1}'.tr({
+                    'v1': _totalCostFiltered.toStringAsFixed(2),
+                  }),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: palette.textSecondary,
                   ),
                 ),
                 Text(
-                  'إجمالي المستلم (المفلترة): {v1}'.tr({'v1': _totalReceivedFiltered.toStringAsFixed(2)}),
+                  'إجمالي المستلم (المفلترة): {v1}'.tr({
+                    'v1': _totalReceivedFiltered.toStringAsFixed(2),
+                  }),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: palette.textSecondary,
                   ),
                 ),
                 Text(
-                  'إجمالي الربح (المفلترة): {v1}'.tr({'v1': _totalProfitFiltered.toStringAsFixed(2)}),
+                  'إجمالي الربح (المفلترة): {v1}'.tr({
+                    'v1': _totalProfitFiltered.toStringAsFixed(2),
+                  }),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: palette.textSecondary,
                   ),
@@ -324,7 +355,7 @@ extension _TopupWindowsBody on _AdminScreenState {
             ),
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== كل العمليات ====================
           DesktopSectionTitle(
@@ -335,9 +366,11 @@ extension _TopupWindowsBody on _AdminScreenState {
             DesktopEmptyState(
               icon: Icons.inbox_outlined,
               title: 'لا توجد عمليات لعرضها'.tr(),
-              message: _fromDate == null && _toDate == null
-                  ? 'لسه مفيش عمليات شحن مسجّلة على المكنة.'.tr()
-                  : 'مفيش عمليات في الفترة المختارة — جرّب تمسح الفلتر.',
+              message:
+                  _fromDate == null && _toDate == null
+                      ? 'لسه مفيش عمليات شحن مسجّلة على المكنة.'.tr()
+                      : 'مفيش عمليات في الفترة المختارة — جرّب تمسح الفلتر.'
+                          .tr(),
             )
           else
             for (final t in _filteredTransactions) ...[
@@ -355,21 +388,22 @@ extension _TopupWindowsBody on _AdminScreenState {
     final palette = DesktopPalette.of(context);
 
     return HoverBuilder(
-      builder: (context, hovering) => GestureDetector(
-        onTap: () {
-          _addController.text = amount.toStringAsFixed(0);
-          _addBalance();
-        },
-        child: AnimatedScale(
-          duration: DesktopTokens.fast,
-          scale: hovering ? 1.05 : 1,
-          child: DesktopInfoChip(
-            label: '{v1} ج'.tr({'v1': amount.toStringAsFixed(0)}),
-            icon: Icons.add,
-            color: hovering ? palette.accent : palette.textSecondary,
+      builder:
+          (context, hovering) => GestureDetector(
+            onTap: () {
+              _addController.text = amount.toStringAsFixed(0);
+              _addBalance();
+            },
+            child: AnimatedScale(
+              duration: DesktopTokens.fast,
+              scale: hovering ? 1.05 : 1,
+              child: DesktopInfoChip(
+                label: '{v1} ج'.tr({'v1': amount.toStringAsFixed(0)}),
+                icon: Icons.add,
+                color: hovering ? palette.accent : palette.textSecondary,
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -398,7 +432,10 @@ extension _TopupWindowsBody on _AdminScreenState {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'التكلفة: {v1}  المستلم: {v2}'.tr({'v1': t['cost'], 'v2': t['received']}),
+                  'التكلفة: {v1}  المستلم: {v2}'.tr({
+                    'v1': t['cost'],
+                    'v2': t['received'],
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -409,7 +446,10 @@ extension _TopupWindowsBody on _AdminScreenState {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'الربح: {v1} • {v2}'.tr({'v1': t['profit'], 'v2': _formattedDate(date)}),
+                  'الربح: {v1} • {v2}'.tr({
+                    'v1': t['profit'],
+                    'v2': _formattedDate(date),
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(

@@ -48,8 +48,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     final modules = await DBHelper.getModules();
     final db = await DBHelper.database;
     final products = await db.rawQuery('SELECT COUNT(*) AS c FROM drinks');
-    final productsCount =
-        (products.first['c'] as num?)?.toInt() ?? 0;
+    final productsCount = (products.first['c'] as num?)?.toInt() ?? 0;
 
     if (!mounted) return;
     setState(() {
@@ -84,39 +83,46 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AppDialog(
-        title:  Text('تغيير كلمة سر السوبر ادمن'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: oldCtl,
-              obscureText: true,
-              decoration:  InputDecoration(labelText: 'كلمة السر الحالية'.tr()),
+      builder:
+          (dialogContext) => AppDialog(
+            title: Text('تغيير كلمة سر السوبر ادمن'.tr()),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: oldCtl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'كلمة السر الحالية'.tr(),
+                  ),
+                ),
+                TextField(
+                  controller: newCtl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'كلمة السر الجديدة'.tr(),
+                  ),
+                ),
+                TextField(
+                  controller: confirmCtl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'تأكيد كلمة السر'.tr(),
+                  ),
+                ),
+              ],
             ),
-            TextField(
-              controller: newCtl,
-              obscureText: true,
-              decoration:  InputDecoration(labelText: 'كلمة السر الجديدة'.tr()),
-            ),
-            TextField(
-              controller: confirmCtl,
-              obscureText: true,
-              decoration:  InputDecoration(labelText: 'تأكيد كلمة السر'.tr()),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child:  Text('إلغاء'.tr()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text('حفظ'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child:  Text('حفظ'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (ok != true || !mounted) return;
@@ -149,67 +155,71 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
 
   List<Map<String, dynamic>> get _actions => [
     {
-      'title': 'الملف التجاري',
+      'title': 'الملف التجاري'.tr(),
       'subtitle': '$_placeName • $_typeLabel',
-      'group': 'التخصيص',
+      'group': 'التخصيص'.tr(),
       'icon': Icons.storefront,
       'color': Colors.teal,
       'onTap': () => _push(const BusinessProfileScreen()),
     },
     {
-      'title': 'أقسام المنتجات',
-      'subtitle': '$_modulesCount قسم • $_productsCount منتج',
-      'group': 'التخصيص',
+      'title': 'أقسام المنتجات'.tr(),
+      'subtitle': '{v1} قسم • {v2} منتج'.tr({
+        'v1': _modulesCount,
+        'v2': _productsCount,
+      }),
+      'group': 'التخصيص'.tr(),
       'icon': Icons.category,
       'color': const Color(0xFF14B8A6),
       'onTap': () => _push(const ModulesManagerScreen()),
     },
     {
-      'title': 'معالج التهيئة',
-      'subtitle': _setupCompleted
-          ? 'إعادة تشغيل خطوات التهيئة'.tr()
-          : '⚠️ لسه فيه خطوات تهيئة مطلوبة',
-      'group': 'التخصيص',
+      'title': 'معالج التهيئة'.tr(),
+      'subtitle':
+          _setupCompleted
+              ? 'إعادة تشغيل خطوات التهيئة'.tr()
+              : '⚠️ لسه فيه خطوات تهيئة مطلوبة'.tr(),
+      'group': 'التخصيص'.tr(),
       'icon': Icons.rocket_launch,
       'color': Colors.deepPurple,
       'onTap': () => _push(const SetupWizardScreen(fromDashboard: true)),
     },
     {
-      'title': 'إدارة المستخدمين',
-      'subtitle': 'حسابات الأدمن والستاف',
-      'group': 'الإدارة',
+      'title': 'إدارة المستخدمين'.tr(),
+      'subtitle': 'حسابات الأدمن والستاف'.tr(),
+      'group': 'الإدارة'.tr(),
       'icon': Icons.manage_accounts,
       'color': Colors.red,
       'onTap': () => _push(ManageUsersScreen()),
     },
     {
-      'title': 'لوحة الأدمن',
-      'subtitle': 'شوف النظام بعين الأدمن',
-      'group': 'الإدارة',
+      'title': 'لوحة الأدمن'.tr(),
+      'subtitle': 'شوف النظام بعين الأدمن'.tr(),
+      'group': 'الإدارة'.tr(),
       'icon': Icons.dashboard,
       'color': Colors.indigo,
       'onTap': () => _push(AdminDashboard()),
     },
     {
-      'title': 'الإعدادات',
-      'subtitle': 'المظهر • النسخ الاحتياطي • الخصائص',
-      'group': 'الإدارة',
+      'title': 'الإعدادات'.tr(),
+      'subtitle': 'المظهر • النسخ الاحتياطي • الخصائص'.tr(),
+      'group': 'الإدارة'.tr(),
       'icon': Icons.settings,
       'color': Colors.blueGrey,
       'onTap': () => _push(const SettingsScreen()),
     },
     {
-      'title': 'التفعيل',
-      'subtitle': 'توليد كود تفعيل للجهاز',
-      'group': 'الإدارة',
+      'title': 'التفعيل'.tr(),
+      'subtitle': 'توليد كود تفعيل للجهاز'.tr(),
+      'group': 'الإدارة'.tr(),
       'icon': Icons.key,
       'color': Colors.amber,
       'onTap': () => _push(const LicenseGeneratorScreen()),
     },
     {
-      'title': 'تغيير كلمة السر',
-      'subtitle': 'كلمة سر حساب السوبر ادمن',
-      'group': 'الإدارة',
+      'title': 'تغيير كلمة السر'.tr(),
+      'subtitle': 'كلمة سر حساب السوبر ادمن'.tr(),
+      'group': 'الإدارة'.tr(),
       'icon': Icons.lock,
       'color': Colors.orange,
       'onTap': _changePassword,

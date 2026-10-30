@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:saytarly/core/desktop/desktop.dart';
+import 'package:saytarly/core/design/design.dart';
+import 'package:saytarly/core/localization/cubit/locale_cubit.dart';
 import 'package:saytarly/core/utils/theme/cubit/theme_cubit.dart';
 import 'package:saytarly/core/widgets/BACKGROUND.dart';
 import 'package:saytarly/Features/auth/logic/cubit/login_cubit.dart';
-import 'package:saytarly/Features/auth/viewmodel/current_user.dart';
 import 'package:saytarly/Features/cashier/presentation/widgets/addDrinkMode.dart';
 import 'package:saytarly/Features/dashboard/presentation/screens/staff_dashboard.dart';
 import 'package:saytarly/Features/superadmin/presentation/screens/super_admin_dashboard.dart';
@@ -79,12 +80,13 @@ class _LoginViewState extends State<_LoginView> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => StaffDashboard(
-              staffName: outcome.username,
-              shiftId: outcome.shiftId!,
-              staffId: outcome.userId,
-              supervisorShiftId: outcome.shiftId!,
-            ),
+            builder:
+                (_) => StaffDashboard(
+                  staffName: outcome.username,
+                  shiftId: outcome.shiftId!,
+                  staffId: outcome.userId,
+                  supervisorShiftId: outcome.shiftId!,
+                ),
           ),
         );
       case 'superadmin':

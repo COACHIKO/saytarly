@@ -69,14 +69,21 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
             color: palette.accentText,
           ),
           DesktopInfoChip(
-            label:
-                '{v1} فاتورة مفتوحة'.tr({'v1': invoices.where((inv) => inv['is_open'] == true).length}),
+            label: '{v1} فاتورة مفتوحة'.tr({
+              'v1': invoices.where((inv) => inv['is_open'] == true).length,
+            }),
             icon: Icons.play_circle_outline,
             color: palette.warning,
           ),
           DesktopInfoChip(
-            label:
-                '{v1} آجل'.tr({'v1': debts.where((d) => ((d['remaining_amount'] as double?) ?? 0) > 0).length}),
+            label: '{v1} آجل'.tr({
+              'v1':
+                  debts
+                      .where(
+                        (d) => ((d['remaining_amount'] as double?) ?? 0) > 0,
+                      )
+                      .length,
+            }),
             icon: Icons.schedule_outlined,
             color: palette.danger,
           ),
@@ -122,7 +129,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 _windowsSummaryLocked(context)
               else
                 _windowsSummaryGrid(context),
-               SizedBox(height: DesktopTokens.gapLg),
+              SizedBox(height: DesktopTokens.gapLg),
 
               // ==================== الأصناف والمنتجات ====================
               DesktopSectionTitle(
@@ -130,13 +137,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 count: productsSummary.length,
               ),
               if (productsSummary.isEmpty)
-                 DesktopEmptyState(
+                DesktopEmptyState(
                   icon: Icons.fastfood_outlined,
                   title: 'لا توجد أصناف مباعة في هذا الشيفت'.tr(),
                 )
               else
                 _windowsProductsGrid(context),
-               SizedBox(height: DesktopTokens.gapLg),
+              SizedBox(height: DesktopTokens.gapLg),
 
               // ==================== الفواتير ====================
               DesktopSectionTitle(
@@ -144,13 +151,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 count: invoices.length,
               ),
               if (invoices.isEmpty)
-                 DesktopEmptyState(
+                DesktopEmptyState(
                   icon: Icons.receipt_long_outlined,
                   title: 'لا توجد فواتير في هذا الشيفت'.tr(),
                 )
               else
                 ...invoices.map((inv) => _windowsInvoiceCard(context, inv)),
-               SizedBox(height: DesktopTokens.gapLg),
+              SizedBox(height: DesktopTokens.gapLg),
 
               // ==================== المصروفات ====================
               DesktopSectionTitle(
@@ -158,24 +165,24 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 count: expenses.length,
               ),
               if (expenses.isEmpty)
-                 DesktopEmptyState(
+                DesktopEmptyState(
                   icon: Icons.money_off_outlined,
                   title: 'لا توجد مصروفات مسجلة'.tr(),
                 )
               else
                 ...expenses.map((e) => _windowsExpenseCard(context, e)),
-               SizedBox(height: DesktopTokens.gapLg),
+              SizedBox(height: DesktopTokens.gapLg),
 
               // ==================== الآجل ====================
               DesktopSectionTitle(title: 'الآجل'.tr(), count: debts.length),
               if (debts.isEmpty)
-                 DesktopEmptyState(
+                DesktopEmptyState(
                   icon: Icons.schedule_outlined,
                   title: 'لا توجد ديون آجلة'.tr(),
                 )
               else
                 ...debts.map((d) => _windowsDebtCard(context, d)),
-               SizedBox(height: DesktopTokens.gapLg),
+              SizedBox(height: DesktopTokens.gapLg),
 
               // ==================== محصّل من الآجل ====================
               DesktopSectionTitle(
@@ -221,7 +228,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                   ),
                 ),
               if (debtPayments.isEmpty)
-                 DesktopEmptyState(
+                DesktopEmptyState(
                   icon: Icons.price_check,
                   title: 'لا يوجد تحصيل في هذا الشيفت'.tr(),
                 )
@@ -270,10 +277,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 const SizedBox(height: 4),
                 Text(
                   'أدخل كلمة مرور الكاشير لعرض تفاصيل المبيعات والتحصيل.'.tr(),
-                  style: TextStyle(
-                    color: palette.textMuted,
-                    fontSize: 12.5,
-                  ),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12.5),
                 ),
               ],
             ),
@@ -387,9 +391,12 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           value: _money(n.grandTotal),
           icon: Icons.summarize_outlined,
           color: palette.accent,
-          hint: n.discounts > 0
-              ? 'بعد الخصومات: {v1}'.tr({'v1': _money(n.grandTotalAfterDiscounts)})
-              : 'من غير خصومات',
+          hint:
+              n.discounts > 0
+                  ? 'بعد الخصومات: {v1}'.tr({
+                    'v1': _money(n.grandTotalAfterDiscounts),
+                  })
+                  : 'من غير خصومات'.tr(),
         ),
       ],
     );
@@ -406,11 +413,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
 
     final totalDevicesPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + paidFraction(inv, (inv['device_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum +
+          paidFraction(inv, (inv['device_cost'] as num?)?.toDouble() ?? 0.0);
     });
     final totalDrinksPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + paidFraction(inv, (inv['drinks_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum +
+          paidFraction(inv, (inv['drinks_cost'] as num?)?.toDouble() ?? 0.0);
     });
     final totalProductsPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
@@ -420,7 +429,10 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
     final totalCigarettes = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
       return sum +
-          paidFraction(inv, (inv['cigarettes_cost'] as num?)?.toDouble() ?? 0.0);
+          paidFraction(
+            inv,
+            (inv['cigarettes_cost'] as num?)?.toDouble() ?? 0.0,
+          );
     });
     final totalShisha = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
@@ -449,7 +461,8 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           paidFraction(inv, (inv['discount'] as num?)?.toDouble() ?? 0.0);
     });
 
-    final grandTotal = totalDevicesPaid +
+    final grandTotal =
+        totalDevicesPaid +
         totalDrinksPaid +
         totalProductsPaid +
         totalCigarettes +
@@ -503,7 +516,9 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
             runSpacing: DesktopTokens.gapSm,
             children: [
               DesktopInfoChip(
-                label: 'إجمالي القطع المباعة: {totalQty}'.tr({'totalQty': totalQty}),
+                label: 'إجمالي القطع المباعة: {totalQty}'.tr({
+                  'totalQty': totalQty,
+                }),
                 icon: Icons.inventory_2_outlined,
                 color: palette.accentText,
               ),
@@ -549,7 +564,12 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            'سعر الوحدة: {v1} {v2}'.tr({'v1': ((p['unit_price'] ?? 0) as num).toDouble().toStringAsFixed(2), 'v2': Money.txt}),
+                            'سعر الوحدة: {v1} {v2}'.tr({
+                              'v1': ((p['unit_price'] ?? 0) as num)
+                                  .toDouble()
+                                  .toStringAsFixed(2),
+                              'v2': Money.txt,
+                            }),
                             style: TextStyle(
                               color: palette.textMuted,
                               fontSize: 11,
@@ -687,10 +707,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => AuditLogScreen(
-                        invoiceId: inv['id'] as int,
-                        title: 'سجل تعديلات الفاتورة #{v1}'.tr({'v1': inv['id']}),
-                      ),
+                      builder:
+                          (_) => AuditLogScreen(
+                            invoiceId: inv['id'] as int,
+                            title: 'سجل تعديلات الفاتورة #{v1}'.tr({
+                              'v1': inv['id'],
+                            }),
+                          ),
                     ),
                   );
                 },
@@ -709,45 +732,57 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
             runSpacing: DesktopTokens.gapSm,
             children: [
               DesktopInfoChip(
-                label: 'بلايستيشن: {v1}'.tr({'v1': _money(((inv['device_cost'] ?? 0) as num).toDouble())}),
+                label: 'بلايستيشن: {v1}'.tr({
+                  'v1': _money(((inv['device_cost'] ?? 0) as num).toDouble()),
+                }),
                 icon: Icons.sports_esports_outlined,
                 color: palette.textSecondary,
                 dense: true,
               ),
               DesktopInfoChip(
-                label: 'مشروبات: {v1}'.tr({'v1': _money(((inv['drinks_cost'] ?? 0) as num).toDouble())}),
+                label: 'مشروبات: {v1}'.tr({
+                  'v1': _money(((inv['drinks_cost'] ?? 0) as num).toDouble()),
+                }),
                 icon: Icons.local_cafe_outlined,
                 color: palette.textSecondary,
                 dense: true,
               ),
               if (((inv['products_cost'] ?? 0) as num).toDouble() != 0)
                 DesktopInfoChip(
-                  label:
-                      'منتجات: {v1}'.tr({'v1': _money(((inv['products_cost'] ?? 0) as num).toDouble())}),
+                  label: 'منتجات: {v1}'.tr({
+                    'v1': _money(
+                      ((inv['products_cost'] ?? 0) as num).toDouble(),
+                    ),
+                  }),
                   icon: Icons.fastfood_outlined,
                   color: palette.textSecondary,
                   dense: true,
                 ),
               if (((inv['cigarettes_cost'] ?? 0) as num).toDouble() != 0)
                 DesktopInfoChip(
-                  label:
-                      'سجائر: {v1}'.tr({'v1': _money(((inv['cigarettes_cost'] ?? 0) as num).toDouble())}),
+                  label: 'سجائر: {v1}'.tr({
+                    'v1': _money(
+                      ((inv['cigarettes_cost'] ?? 0) as num).toDouble(),
+                    ),
+                  }),
                   icon: Icons.smoking_rooms_outlined,
                   color: palette.textSecondary,
                   dense: true,
                 ),
               if (((inv['shisha_cost'] ?? 0) as num).toDouble() != 0)
                 DesktopInfoChip(
-                  label:
-                      'شيشة: {v1}'.tr({'v1': _money(((inv['shisha_cost'] ?? 0) as num).toDouble())}),
+                  label: 'شيشة: {v1}'.tr({
+                    'v1': _money(((inv['shisha_cost'] ?? 0) as num).toDouble()),
+                  }),
                   icon: Icons.blur_on,
                   color: palette.textSecondary,
                   dense: true,
                 ),
               if ((inv['discount'] ?? 0) != 0)
                 DesktopInfoChip(
-                  label:
-                      'خصم: {v1}'.tr({'v1': _money(((inv['discount'] ?? 0) as num).toDouble())}),
+                  label: 'خصم: {v1}'.tr({
+                    'v1': _money(((inv['discount'] ?? 0) as num).toDouble()),
+                  }),
                   icon: Icons.discount_outlined,
                   color: palette.warning,
                   dense: true,
@@ -762,34 +797,34 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           const SizedBox(height: DesktopTokens.gapSm),
           Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 14,
-                color: palette.textMuted,
-              ),
+              Icon(Icons.access_time, size: 14, color: palette.textMuted),
               const SizedBox(width: DesktopTokens.gapXs),
               Expanded(
                 child: Text(
-                  'من {v1}  إلى  {v2}'.tr({'v1': formatDate(inv['start_time']), 'v2': formatDate(inv['end_time'])}),
+                  'من {v1}  إلى  {v2}'.tr({
+                    'v1': formatDate(inv['start_time']),
+                    'v2': formatDate(inv['end_time']),
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    color: palette.textMuted,
-                  ),
+                  style: TextStyle(fontSize: 11.5, color: palette.textMuted),
                 ),
               ),
               if (remainingDebt > 0)
                 DesktopInfoChip(
-                  label:
-                      'مدفوع جزئيًا: {v1}  |  الباقي: {v2}'.tr({'v1': _money(paidPartial), 'v2': _money(remainingDebt)}),
+                  label: 'مدفوع جزئيًا: {v1}  |  الباقي: {v2}'.tr({
+                    'v1': _money(paidPartial),
+                    'v2': _money(remainingDebt),
+                  }),
                   icon: Icons.info_outline,
                   color: _ShiftDetailsPageState.debtColor,
                 ),
               if (isOpen && paidPartial > 0) ...[
                 const SizedBox(width: DesktopTokens.gapSm),
                 DesktopInfoChip(
-                  label: 'محصّل جزئيًا (والترابيزة لسه شغالة): {v1}'.tr({'v1': _money(paidPartial)}),
+                  label: 'محصّل جزئيًا (والترابيزة لسه شغالة): {v1}'.tr({
+                    'v1': _money(paidPartial),
+                  }),
                   icon: Icons.price_check,
                   color: _ShiftDetailsPageState.collectedColor,
                 ),
@@ -833,15 +868,16 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           where: 'invoice_id = ? AND item_type != ?',
           whereArgs: [inv['id'], 'playstation'],
         );
-        final drinksList = drinkItemsRaw
-            .map(
-              (e) => {
-                'name': e['drink_name'] ?? 'غير معروف'.tr(),
-                'qty': e['qty'] ?? 1,
-                'total': e['total'] ?? 0.0,
-              },
-            )
-            .toList();
+        final drinksList =
+            drinkItemsRaw
+                .map(
+                  (e) => {
+                    'name': e['drink_name'] ?? 'غير معروف'.tr(),
+                    'qty': e['qty'] ?? 1,
+                    'total': e['total'] ?? 0.0,
+                  },
+                )
+                .toList();
 
         final consoleName = consoleNames[consoleId] ?? 'غير معروف'.tr();
 
@@ -905,13 +941,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'تمت في: {v1} بواسطة: {v2}'.tr({'v1': formatDate(e['date']), 'v2': e['added_by']}),
+                  'تمت في: {v1} بواسطة: {v2}'.tr({
+                    'v1': formatDate(e['date']),
+                    'v2': e['added_by'],
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    color: palette.textMuted,
-                  ),
+                  style: TextStyle(fontSize: 11.5, color: palette.textMuted),
                 ),
               ],
             ),
@@ -975,7 +1011,11 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'المتبقي: {v1} {v2}  |  تاريخ: {v3}'.tr({'v1': remaining.toStringAsFixed(2), 'v2': Money.txt, 'v3': formatDate(d['date'])}),
+                  'المتبقي: {v1} {v2}  |  تاريخ: {v3}'.tr({
+                    'v1': remaining.toStringAsFixed(2),
+                    'v2': Money.txt,
+                    'v3': formatDate(d['date']),
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -1007,12 +1047,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           DesktopToolbarIconButton(
             icon: Icons.print_outlined,
             tooltip: 'طباعة إيصال الدين'.tr(),
-            onPressed: () => _windowsPrintDebt(
-              context,
-              d,
-              totalAmount,
-              totalPaidPartial,
-            ),
+            onPressed:
+                () => _windowsPrintDebt(
+                  context,
+                  d,
+                  totalAmount,
+                  totalPaidPartial,
+                ),
           ),
         ],
       ),
@@ -1044,11 +1085,9 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
       final debtDetails = <Map<String, dynamic>>[
         {
           'date': d['date'],
-          'items':
-              items.map((e) => Map<String, dynamic>.from(e)).toList(),
+          'items': items.map((e) => Map<String, dynamic>.from(e)).toList(),
           'total': totalAmount,
-          'original':
-              (d['original_amount'] as num?)?.toDouble() ?? totalAmount,
+          'original': (d['original_amount'] as num?)?.toDouble() ?? totalAmount,
           'paid': totalPaidPartial,
           'payments':
               payments.map((p) => Map<String, dynamic>.from(p)).toList(),
@@ -1071,10 +1110,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
   // التحصيل
   // ==================================================================
 
-  Widget _windowsDebtPaymentCard(
-    BuildContext context,
-    Map<String, dynamic> p,
-  ) {
+  Widget _windowsDebtPaymentCard(BuildContext context, Map<String, dynamic> p) {
     final palette = DesktopPalette.of(context);
 
     final customerName = (p['customer_name'] ?? 'غير معروف'.tr()).toString();
@@ -1087,8 +1123,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
         horizontal: DesktopTokens.gapMd,
         vertical: DesktopTokens.gapSm + 2,
       ),
-      borderColor: _ShiftDetailsPageState.collectedColor
-          .withValues(alpha: 0.4),
+      borderColor: _ShiftDetailsPageState.collectedColor.withValues(alpha: 0.4),
       child: Row(
         children: [
           DesktopIconBadge(
@@ -1115,7 +1150,14 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                 const SizedBox(height: 3),
                 Text(
                   discount > 0
-                      ? 'مدفوع: {v1} {v2}  |  خصم: {v3} {v4}  |  بتاريخ: {v5}'.tr({'v1': amount.toStringAsFixed(2), 'v2': Money.txt, 'v3': discount.toStringAsFixed(2), 'v4': Money.txt, 'v5': formatDate(p['paid_at'] as String?)})
+                      ? 'مدفوع: {v1} {v2}  |  خصم: {v3} {v4}  |  بتاريخ: {v5}'
+                          .tr({
+                            'v1': amount.toStringAsFixed(2),
+                            'v2': Money.txt,
+                            'v3': discount.toStringAsFixed(2),
+                            'v4': Money.txt,
+                            'v5': formatDate(p['paid_at'] as String?),
+                          })
                       : 'مدفوع: ${amount.toStringAsFixed(2)} ${Money.txt}  |  بتاريخ: ${formatDate(p['paid_at'] as String?)}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1132,13 +1174,14 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           DesktopToolbarIconButton(
             icon: Icons.print_outlined,
             tooltip: 'طباعة إيصال التحصيل'.tr(),
-            onPressed: () => _windowsPrintDebtPayment(
-              context,
-              p,
-              customerName,
-              amount,
-              discount,
-            ),
+            onPressed:
+                () => _windowsPrintDebtPayment(
+                  context,
+                  p,
+                  customerName,
+                  amount,
+                  discount,
+                ),
           ),
           const SizedBox(width: DesktopTokens.gapXs),
           Text(
@@ -1175,8 +1218,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
       final debtDetails = <Map<String, dynamic>>[
         {
           'date': p['paid_at'],
-          'items':
-              items.map((e) => Map<String, dynamic>.from(e)).toList(),
+          'items': items.map((e) => Map<String, dynamic>.from(e)).toList(),
           'total': amount,
           'original': amount,
           'paid': amount,
@@ -1184,12 +1226,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
         },
       ];
 
-      await printDebtInvoice(
-        customerName,
-        debtDetails,
-        amount,
-        discount,
-      );
+      await printDebtInvoice(customerName, debtDetails, amount, discount);
     } catch (e) {
       debugPrint('⚠️ فشلت طباعة إيصال التحصيل: $e');
       AppToast.show('حصلت مشكلة في الطباعة'.tr());

@@ -10,19 +10,23 @@ import 'package:saytarly/core/localization/messages.dart';
 class Money {
   Money._();
 
-  /// الافتراضي لو السوبر ادمن ما حددش رمز عملة.
+  /// Default when the super admin has not set a custom currency symbol.
+  /// Resolved at access time so it follows the current UI language.
   static String get fallback => 'ج.م'.tr();
 
-  /// الرمز الحالي المستخدم في التطبيق.
-  static String symbol = fallback;
+  static String _customSymbol = '';
 
-  /// وسيط ترحيل — بنفس الاسم اللي بيستخدمه سكريبت الترحيل `${Money.txt}`.
+  /// Current symbol. A custom business symbol wins; otherwise the localized
+  /// default is resolved on every read, so switching to English shows “EGP”.
+  static String get symbol => _customSymbol.isEmpty ? fallback : _customSymbol;
+
+  /// Migration alias used by older script-generated call sites.
   static String get txt => symbol;
 
-  /// تحميل الرمز من قاعدة البيانات — بيتنادى في main() وبعد الحفظ من الإعدادات.
+  /// Loads the custom symbol from the business settings.
   static Future<void> load() async {
     final v = await DBHelper.getSetting(DBHelper.kCurrencySymbolKey);
-    symbol = (v == null || v.trim().isEmpty) ? fallback : v.trim();
+    _customSymbol = (v == null || v.trim().isEmpty) ? '' : v.trim();
   }
 
   /// تنسيق مبلغ مع الرمز — للمواضع الجديدة بدل النصوص المكتوبة يدويًا.

@@ -11,7 +11,7 @@ import 'package:saytarly/core/services/app_settings.dart';
 import 'package:saytarly/core/models/material_unit.dart';
 import 'package:saytarly/core/services/business_profile.dart';
 import 'package:saytarly/core/utils/money.dart';
-import 'package:saytarly/core/utils/theme/cubit/accent_color_cubit.dart';
+import 'package:saytarly/core/localization/cubit/locale_cubit.dart';
 import 'package:saytarly/core/utils/theme/cubit/theme_cubit.dart';
 import 'package:saytarly/Features/dashboard/presentation/screens/admin.dart';
 import 'package:saytarly/Features/staff/presentation/screens/shifts_report.dart';
@@ -75,14 +75,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _cigarettesEnabled = value);
     await AppSettings.setCigarettesEnabled(value);
     if (!mounted) return;
-    AppToast.show(value ? '✅ تم تفعيل بيع السجائر'.tr() : '✅ تم إيقاف بيع السجائر',);
+    AppToast.show(
+      value ? '✅ تم تفعيل بيع السجائر'.tr() : '✅ تم إيقاف بيع السجائر'.tr(),
+    );
   }
 
   Future<void> _changeShishaEnabled(bool value) async {
     setState(() => _shishaEnabled = value);
     await AppSettings.setShishaEnabled(value);
     if (!mounted) return;
-    AppToast.show(value ? '✅ تم تفعيل بيع الشيشة'.tr() : '✅ تم إيقاف بيع الشيشة',);
+    AppToast.show(
+      value ? '✅ تم تفعيل بيع الشيشة'.tr() : '✅ تم إيقاف بيع الشيشة'.tr(),
+    );
+  }
+
+  /// Changes the app locale immediately and persists it for the next launch.
+  Future<void> _changeLanguage(String languageCode) async {
+    final current = context.read<LocaleCubit>().state.locale.languageCode;
+    if (current == languageCode) return;
+    await context.read<LocaleCubit>().changeLanguage(languageCode);
+    if (!mounted) return;
+    AppToast.show('✅ تم تغيير اللغة'.tr());
   }
 
   Future<void> _backupNow() async {
@@ -106,18 +119,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AppDialog(
-              title:  Text('كلمة سر الاسترجاع'.tr()),
+              title: Text('كلمة سر الاسترجاع'.tr()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                   Text(
+                  Text(
                     'من فضلك أدخل كلمة السر لاسترجاع النسخة الاحتياطية.'.tr(),
                   ),
-                   SizedBox(height: 12),
+                  SizedBox(height: 12),
                   TextField(
                     controller: controller,
                     obscureText: true,
-                    decoration:  InputDecoration(labelText: 'كلمة السر'.tr()),
+                    decoration: InputDecoration(labelText: 'كلمة السر'.tr()),
                   ),
                   if (errorText != null) ...[
                     const SizedBox(height: 8),
@@ -128,7 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, null),
-                  child:  Text('إلغاء'.tr()),
+                  child: Text('إلغاء'.tr()),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -138,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                     Navigator.pop(ctx, controller.text);
                   },
-                  child:  Text('تأكيد'.tr()),
+                  child: Text('تأكيد'.tr()),
                 ),
               ],
             );
@@ -151,22 +164,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _restoreNow() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Text('استرجاع نسخة احتياطية'.tr()),
-        content:  Text(
-          'سيتم استبدال كل البيانات الحالية بالكامل، ولا يمكن التراجع عن هذه الخطوة. متابعة؟'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (ctx) => AppDialog(
+            title: Text('استرجاع نسخة احتياطية'.tr()),
+            content: Text(
+              'سيتم استبدال كل البيانات الحالية بالكامل، ولا يمكن التراجع عن هذه الخطوة. متابعة؟'
+                  .tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('متابعة'.tr()),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('متابعة'.tr()),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
 
@@ -176,7 +191,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final done = await BackupHelper.restoreDatabase(password);
       if (!mounted || !done) return;
-      AppToast.show('✅ تم استرجاع النسخة بنجاح، يفضل إعادة تشغيل البرنامج'.tr());
+      AppToast.show(
+        '✅ تم استرجاع النسخة بنجاح، يفضل إعادة تشغيل البرنامج'.tr(),
+      );
     } catch (e) {
       if (!mounted) return;
       AppToast.show('❌ فشل الاسترجاع: {e}'.tr({'e': e}));
@@ -204,14 +221,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TextField(
                     controller: pass1,
                     obscureText: true,
-                    decoration:  InputDecoration(labelText: 'كلمة السر'.tr()),
+                    decoration: InputDecoration(labelText: 'كلمة السر'.tr()),
                   ),
                   if (confirm) ...[
-                     SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextField(
                       controller: pass2,
                       obscureText: true,
-                      decoration:  InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'تأكيد كلمة السر'.tr(),
                       ),
                     ),
@@ -225,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, null),
-                  child:  Text('إلغاء'.tr()),
+                  child: Text('إلغاء'.tr()),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -241,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                     Navigator.pop(ctx, pass1.text);
                   },
-                  child:  Text('متابعة'.tr()),
+                  child: Text('متابعة'.tr()),
                 ),
               ],
             );
@@ -260,34 +277,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AppDialog(
-              title:  Text('مسح كل البيانات'.tr()),
+              title: Text('مسح كل البيانات'.tr()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
-                    'سيتم حذف كل الفواتير والمصروفات والشيفتات والكاش نهائياً ولا يمكن التراجع. ينصح بعمل نسخة احتياطية قبل المتابعة.'.tr(),
+                  Text(
+                    'سيتم حذف كل الفواتير والمصروفات والشيفتات والكاش نهائياً ولا يمكن التراجع. ينصح بعمل نسخة احتياطية قبل المتابعة.'
+                        .tr(),
                   ),
                   const SizedBox(height: 12),
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
-                    title:  Text('مسح حسابات الآجل (الديون) أيضاً'.tr()),
+                    title: Text('مسح حسابات الآجل (الديون) أيضاً'.tr()),
                     value: clearDebts,
-                    onChanged: (v) =>
-                        setDialogState(() => clearDebts = v ?? true),
+                    onChanged:
+                        (v) => setDialogState(() => clearDebts = v ?? true),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child:  Text('إلغاء'.tr()),
+                  child: Text('إلغاء'.tr()),
                 ),
                 FilledButton(
                   style: FilledButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: () => Navigator.pop(ctx, true),
-                  child:  Text('مسح نهائياً'.tr()),
+                  child: Text('مسح نهائياً'.tr()),
                 ),
               ],
             );
@@ -318,55 +336,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final ip = await showDialog<String>(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Text('استيراد من جهاز الكاشير'.tr()),
-        content: TextField(
-          controller: ipController,
-          decoration:  InputDecoration(
-            labelText: 'عنوان IP بتاع جهاز الكاشير'.tr(),
-            hintText: 'مثال: 192.168.1.5'.tr(),
+      builder:
+          (ctx) => AppDialog(
+            title: Text('استيراد من جهاز الكاشير'.tr()),
+            content: TextField(
+              controller: ipController,
+              decoration: InputDecoration(
+                labelText: 'عنوان IP بتاع جهاز الكاشير'.tr(),
+                hintText: 'مثال: 192.168.1.5'.tr(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, null),
+                child: Text('إلغاء'.tr()),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, ipController.text.trim()),
+                child: Text('متابعة'.tr()),
+              ),
+            ],
           ),
-          keyboardType: TextInputType.number,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, null),
-            child:  Text('إلغاء'.tr()),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, ipController.text.trim()),
-            child:  Text('متابعة'.tr()),
-          ),
-        ],
-      ),
     );
     if (ip == null || ip.isEmpty) return;
 
-
     final ok = await LanBackupClient.ping(ip);
     if (!ok) {
-      AppToast.show('❌ مش لاقي جهاز الكاشير — تأكد إنكم على نفس الواي فاي والعنوان صحيح'.tr(),);
+      AppToast.show(
+        '❌ مش لاقي جهاز الكاشير — تأكد إنكم على نفس الواي فاي والعنوان صحيح'
+            .tr(),
+      );
       return;
     }
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Text('استيراد نسخة من الكاشير'.tr()),
-        content:  Text(
-          'سيتم استبدال كل بيانات هذا الجهاز الحالية. متابعة؟'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (ctx) => AppDialog(
+            title: Text('استيراد نسخة من الكاشير'.tr()),
+            content: Text(
+              'سيتم استبدال كل بيانات هذا الجهاز الحالية. متابعة؟'.tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('متابعة'.tr()),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('متابعة'.tr()),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
 
@@ -388,7 +410,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await BackupHelper.saveAutoBackupSnapshot();
       if (!mounted) return;
-      AppToast.show('✅ تم رفع نسخة محدّثة على الشبكة — الموبايل يقدر يستوردها الآن'.tr(),);
+      AppToast.show(
+        '✅ تم رفع نسخة محدّثة على الشبكة — الموبايل يقدر يستوردها الآن'.tr(),
+      );
     } catch (e) {
       if (!mounted) return;
       AppToast.show('❌ فشل رفع النسخة: {e}'.tr({'e': e}));
@@ -400,7 +424,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await AppSettings.setDrinksScreenPosMode(value);
 
     if (!mounted) return;
-    AppToast.show(value ? '✅ تم اختيار وضع الكاشير'.tr() : '✅ تم اختيار وضع القائمة',);
+    AppToast.show(
+      value ? '✅ تم اختيار وضع الكاشير'.tr() : '✅ تم اختيار وضع القائمة'.tr(),
+    );
   }
 
   Future<void> _changeDashStyle(DashStyle value) async {
@@ -414,20 +440,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _uploadToSupabaseNow() async {
-
     // 🆕 نعرض مؤشر تحميل بسيط طول ما بيرفع
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AppDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Expanded(child: Text('جاري الرفع على السيرفر...'.tr())),
-          ],
-        ),
-      ),
+      builder:
+          (_) => AppDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Expanded(child: Text('جاري الرفع على السيرفر...'.tr())),
+              ],
+            ),
+          ),
     );
 
     try {
@@ -445,41 +471,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _restoreFromSupabaseNow() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Text('استرجاع نسخة من السيرفر'.tr()),
-        content:  Text(
-          'سيتم استبدال كل بيانات هذا الجهاز الحالية بآخر نسخة مرفوعة على السيرفر. متابعة؟'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (ctx) => AppDialog(
+            title: Text('استرجاع نسخة من السيرفر'.tr()),
+            content: Text(
+              'سيتم استبدال كل بيانات هذا الجهاز الحالية بآخر نسخة مرفوعة على السيرفر. متابعة؟'
+                  .tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('متابعة'.tr()),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('متابعة'.tr()),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
 
     final password = await _askRestorePassword();
     if (password == null) return;
 
-
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AppDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Expanded(child: Text('جاري التحميل والاسترجاع...'.tr())),
-          ],
-        ),
-      ),
+      builder:
+          (_) => AppDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Expanded(child: Text('جاري التحميل والاسترجاع...'.tr())),
+              ],
+            ),
+          ),
     );
 
     try {
@@ -491,7 +519,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Navigator.pop(context);
       if (ok) {
         debugPrint('✅ الاسترجاع نجح');
-        AppToast.show('✅ تم استرجاع النسخة من السيرفر بنجاح، يفضل إعادة تشغيل البرنامج'.tr(),);
+        AppToast.show(
+          '✅ تم استرجاع النسخة من السيرفر بنجاح، يفضل إعادة تشغيل البرنامج'
+              .tr(),
+        );
       }
     } catch (e, stackTrace) {
       // 🆕 طباعة تفصيلية كاملة للخطأ
@@ -521,72 +552,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlg) => AppDialog(
-          title:  Row(
-            children: [
-              Icon(Icons.currency_exchange),
-              SizedBox(width: 8),
-              Text('العملة والطباعة'.tr()),
-            ],
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: symbolCtrl,
-                  maxLength: 6,
-                  decoration:  InputDecoration(
-                    labelText: 'رمز العملة'.tr(),
-                    helperText: 'مثال: ج.م / د.إ / SAR — فاضي يعني افتراضي (ج.م)'.tr(),
-                    prefixIcon: Icon(Icons.payments_outlined),
-                    counterText: '',
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDlg) => AppDialog(
+                  title: Row(
+                    children: [
+                      Icon(Icons.currency_exchange),
+                      SizedBox(width: 8),
+                      Text('العملة والطباعة'.tr()),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                 Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text('عرض ورق الفاتورة'.tr()),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final mm in BusinessProfile.invoicePaperOptions)
-                      ChoiceChip(
-                        label: Text('{mm} مم'.tr({'mm': mm})),
-                        selected: paperMm == mm,
-                        onSelected: (_) => setDlg(() => paperMm = mm),
-                      ),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: symbolCtrl,
+                          maxLength: 6,
+                          decoration: InputDecoration(
+                            labelText: 'رمز العملة'.tr(),
+                            helperText:
+                                'مثال: ج.م / د.إ / SAR — فاضي يعني افتراضي (ج.م)'
+                                    .tr(),
+                            prefixIcon: Icon(Icons.payments_outlined),
+                            counterText: '',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text('عرض ورق الفاتورة'.tr()),
+                        ),
+                        const SizedBox(height: 4),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            for (final mm
+                                in BusinessProfile.invoicePaperOptions)
+                              ChoiceChip(
+                                label: Text('{mm} مم'.tr({'mm': mm})),
+                                selected: paperMm == mm,
+                                onSelected: (_) => setDlg(() => paperMm = mm),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: printerCtrl,
+                          decoration: InputDecoration(
+                            labelText: 'اسم طابعة الفواتير'.tr(),
+                            helperText:
+                                'بالظبط زي اسمها في «الأجهزة والطابعات» بويندوز — فاضي يعني الافتراضية'
+                                    .tr(),
+                            prefixIcon: Icon(Icons.print),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text('حفظ'.tr()),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: printerCtrl,
-                  decoration:  InputDecoration(
-                    labelText: 'اسم طابعة الفواتير'.tr(),
-                    helperText:
-                        'بالظبط زي اسمها في «الأجهزة والطابعات» بويندوز — فاضي يعني الافتراضية'.tr(),
-                    prefixIcon: Icon(Icons.print),
-                  ),
-                ),
-              ],
-            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child:  Text('إلغاء'.tr()),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child:  Text('حفظ'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
     if (ok != true) return;
 
@@ -609,66 +646,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Row(
-          children: [
-            Icon(Icons.receipt_long),
-            SizedBox(width: 8),
-            Text('نصوص الفاتورة'.tr()),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: thanksCtrl,
-                decoration:  InputDecoration(
-                  labelText: 'جملة الشكر'.tr(),
-                  helperText: 'بيظهر آخر الفاتورة — فاضي يعني بيتشال'.tr(),
-                  prefixIcon: Icon(Icons.waving_hand_outlined),
-                ),
+      builder:
+          (ctx) => AppDialog(
+            title: Row(
+              children: [
+                Icon(Icons.receipt_long),
+                SizedBox(width: 8),
+                Text('نصوص الفاتورة'.tr()),
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: thanksCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'جملة الشكر'.tr(),
+                      helperText: 'بيظهر آخر الفاتورة — فاضي يعني بيتشال'.tr(),
+                      prefixIcon: Icon(Icons.waving_hand_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: 'تليفون (اختياري)'.tr(),
+                      prefixIcon: Icon(Icons.phone_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: addressCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'العنوان (اختياري)'.tr(),
+                      prefixIcon: Icon(Icons.location_on_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: taxIdCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'الرقم الضريبي (اختياري)'.tr(),
+                      prefixIcon: Icon(Icons.badge_outlined),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: phoneCtrl,
-                keyboardType: TextInputType.phone,
-                decoration:  InputDecoration(
-                  labelText: 'تليفون (اختياري)'.tr(),
-                  prefixIcon: Icon(Icons.phone_outlined),
-                ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('إلغاء'.tr()),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: addressCtrl,
-                decoration:  InputDecoration(
-                  labelText: 'العنوان (اختياري)'.tr(),
-                  prefixIcon: Icon(Icons.location_on_outlined),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: taxIdCtrl,
-                decoration:  InputDecoration(
-                  labelText: 'الرقم الضريبي (اختياري)'.tr(),
-                  prefixIcon: Icon(Icons.badge_outlined),
-                ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('حفظ'.tr()),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('إلغاء'.tr()),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('حفظ'.tr()),
-          ),
-        ],
-      ),
     );
     if (ok != true) return;
 
@@ -701,101 +739,108 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDlg) => AppDialog(
-          title:  Row(
-            children: [
-              Icon(Icons.straighten),
-              SizedBox(width: 8),
-              Text('وحدات الخامات'.tr()),
-            ],
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                 Text(
-                  'الوحدة الجزئية للعرض الدقيق (كيلو ← جرام ×1000). سيبها فاضية لو الوحدة بسيطة زي «قطعة».'.tr(),
-                ),
-                const SizedBox(height: 8),
-                Flexible(
-                  child: SingleChildScrollView(
+      builder:
+          (ctx) => StatefulBuilder(
+            builder:
+                (ctx, setDlg) => AppDialog(
+                  title: Row(
+                    children: [
+                      Icon(Icons.straighten),
+                      SizedBox(width: 8),
+                      Text('وحدات الخامات'.tr()),
+                    ],
+                  ),
+                  content: SizedBox(
+                    width: double.maxFinite,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        for (var i = 0; i < nameCtrls.length; i++)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
+                        Text(
+                          'الوحدة الجزئية للعرض الدقيق (كيلو ← جرام ×1000). سيبها فاضية لو الوحدة بسيطة زي «قطعة».'
+                              .tr(),
+                        ),
+                        const SizedBox(height: 8),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            child: Column(
                               children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: nameCtrls[i],
-                                    decoration:  InputDecoration(
-                                      labelText: 'الوحدة'.tr(),
+                                for (var i = 0; i < nameCtrls.length; i++)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            controller: nameCtrls[i],
+                                            decoration: InputDecoration(
+                                              labelText: 'الوحدة'.tr(),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: subCtrls[i],
+                                            decoration: InputDecoration(
+                                              labelText: 'الجزئية'.tr(),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        SizedBox(
+                                          width: 64,
+                                          child: TextField(
+                                            controller: factorCtrls[i],
+                                            keyboardType: TextInputType.number,
+                                            decoration: const InputDecoration(
+                                              labelText: '×',
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          tooltip: 'حذف'.tr(),
+                                          icon: const Icon(
+                                            Icons.remove_circle_outline,
+                                          ),
+                                          onPressed:
+                                              () => setDlg(() {
+                                                nameCtrls.removeAt(i);
+                                                subCtrls.removeAt(i);
+                                                factorCtrls.removeAt(i);
+                                              }),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextField(
-                                    controller: subCtrls[i],
-                                    decoration:  InputDecoration(
-                                      labelText: 'الجزئية'.tr(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                SizedBox(
-                                  width: 64,
-                                  child: TextField(
-                                    controller: factorCtrls[i],
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      labelText: '×',
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  tooltip: 'حذف'.tr(),
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () => setDlg(() {
-                                    nameCtrls.removeAt(i);
-                                    subCtrls.removeAt(i);
-                                    factorCtrls.removeAt(i);
-                                  }),
-                                ),
                               ],
                             ),
                           ),
+                        ),
+                        TextButton.icon(
+                          onPressed:
+                              () => setDlg(() {
+                                nameCtrls.add(TextEditingController());
+                                subCtrls.add(TextEditingController());
+                                factorCtrls.add(TextEditingController());
+                              }),
+                          icon: const Icon(Icons.add_circle_outline),
+                          label: Text('إضافة وحدة'.tr()),
+                        ),
                       ],
                     ),
                   ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text('حفظ'.tr()),
+                    ),
+                  ],
                 ),
-                TextButton.icon(
-                  onPressed: () => setDlg(() {
-                    nameCtrls.add(TextEditingController());
-                    subCtrls.add(TextEditingController());
-                    factorCtrls.add(TextEditingController());
-                  }),
-                  icon: const Icon(Icons.add_circle_outline),
-                  label:  Text('إضافة وحدة'.tr()),
-                ),
-              ],
-            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child:  Text('إلغاء'.tr()),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child:  Text('حفظ'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
     if (ok != true) return;
 
@@ -807,11 +852,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
       final sub = subCtrls[i].text.trim();
       final factor = double.tryParse(factorCtrls[i].text.trim());
-      saved.add(MaterialUnit(
-        name: name,
-        sub: sub.isEmpty ? null : sub,
-        subFactor: (sub.isEmpty || factor == null) ? null : factor,
-      ));
+      saved.add(
+        MaterialUnit(
+          name: name,
+          sub: sub.isEmpty ? null : sub,
+          subFactor: (sub.isEmpty || factor == null) ? null : factor,
+        ),
+      );
     }
     if (saved.isEmpty) {
       AppToast.show('⚠️ لازم تسيب وحدة واحدة صالحة على الأقل'.tr());
@@ -820,99 +867,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await BusinessProfile.setUnits(saved);
     if (!mounted) return;
     AppToast.show('✅ تم حفظ وحدات الخامات'.tr());
-  }
-
-  /// 🎨 لون الهوية — بيعاد بناء الثيم فورًا (لايت/دارك).
-  static const List<Color> _brandSwatches = [
-    Color(0xFF3A7BD5), // أزرق الكوبالة (افتراضي الدارك الحالي)
-    Color(0xFF6FCF97), // أخضر اللايت الحالي
-    Color(0xFF14B8A6),
-    Color(0xFF00B894),
-    Color(0xFFF59E0B),
-    Color(0xFFE17055),
-    Color(0xFFE356A8),
-    Color(0xFF8E44AD),
-    Color(0xFF636EFA),
-    Color(0xFF2E86DE),
-    Color(0xFF7F8C8D),
-    Color(0xFF333333),
-  ];
-
-  Future<void> _changeBrandColor() async {
-    final current = context.read<AccentColorCubit>().state.toARGB32();
-    if (!mounted) return;
-
-    final action = await showDialog<String?>(
-      context: context,
-      builder: (ctx) => AppDialog(
-        title:  Row(
-          children: [
-            Icon(Icons.palette_outlined),
-            SizedBox(width: 8),
-            Text('لون الهوية'.tr()),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-               Text('بيغير ألوان الأزرار والسويتشات وأغلفة ويندوز كلها.'.tr()),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  for (final c in _brandSwatches)
-                    InkWell(
-                      onTap: () => Navigator.pop(ctx, 'set:${c.toARGB32()}'),
-                      customBorder:  CircleBorder(),
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: c,
-                          shape: BoxShape.circle,
-                          border: (c.toARGB32() == current)
-                              ? Border.all(color: Colors.white, width: 3)
-                              : null,
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black26, blurRadius: 4),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextButton.icon(
-                onPressed: () => Navigator.pop(ctx, 'reset'),
-                icon: const Icon(Icons.undo),
-                label:  Text('رجوع للون الافتراضي'.tr()),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, null),
-            child:  Text('إغلاق'.tr()),
-          ),
-        ],
-      ),
-    );
-    if (!mounted) return;
-
-    if (action == 'reset') {
-      await context.read<AccentColorCubit>().setAccentColorIndex(0);
-      AppToast.show('✅ تم الرجوع للون الافتراضي'.tr());
-      return;
-    }
-    if (action != null && action.startsWith('set:')) {
-      final swatchColor = Color(int.tryParse(action.substring(4)) ?? 0);
-      await context.read<AccentColorCubit>().setAccentColor(swatchColor);
-      AppToast.show('✅ تم تطبيق لون الهوية'.tr());
-    }
   }
 
   String _dashStyleLabel(DashStyle d) {
@@ -970,4 +924,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
         : _buildMobileBody(context);
   }
 }
-

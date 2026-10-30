@@ -603,10 +603,11 @@ class ShiftsReportScreen extends StatefulWidget {
 
 class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
   List<Map<String, dynamic>> shifts = [];
-  final bool isMobile = defaultTargetPlatform == TargetPlatform.android ||
+  final bool isMobile =
+      defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS;
   final formatter = NumberFormat('#,##0.00');
-// 🆕 Pagination
+  // 🆕 Pagination
   static const int _pageSize = 7;
   List<Map<String, dynamic>> _rawShifts = [];
   Map<int, String> _consoleNameById = {};
@@ -791,11 +792,13 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       final invoiceId = inv['id'] as int;
 
       final invItems = itemsByInvoice[invoiceId] ?? const [];
-      final itemsSummary = invItems.map((it) {
-        final n = (it['drink_name'] ?? 'صنف'.tr()).toString();
-        final q = it['qty'] ?? 1;
-        return '$n×$q';
-      }).join('، '.tr());
+      final itemsSummary = invItems
+          .map((it) {
+            final n = (it['drink_name'] ?? 'صنف'.tr()).toString();
+            final q = it['qty'] ?? 1;
+            return '$n×$q';
+          })
+          .join('، '.tr());
 
       String? deviceSummary;
       final consoleId = inv['console_id'];
@@ -803,8 +806,11 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
         final consoleName = consoleNameById[consoleId] ?? 'جهاز'.tr();
         if (inv['is_fixed_price'] == 1) {
           final fixedPrice = ((inv['fixed_price'] ?? 0) as num).toDouble();
-          deviceSummary =
-              '🎮 {consoleName} (سعر ثابت {v2} {v3})'.tr({'consoleName': consoleName, 'v2': formatter.format(fixedPrice), 'v3': Money.txt});
+          deviceSummary = '🎮 {consoleName} (سعر ثابت {v2} {v3})'.tr({
+            'consoleName': consoleName,
+            'v2': formatter.format(fixedPrice),
+            'v3': Money.txt,
+          });
         } else {
           final st = DateTime.tryParse(inv['start_time']?.toString() ?? '');
           final et = DateTime.tryParse(inv['end_time']?.toString() ?? '');
@@ -814,8 +820,10 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
             final minutes =
                 et.difference(st).inMinutes - (pausedSeconds / 60).round();
             final hours = minutes / 60.0;
-            deviceSummary =
-                '🎮 {consoleName} ({v2} ساعة)'.tr({'consoleName': consoleName, 'v2': hours.toStringAsFixed(2)});
+            deviceSummary = '🎮 {consoleName} ({v2} ساعة)'.tr({
+              'consoleName': consoleName,
+              'v2': hours.toStringAsFixed(2),
+            });
           } else {
             deviceSummary = '🎮 $consoleName';
           }
@@ -855,7 +863,7 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
             'customer_name': customerName,
             'amount': total,
             'start_time': startTime,
-            'note': 'آجل مسدد بالكامل',
+            'note': 'آجل مسدد بالكامل'.tr(),
             'items_summary': itemsSummary,
             'device_summary': deviceSummary,
           });
@@ -924,11 +932,12 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       orderBy: 'paid_at ASC',
     );
 
-    final debtPaymentsRows = debtPaymentsRowsRaw.where((p) {
-      final invoiceId = p['invoice_id'];
-      if (invoiceId == null) return true;
-      return !currentShiftInvoiceIds.contains(invoiceId as int);
-    }).toList();
+    final debtPaymentsRows =
+        debtPaymentsRowsRaw.where((p) {
+          final invoiceId = p['invoice_id'];
+          if (invoiceId == null) return true;
+          return !currentShiftInvoiceIds.contains(invoiceId as int);
+        }).toList();
 
     final debtCollected = debtPaymentsRows.fold<double>(
       0.0,
@@ -955,7 +964,8 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
     shift['charge_in_details'] = chargeInDetails;
     shift['charge_out_details'] = chargeOutDetails;
 
-    final invoiceItems = await db.rawQuery('''
+    final invoiceItems = await db.rawQuery(
+      '''
       SELECT ii.total, d.temperature 
       FROM invoice_items ii
       LEFT JOIN drinks d ON d.id = ii.drink_id
@@ -963,7 +973,9 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
         SELECT id FROM invoices
         WHERE shift_id = ? OR ((shift_id IS NULL OR shift_id = 0) AND staff_name = ? AND start_time >= ? AND start_time <= ?)
       )
-    ''', [shift['id'], shift['staff_name'], rangeStart, rangeEnd]);
+    ''',
+      [shift['id'], shift['staff_name'], rangeStart, rangeEnd],
+    );
 
     double cigaretteTotal = 0.0;
     for (var item in invoiceItems) {
@@ -975,15 +987,19 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
 
     final expenses = await DBHelper.getExpensesByShift(shift['id'] as int);
     final totalExpenses = expenses.fold<double>(
-        0.0, (sum, e) => sum + ((e['amount'] as num?)?.toDouble() ?? 0));
+      0.0,
+      (sum, e) => sum + ((e['amount'] as num?)?.toDouble() ?? 0),
+    );
     shift['expenses'] = totalExpenses;
     shift['expenses_details'] =
         expenses.map((e) => Map<String, dynamic>.from(e)).toList();
 
-    final vodafoneCashTotal =
-        await DBHelper.getVodafoneCashTotal(shift['id'] as int);
-    final vodafoneCashNotes =
-        await DBHelper.getVodafoneCashNotes(shift['id'] as int);
+    final vodafoneCashTotal = await DBHelper.getVodafoneCashTotal(
+      shift['id'] as int,
+    );
+    final vodafoneCashNotes = await DBHelper.getVodafoneCashNotes(
+      shift['id'] as int,
+    );
     shift['vodafone_cash_total'] = vodafoneCashTotal;
     shift['vodafone_cash_notes'] =
         vodafoneCashNotes.map((e) => Map<String, dynamic>.from(e)).toList();
@@ -992,17 +1008,17 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
   }
 
   String formatArabicDate(DateTime date) {
-     final days = [
-      "الاثنين",
+    final days = [
+      "الاثنين".tr(),
       'الثلاثاء'.tr(),
       'الأربعاء'.tr(),
       'الخميس'.tr(),
       'الجمعة'.tr(),
       'السبت'.tr(),
-      'الأحد'.tr()
+      'الأحد'.tr(),
     ];
-     final months = [
-      "يناير",
+    final months = [
+      "يناير".tr(),
       'فبراير'.tr(),
       'مارس'.tr(),
       'أبريل'.tr(),
@@ -1013,16 +1029,24 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       'سبتمبر'.tr(),
       'أكتوبر'.tr(),
       'نوفمبر'.tr(),
-      'ديسمبر'.tr()
+      'ديسمبر'.tr(),
     ];
 
     final dayName = days[date.weekday - 1];
     final monthName = months[date.month - 1];
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
-    final ampm = date.hour >= 12 ? 'م'.tr() : "ص";
+    final ampm = date.hour >= 12 ? 'م'.tr() : "ص".tr();
     final minute = date.minute.toString().padLeft(2, '0');
 
-    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({'dayName': dayName, 'v2': date.day, 'monthName': monthName, 'v4': date.year, 'hour': hour, 'minute': minute, 'ampm': ampm});
+    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({
+      'dayName': dayName,
+      'v2': date.day,
+      'monthName': monthName,
+      'v4': date.year,
+      'hour': hour,
+      'minute': minute,
+      'ampm': ampm,
+    });
   }
 
   void _showDebtCollectedDetails(List<Map<String, dynamic>> details) {
@@ -1043,72 +1067,89 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
           initialChildSize: 0.6,
           maxChildSize: 0.9,
           minChildSize: 0.3,
-          builder: (_, controller) => Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  'تفاصيل تحصيل الآجل ({v1} عملية)'.tr({'v1': details.length}),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Divider(),
-                Expanded(
-                  child: ListView.builder(
-                    controller: controller,
-                    itemCount: details.length,
-                    itemBuilder: (_, i) {
-                      final p = details[i];
-                      final amount = ((p['amount'] ?? 0) as num).toDouble();
-                      final discount = ((p['discount'] ?? 0) as num).toDouble();
-                      final customerName =
-                          (p['customer_name'] ?? 'غير معروف'.tr()).toString();
-                      final paidAt =
-                          DateTime.tryParse(p['paid_at']?.toString() ?? '');
-                      final formattedDate = paidAt != null
-                          ? formatArabicDate(paidAt)
-                          : 'غير محدد';
+          builder:
+              (_, controller) => Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'تفاصيل تحصيل الآجل ({v1} عملية)'.tr({
+                        'v1': details.length,
+                      }),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: controller,
+                        itemCount: details.length,
+                        itemBuilder: (_, i) {
+                          final p = details[i];
+                          final amount = ((p['amount'] ?? 0) as num).toDouble();
+                          final discount =
+                              ((p['discount'] ?? 0) as num).toDouble();
+                          final customerName =
+                              (p['customer_name'] ?? 'غير معروف'.tr())
+                                  .toString();
+                          final paidAt = DateTime.tryParse(
+                            p['paid_at']?.toString() ?? '',
+                          );
+                          final formattedDate =
+                              paidAt != null
+                                  ? formatArabicDate(paidAt)
+                                  : 'غير محدد';
 
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          leading: const Icon(Icons.check_circle,
-                              color: Colors.teal),
-                          title: Text(
-                            customerName,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(formattedDate),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${formatter.format(amount)} ${Money.txt}',
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.check_circle,
+                                color: Colors.teal,
+                              ),
+                              title: Text(
+                                customerName,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.teal,
                                 ),
                               ),
-                              if (discount > 0)
-                                Text(
-                                  'خصم {v1}'.tr({'v1': formatter.format(discount)}),
-                                  style: TextStyle(
-                                      fontSize: 11, color: Colors.grey[600]),
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                              subtitle: Text(formattedDate),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '${formatter.format(amount)} ${Money.txt}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal,
+                                    ),
+                                  ),
+                                  if (discount > 0)
+                                    Text(
+                                      'خصم {v1}'.tr({
+                                        'v1': formatter.format(discount),
+                                      }),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
         );
       },
     );
@@ -1140,47 +1181,54 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
           initialChildSize: 0.6,
           maxChildSize: 0.9,
           minChildSize: 0.3,
-          builder: (_, controller) => Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  '$title (${items.length})',
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+          builder:
+              (_, controller) => Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      '$title (${items.length})',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: controller,
+                        itemCount: items.length,
+                        itemBuilder: (_, i) {
+                          final item = items[i];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: Icon(icon, color: color),
+                              title: Text(
+                                nameOf(item),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(subtitleOf(item)),
+                              trailing: Text(
+                                '${formatter.format(amountOf(item))} ${Money.txt}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: color,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                const Divider(),
-                Expanded(
-                  child: ListView.builder(
-                    controller: controller,
-                    itemCount: items.length,
-                    itemBuilder: (_, i) {
-                      final item = items[i];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          leading: Icon(icon, color: color),
-                          title: Text(
-                            nameOf(item),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(subtitleOf(item)),
-                          trailing: Text(
-                            '${formatter.format(amountOf(item))} ${Money.txt}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: color),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
         );
       },
     );
@@ -1247,29 +1295,38 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       grouped[name]!['total_sales'] += (s['total_sales'] ?? 0);
       grouped[name]!['vodafone_cash_total'] += (s['vodafone_cash_total'] ?? 0);
       (grouped[name]!['vodafone_cash_notes'] as List<Map<String, dynamic>>)
-          .addAll((s['vodafone_cash_notes'] as List?)
-                  ?.cast<Map<String, dynamic>>() ??
-              []);
+          .addAll(
+            (s['vodafone_cash_notes'] as List?)?.cast<Map<String, dynamic>>() ??
+                [],
+          );
       (grouped[name]!['debt_collected_details'] as List<Map<String, dynamic>>)
-          .addAll((s['debt_collected_details'] as List?)
-                  ?.cast<Map<String, dynamic>>() ??
-              []);
+          .addAll(
+            (s['debt_collected_details'] as List?)
+                    ?.cast<Map<String, dynamic>>() ??
+                [],
+          );
       (grouped[name]!['paid_details'] as List<Map<String, dynamic>>).addAll(
-          (s['paid_details'] as List?)?.cast<Map<String, dynamic>>() ?? []);
+        (s['paid_details'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+      );
       (grouped[name]!['debt_details'] as List<Map<String, dynamic>>).addAll(
-          (s['debt_details'] as List?)?.cast<Map<String, dynamic>>() ?? []);
+        (s['debt_details'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+      );
       (grouped[name]!['sales_details'] as List<Map<String, dynamic>>).addAll(
-          (s['sales_details'] as List?)?.cast<Map<String, dynamic>>() ?? []);
+        (s['sales_details'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+      );
       (grouped[name]!['charge_in_details'] as List<Map<String, dynamic>>)
           .addAll(
-              (s['charge_in_details'] as List?)?.cast<Map<String, dynamic>>() ??
-                  []);
+            (s['charge_in_details'] as List?)?.cast<Map<String, dynamic>>() ??
+                [],
+          );
       (grouped[name]!['charge_out_details'] as List<Map<String, dynamic>>)
-          .addAll((s['charge_out_details'] as List?)
-                  ?.cast<Map<String, dynamic>>() ??
-              []);
+          .addAll(
+            (s['charge_out_details'] as List?)?.cast<Map<String, dynamic>>() ??
+                [],
+          );
       (grouped[name]!['expenses_details'] as List<Map<String, dynamic>>).addAll(
-          (s['expenses_details'] as List?)?.cast<Map<String, dynamic>>() ?? []);
+        (s['expenses_details'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+      );
       grouped[name]!['count'] += 1;
     }
 

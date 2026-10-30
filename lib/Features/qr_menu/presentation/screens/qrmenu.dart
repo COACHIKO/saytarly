@@ -12,6 +12,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:saytarly/core/database/db_helper.dart';
+import 'package:saytarly/core/models/app_modules.dart';
+import 'package:saytarly/core/models/models.dart';
 // عدّل المسار
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -26,11 +28,8 @@ class MenuScreen extends StatefulWidget {
   final int tableId;
   final String tableName;
 
-  const MenuScreen({
-    Key? key,
-    required this.tableId,
-    required this.tableName,
-  }) : super(key: key);
+  const MenuScreen({Key? key, required this.tableId, required this.tableName})
+    : super(key: key);
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -64,17 +63,18 @@ class _MenuScreenState extends State<MenuScreen>
     try {
       final modules = await DBHelper.getModules(enabledOnly: true);
       final moduleIds = modules.map((m) => m['id'] as int).toSet();
-      final cats = (await DBHelper.getCategories(enabledOnly: true))
-          .where((c) => moduleIds.contains(c['module_id'] as int?))
-          .where((c) => (c['key'] as String? ?? '') != 'cigarette')
-          .toList();
+      final cats =
+          (await DBHelper.getCategories(enabledOnly: true))
+              .where((c) => moduleIds.contains(c['module_id'] as int?))
+              .where((c) => (c['key'] as String? ?? '') != 'cigarette')
+              .toList();
 
       final list = <Map<String, dynamic>>[
         {'label': 'الكل', 'temps': null},
         for (final c in cats)
           {
             'label':
-                '${_emojiForCategory(c['key'] as String? ?? '')} ${c['name']}',
+                '${_emojiForCategory(c['key'] as String? ?? '')} ${AppModuleCategory.displayNameFromMap(c)}',
             'temps': c['key'],
           },
       ];
@@ -138,8 +138,10 @@ class _MenuScreenState extends State<MenuScreen>
   double get _cartPrice {
     double total = 0;
     for (final e in _cart.entries) {
-      final drink =
-          _allDrinks.firstWhere((d) => d['id'] == e.key, orElse: () => {});
+      final drink = _allDrinks.firstWhere(
+        (d) => d['id'] == e.key,
+        orElse: () => {},
+      );
       if (drink.isNotEmpty) {
         total += (drink['price'] as num).toDouble() * e.value;
       }
@@ -166,20 +168,19 @@ class _MenuScreenState extends State<MenuScreen>
     if (_cart.isEmpty) return;
     setState(() => _submitting = true);
 
-    final items = _cart.entries.map((e) {
-      final drink = _allDrinks.firstWhere((d) => d['id'] == e.key);
-      return {
-        'drink_id': e.key,
-        'drink_name': drink['name'],
-        'qty': e.value,
-        'price': (drink['price'] as num).toDouble(),
-      };
-    }).toList();
+    final items =
+        _cart.entries.map((e) {
+          final drink = _allDrinks.firstWhere((d) => d['id'] == e.key);
+          return {
+            'drink_id': e.key,
+            'drink_name': DrinkModel.displayNameFromMap(drink),
+            'qty': e.value,
+            'price': (drink['price'] as num).toDouble(),
+          };
+        }).toList();
     await http.post(
       Uri.parse('http://192.168.100.5:5000/order'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'tableId': widget.tableId,
         'tableName': widget.tableName,

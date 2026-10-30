@@ -27,7 +27,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
 
     // ── جهاز غير مصرّح له ──
     if (!_isMasterDevice) {
-      return  DesktopPageScaffold(
+      return DesktopPageScaffold(
         title: 'طلبات تفعيل الأجهزة'.tr(),
         subtitle: 'إدارة تراخيص العملاء'.tr(),
         child: DesktopEmptyState(
@@ -159,16 +159,17 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      child: _loginLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.2,
-                                color: Colors.white,
-                              ),
-                            )
-                          :  Text('دخول'.tr()),
+                      child:
+                          _loginLoading
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : Text('دخول'.tr()),
                     ),
                   ),
                 ],
@@ -195,7 +196,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
         children: [
           // ── حظر جهاز بالكود مباشرة ──
           DesktopCard(
-            padding:  EdgeInsets.all(DesktopTokens.gapMd),
+            padding: EdgeInsets.all(DesktopTokens.gapMd),
             child: Row(
               children: [
                 Expanded(
@@ -206,9 +207,9 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
                     dense: true,
                   ),
                 ),
-                 SizedBox(width: DesktopTokens.gapSm),
+                SizedBox(width: DesktopTokens.gapSm),
                 if (_blocking)
-                   Padding(
+                  Padding(
                     padding: EdgeInsets.all(10),
                     child: SizedBox(
                       width: 20,
@@ -226,11 +227,11 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
               ],
             ),
           ),
-           SizedBox(height: DesktopTokens.gapLg),
+          SizedBox(height: DesktopTokens.gapLg),
 
           if (_loadingRequests)
             Padding(
-              padding:  EdgeInsets.symmetric(vertical: 48),
+              padding: EdgeInsets.symmetric(vertical: 48),
               child: Center(
                 child: SizedBox(
                   width: 26,
@@ -272,7 +273,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
               ),
             )
           else if (_requests.isEmpty)
-             Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: DesktopEmptyState(
                 icon: Icons.inbox_outlined,
@@ -302,8 +303,8 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
     final requestedAt = row['requested_at']?.toString() ?? '';
 
     return DesktopCard(
-      margin:  EdgeInsets.only(bottom: DesktopTokens.gapSm + 2),
-      padding:  EdgeInsets.all(DesktopTokens.gapMd + 2),
+      margin: EdgeInsets.only(bottom: DesktopTokens.gapSm + 2),
+      padding: EdgeInsets.all(DesktopTokens.gapMd + 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -320,7 +321,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
                   ),
                 ),
               ),
-               SizedBox(width: DesktopTokens.gapSm),
+              SizedBox(width: DesktopTokens.gapSm),
               DesktopInfoChip(
                 label: _statusLabel(status),
                 icon: _desktopStatusIcon(status),
@@ -329,7 +330,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
             ],
           ),
           if (requestedAt.isNotEmpty || status == 'approved') ...[
-             SizedBox(height: DesktopTokens.gapSm),
+            SizedBox(height: DesktopTokens.gapSm),
             Wrap(
               spacing: DesktopTokens.gapSm,
               runSpacing: DesktopTokens.gapXs,
@@ -344,7 +345,7 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
                         size: 13,
                         color: palette.textMuted,
                       ),
-                       SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Text(
                         requestedAt,
                         style: TextStyle(
@@ -356,17 +357,18 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
                   ),
                 if (status == 'approved')
                   DesktopInfoChip(
-                    label: isDemo ? 'تجريبي (ديمو)'.tr() : 'دائم (مدى الحياة)',
-                    icon: isDemo
-                        ? Icons.hourglass_bottom
-                        : Icons.all_inclusive,
+                    label:
+                        isDemo
+                            ? 'تجريبي (ديمو)'.tr()
+                            : 'دائم (مدى الحياة)'.tr(),
+                    icon: isDemo ? Icons.hourglass_bottom : Icons.all_inclusive,
                     color: isDemo ? palette.warning : palette.info,
                     dense: true,
                   ),
               ],
             ),
           ],
-           SizedBox(height: DesktopTokens.gapMd),
+          SizedBox(height: DesktopTokens.gapMd),
           Wrap(
             spacing: DesktopTokens.gapSm,
             runSpacing: DesktopTokens.gapSm,
@@ -476,9 +478,10 @@ extension _DeviceApprovalScreenWindowsBody on _DeviceApprovalScreenState {
         labelText: label,
         labelStyle: TextStyle(color: palette.textMuted, fontSize: 13),
         floatingLabelStyle: TextStyle(color: palette.accentText),
-        prefixIcon: icon != null
-            ? Icon(icon, size: 19, color: palette.textMuted)
-            : null,
+        prefixIcon:
+            icon != null
+                ? Icon(icon, size: 19, color: palette.textMuted)
+                : null,
         filled: true,
         fillColor: palette.surfaceSoft,
         isDense: true,

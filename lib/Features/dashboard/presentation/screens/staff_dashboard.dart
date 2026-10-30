@@ -115,30 +115,39 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('الفاتورة النهائية'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('الكونسول: {v1}'.tr({'v1': c.name})),
-            Text('المدة: {v1} ساعة'.tr({'v1': duration.toStringAsFixed(2)})),
-            Text('تكلفة الكونسول: {v1}'.tr({'v1': deviceCost.toStringAsFixed(2)})),
-            Text('المشروبات: {v1}'.tr({'v1': drinksCost.toStringAsFixed(2)})),
-            Divider(),
-            Text(
-              'الإجمالي: {v1}'.tr({'v1': total.toStringAsFixed(2)}),
-              style: TextStyle(fontWeight: FontWeight.bold),
+      builder:
+          (_) => AppDialog(
+            title: Text('الفاتورة النهائية'.tr()),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('الكونسول: {v1}'.tr({'v1': c.name})),
+                Text(
+                  'المدة: {v1} ساعة'.tr({'v1': duration.toStringAsFixed(2)}),
+                ),
+                Text(
+                  'تكلفة الكونسول: {v1}'.tr({
+                    'v1': deviceCost.toStringAsFixed(2),
+                  }),
+                ),
+                Text(
+                  'المشروبات: {v1}'.tr({'v1': drinksCost.toStringAsFixed(2)}),
+                ),
+                Divider(),
+                Text(
+                  'الإجمالي: {v1}'.tr({'v1': total.toStringAsFixed(2)}),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('تم'.tr()),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('تم'.tr()),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -192,7 +201,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
                         itemCount: editableSubStaff.length,
                         itemBuilder: (context, i) {
                           final staff = editableSubStaff[i];
-                          final staffName = staff['username'] ?? 'غير معروف'.tr();
+                          final staffName =
+                              staff['username'] ?? 'غير معروف'.tr();
                           final staffId = staff['id'] as int;
                           final shiftStartStr = staff['shift_start'];
                           final shiftEndStr = staff['shift_end'];
@@ -207,9 +217,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
                           if (shiftStartStr != null) {
                             final start = DateTime.parse(shiftStartStr);
-                            final end = shiftEndStr != null
-                                ? DateTime.parse(shiftEndStr)
-                                : DateTime.now();
+                            final end =
+                                shiftEndStr != null
+                                    ? DateTime.parse(shiftEndStr)
+                                    : DateTime.now();
                             workedHours =
                                 end.difference(start).inSeconds / 3600;
                             earned = workedHours * salaryPerHour;
@@ -219,11 +230,19 @@ class _StaffDashboardState extends State<StaffDashboard> {
                             margin: EdgeInsets.symmetric(vertical: 6),
                             child: ListTile(
                               title: Text(staffName),
-                              subtitle: shiftStartStr != null
-                                  ? Text(
-                                      'المدة: {v1} ساعة\nالأجر: {v2} {v3}'.tr({'v1': workedHours.toStringAsFixed(2), 'v2': earned.toStringAsFixed(2), 'v3': Money.txt}),
-                                    )
-                                  : null,
+                              subtitle:
+                                  shiftStartStr != null
+                                      ? Text(
+                                        'المدة: {v1} ساعة\nالأجر: {v2} {v3}'
+                                            .tr({
+                                              'v1': workedHours.toStringAsFixed(
+                                                2,
+                                              ),
+                                              'v2': earned.toStringAsFixed(2),
+                                              'v3': Money.txt,
+                                            }),
+                                      )
+                                      : null,
                               trailing: ElevatedButton(
                                 onPressed: () async {
                                   if (!isWorking) {
@@ -231,8 +250,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                     await DBHelper.startShiftForSubStaff(
                                       staffId: staffId,
                                       supervisorShiftId: widget.shiftId,
-                                      startTime: DateTime.now()
-                                          .toIso8601String(),
+                                      startTime:
+                                          DateTime.now().toIso8601String(),
                                     );
                                   } else {
                                     // إنهاء الشيفت
@@ -254,11 +273,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                         );
                                   });
                                 },
-                                child: Text(isWorking ? 'إنهاء'.tr() : 'بدء'),
+                                child: Text(
+                                  isWorking ? 'إنهاء'.tr() : 'بدء'.tr(),
+                                ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: isWorking
-                                      ? Colors.red
-                                      : Colors.green,
+                                  backgroundColor:
+                                      isWorking ? Colors.red : Colors.green,
                                 ),
                               ),
                             ),
@@ -282,250 +302,349 @@ class _StaffDashboardState extends State<StaffDashboard> {
     final subStaffList = await DBHelper.getSubStaff(widget.staffId);
 
     // حساب الأجر لكل موظف
-    List<Map<String, dynamic>> staffEarnings = subStaffList.map((staff) {
-      final shiftStartStr = staff['shift_start'];
-      final shiftEndStr = staff['shift_end'];
-      final salaryPerHour = (staff['salary_per_hour'] ?? 0.0) as double;
-      final advance = (staff['advance'] ?? 0.0) as double; // سلفة الموظف
-      double workedHours = 0.0;
-      double earned = 0.0;
-      double netEarned = 0.0;
+    List<Map<String, dynamic>> staffEarnings =
+        subStaffList.map((staff) {
+          final shiftStartStr = staff['shift_start'];
+          final shiftEndStr = staff['shift_end'];
+          final salaryPerHour = (staff['salary_per_hour'] ?? 0.0) as double;
+          final advance = (staff['advance'] ?? 0.0) as double; // سلفة الموظف
+          double workedHours = 0.0;
+          double earned = 0.0;
+          double netEarned = 0.0;
 
-      if (shiftStartStr != null) {
-        final start = DateTime.parse(shiftStartStr);
-        final end = shiftEndStr != null
-            ? DateTime.parse(shiftEndStr)
-            : DateTime.now();
-        workedHours = end.difference(start).inSeconds / 3600;
-        earned = workedHours * salaryPerHour;
-        netEarned = (earned - advance).clamp(0, earned);
-      }
+          if (shiftStartStr != null) {
+            final start = DateTime.parse(shiftStartStr);
+            final end =
+                shiftEndStr != null
+                    ? DateTime.parse(shiftEndStr)
+                    : DateTime.now();
+            workedHours = end.difference(start).inSeconds / 3600;
+            earned = workedHours * salaryPerHour;
+            netEarned = (earned - advance).clamp(0, earned);
+          }
 
-      return {
-        'id': staff['id'],
-        'name': staff['username'] ?? 'غير معروف'.tr(),
-        'workedHours': workedHours,
-        'earned': earned,
-        'advance': advance,
-        'netEarned': netEarned,
-      };
-    }).toList();
+          return {
+            'id': staff['id'],
+            'name': staff['username'] ?? 'غير معروف'.tr(),
+            'workedHours': workedHours,
+            'earned': earned,
+            'advance': advance,
+            'netEarned': netEarned,
+          };
+        }).toList();
     /* ج, سلفة: ${s['advance'].toStringAsFixed(2)}*/
     final shiftInvoices = await DBHelper.getInvoicesByShift(widget.shiftId);
     final productsSold = await DBHelper.getShiftProductsSummary(widget.shiftId);
     final shiftExpenses = await DBHelper.getExpensesByShift(widget.shiftId);
-    final totalExpenses = shiftExpenses.fold<double>(0.0, (sum, e) => sum + ((e['amount'] ?? 0) as num).toDouble());
-    final totalDevices = shiftInvoices.fold<double>(0.0, (s, i) => i['payment_type'] == 'ملغي' ? s : s + ((i['device_cost'] ?? 0) as num).toDouble());
-    final totalDrinks = shiftInvoices.fold<double>(0.0, (s, i) => i['payment_type'] == 'ملغي' ? s : s + ((i['drinks_cost'] ?? 0) as num).toDouble());
-    final totalProducts = shiftInvoices.fold<double>(0.0, (s, i) => i['payment_type'] == 'ملغي' ? s : s + ((i['products_cost'] ?? 0) as num).toDouble());
-    final totalCigarettes = shiftInvoices.fold<double>(0.0, (s, i) => i['payment_type'] == 'ملغي' ? s : s + ((i['cigarettes_cost'] ?? 0) as num).toDouble());
-    final totalShisha = shiftInvoices.fold<double>(0.0, (s, i) => i['payment_type'] == 'ملغي' ? s : s + ((i['shisha_cost'] ?? 0) as num).toDouble());
-    final totalItemsSoldQty = productsSold.fold<int>(0, (s, p) => s + ((p['total_qty'] ?? 0) as num).toInt());
-    final totalSalesBeforeDiscount = totalDevices + totalDrinks + totalProducts + totalCigarettes + totalShisha;
+    final totalExpenses = shiftExpenses.fold<double>(
+      0.0,
+      (sum, e) => sum + ((e['amount'] ?? 0) as num).toDouble(),
+    );
+    final totalDevices = shiftInvoices.fold<double>(
+      0.0,
+      (s, i) =>
+          i['payment_type'] == 'ملغي'
+              ? s
+              : s + ((i['device_cost'] ?? 0) as num).toDouble(),
+    );
+    final totalDrinks = shiftInvoices.fold<double>(
+      0.0,
+      (s, i) =>
+          i['payment_type'] == 'ملغي'
+              ? s
+              : s + ((i['drinks_cost'] ?? 0) as num).toDouble(),
+    );
+    final totalProducts = shiftInvoices.fold<double>(
+      0.0,
+      (s, i) =>
+          i['payment_type'] == 'ملغي'
+              ? s
+              : s + ((i['products_cost'] ?? 0) as num).toDouble(),
+    );
+    final totalCigarettes = shiftInvoices.fold<double>(
+      0.0,
+      (s, i) =>
+          i['payment_type'] == 'ملغي'
+              ? s
+              : s + ((i['cigarettes_cost'] ?? 0) as num).toDouble(),
+    );
+    final totalShisha = shiftInvoices.fold<double>(
+      0.0,
+      (s, i) =>
+          i['payment_type'] == 'ملغي'
+              ? s
+              : s + ((i['shisha_cost'] ?? 0) as num).toDouble(),
+    );
+    final totalItemsSoldQty = productsSold.fold<int>(
+      0,
+      (s, p) => s + ((p['total_qty'] ?? 0) as num).toInt(),
+    );
+    final totalSalesBeforeDiscount =
+        totalDevices +
+        totalDrinks +
+        totalProducts +
+        totalCigarettes +
+        totalShisha;
 
     // بناء نص لعرضه في الـ AlertDialog
-    final earningsText = staffEarnings.isEmpty
-        ? 'لا يوجد موظفين فرعيين مسجلين'.tr()
-        : staffEarnings
-            .map(
-              (s) =>
-                  '• {v1}: أجر: {v2} ج | صافي: {v3} ج'.tr({'v1': s['name'], 'v2': s['earned'].toStringAsFixed(2), 'v3': s['netEarned'].toStringAsFixed(2)}),
-            )
-            .join('\n');
+    final earningsText =
+        staffEarnings.isEmpty
+            ? 'لا يوجد موظفين فرعيين مسجلين'.tr()
+            : staffEarnings
+                .map(
+                  (s) => '• {v1}: أجر: {v2} ج | صافي: {v3} ج'.tr({
+                    'v1': s['name'],
+                    'v2': s['earned'].toStringAsFixed(2),
+                    'v3': s['netEarned'].toStringAsFixed(2),
+                  }),
+                )
+                .join('\n');
 
     // عرض الـ AlertDialog
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('تأكيد قفل الشيفت'.tr()),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '📊 ملخص مبيعات الشيفت:'.tr(),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      builder:
+          (_) => AppDialog(
+            title: Text('تأكيد قفل الشيفت'.tr()),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '📊 ملخص مبيعات الشيفت:'.tr(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    '• إجمالي المبيعات: {v1} {v2}'.tr({
+                      'v1': totalSalesBeforeDiscount.toStringAsFixed(2),
+                      'v2': Money.txt,
+                    }),
+                  ),
+                  Text(
+                    '• المشروبات: {v1} {v2}'.tr({
+                      'v1': totalDrinks.toStringAsFixed(2),
+                      'v2': Money.txt,
+                    }),
+                  ),
+                  if (totalProducts > 0)
+                    Text(
+                      '• المنتجات/المأكولات: {v1} {v2}'.tr({
+                        'v1': totalProducts.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                    ),
+                  if (totalDevices > 0)
+                    Text(
+                      '• الأجهزة: {v1} {v2}'.tr({
+                        'v1': totalDevices.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                    ),
+                  if (totalCigarettes > 0)
+                    Text(
+                      '• السجائر: {v1} {v2}'.tr({
+                        'v1': totalCigarettes.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                    ),
+                  if (totalShisha > 0)
+                    Text(
+                      '• الشيشة: {v1} {v2}'.tr({
+                        'v1': totalShisha.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                    ),
+                  Text(
+                    '• إجمالي الأصناف المباعة: {totalItemsSoldQty} قطعة'.tr({
+                      'totalItemsSoldQty': totalItemsSoldQty,
+                    }),
+                  ),
+                  Text(
+                    '• المصروفات المسجلة: {v1} {v2}'.tr({
+                      'v1': totalExpenses.toStringAsFixed(2),
+                      'v2': Money.txt,
+                    }),
+                  ),
+                  Divider(height: 20),
+                  Text(
+                    '👥 أجور الموظفين:'.tr(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  SizedBox(height: 4),
+                  Text(earningsText),
+                  SizedBox(height: 12),
+                  Text(
+                    'هل تريد تأكيد قفل الشيفت وطباعة التقرير؟'.tr(),
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
-              SizedBox(height: 6),
-              Text('• إجمالي المبيعات: {v1} {v2}'.tr({'v1': totalSalesBeforeDiscount.toStringAsFixed(2), 'v2': Money.txt})),
-              Text('• المشروبات: {v1} {v2}'.tr({'v1': totalDrinks.toStringAsFixed(2), 'v2': Money.txt})),
-              if (totalProducts > 0)
-                Text('• المنتجات/المأكولات: {v1} {v2}'.tr({'v1': totalProducts.toStringAsFixed(2), 'v2': Money.txt})),
-              if (totalDevices > 0)
-                Text('• الأجهزة: {v1} {v2}'.tr({'v1': totalDevices.toStringAsFixed(2), 'v2': Money.txt})),
-              if (totalCigarettes > 0)
-                Text('• السجائر: {v1} {v2}'.tr({'v1': totalCigarettes.toStringAsFixed(2), 'v2': Money.txt})),
-              if (totalShisha > 0)
-                Text('• الشيشة: {v1} {v2}'.tr({'v1': totalShisha.toStringAsFixed(2), 'v2': Money.txt})),
-              Text('• إجمالي الأصناف المباعة: {totalItemsSoldQty} قطعة'.tr({'totalItemsSoldQty': totalItemsSoldQty})),
-              Text('• المصروفات المسجلة: {v1} {v2}'.tr({'v1': totalExpenses.toStringAsFixed(2), 'v2': Money.txt})),
-              Divider(height: 20),
-              Text(
-                '👥 أجور الموظفين:'.tr(),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              SizedBox(height: 4),
-              Text(earningsText),
-              SizedBox(height: 12),
-              Text(
-                'هل تريد تأكيد قفل الشيفت وطباعة التقرير؟'.tr(),
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء'.tr(), style: TextStyle(color: Colors.white)),
-          ),
-          ElevatedButton.icon(
-            icon: Icon(Icons.lock),
-            label: Text('تأكيد القفل'.tr()),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHighest,
-              foregroundColor: Colors.redAccent,
             ),
-            onPressed: () async {
-              Navigator.pop(context);
-              // 1️⃣ جلب بيانات الكاشير الرئيسي
-              final mainStaff = await DBHelper.getUserById(widget.staffId);
-              double mainWorkedHours = 0.0;
-              double mainEarned = 0.0;
-              double mainNetEarned = 0.0;
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'إلغاء'.tr(),
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton.icon(
+                icon: Icon(Icons.lock),
+                label: Text('تأكيد القفل'.tr()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  foregroundColor: Colors.redAccent,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  // 1️⃣ جلب بيانات الكاشير الرئيسي
+                  final mainStaff = await DBHelper.getUserById(widget.staffId);
+                  double mainWorkedHours = 0.0;
+                  double mainEarned = 0.0;
+                  double mainNetEarned = 0.0;
 
-              if (mainStaff != null) {
-                final shiftStartStr = mainStaff['shift_start'];
-                final shiftEndStr = mainStaff['shift_end'];
-                final salaryPerHour =
-                    (mainStaff['salary_per_hour'] ?? 0.0) as double;
-                final advance = (mainStaff['advance'] ?? 0.0) as double;
+                  if (mainStaff != null) {
+                    final shiftStartStr = mainStaff['shift_start'];
+                    final shiftEndStr = mainStaff['shift_end'];
+                    final salaryPerHour =
+                        (mainStaff['salary_per_hour'] ?? 0.0) as double;
+                    final advance = (mainStaff['advance'] ?? 0.0) as double;
 
-                if (shiftStartStr != null) {
-                  final start = DateTime.parse(shiftStartStr);
-                  final end = shiftEndStr != null
-                      ? DateTime.parse(shiftEndStr)
-                      : DateTime.now();
-                  mainWorkedHours = end.difference(start).inSeconds / 3600;
-                  mainEarned = mainWorkedHours * salaryPerHour;
-                  mainNetEarned = (mainEarned - advance).clamp(0, mainEarned);
-                }
+                    if (shiftStartStr != null) {
+                      final start = DateTime.parse(shiftStartStr);
+                      final end =
+                          shiftEndStr != null
+                              ? DateTime.parse(shiftEndStr)
+                              : DateTime.now();
+                      mainWorkedHours = end.difference(start).inSeconds / 3600;
+                      mainEarned = mainWorkedHours * salaryPerHour;
+                      mainNetEarned = (mainEarned - advance).clamp(
+                        0,
+                        mainEarned,
+                      );
+                    }
 
-                // 2️⃣ إضافة راتب الكاشير للمستحقات بدل المصروف مباشرة
-                if (mainNetEarned > 0) {
-                  await DBHelper.addStaffDueSalary({
-                    'id': mainStaff['id'],
-                    'name': mainStaff['username'],
-                    'shiftId': widget.shiftId,
-                    'hours': mainWorkedHours,
-                    'earned': mainEarned,
-                    'advance': advance,
-                    'net': mainNetEarned,
-                  });
-                }
-              }
+                    // 2️⃣ إضافة راتب الكاشير للمستحقات بدل المصروف مباشرة
+                    if (mainNetEarned > 0) {
+                      await DBHelper.addStaffDueSalary({
+                        'id': mainStaff['id'],
+                        'name': mainStaff['username'],
+                        'shiftId': widget.shiftId,
+                        'hours': mainWorkedHours,
+                        'earned': mainEarned,
+                        'advance': advance,
+                        'net': mainNetEarned,
+                      });
+                    }
+                  }
 
-              // 1️⃣ جلب وحساب الأجور
-              final subStaffList = await DBHelper.getSubStaff(widget.staffId);
+                  // 1️⃣ جلب وحساب الأجور
+                  final subStaffList = await DBHelper.getSubStaff(
+                    widget.staffId,
+                  );
 
-              List<Map<String, dynamic>> staffEarnings = subStaffList.map((
-                staff,
-              ) {
-                final shiftStartStr = staff['shift_start'];
-                final shiftEndStr = staff['shift_end'];
-                final salaryPerHour =
-                    (staff['salary_per_hour'] ?? 0.0) as double;
-                final advance = (staff['advance'] ?? 0.0) as double;
-                double workedHours = 0.0;
-                double earned = 0.0;
-                double netEarned = 0.0;
+                  List<Map<String, dynamic>> staffEarnings =
+                      subStaffList.map((staff) {
+                        final shiftStartStr = staff['shift_start'];
+                        final shiftEndStr = staff['shift_end'];
+                        final salaryPerHour =
+                            (staff['salary_per_hour'] ?? 0.0) as double;
+                        final advance = (staff['advance'] ?? 0.0) as double;
+                        double workedHours = 0.0;
+                        double earned = 0.0;
+                        double netEarned = 0.0;
 
-                if (shiftStartStr != null) {
-                  final start = DateTime.parse(shiftStartStr);
-                  final end = shiftEndStr != null
-                      ? DateTime.parse(shiftEndStr)
-                      : DateTime.now();
-                  workedHours = end.difference(start).inSeconds / 3600;
-                  earned = workedHours * salaryPerHour;
-                  netEarned = (earned - advance).clamp(0, earned);
-                }
+                        if (shiftStartStr != null) {
+                          final start = DateTime.parse(shiftStartStr);
+                          final end =
+                              shiftEndStr != null
+                                  ? DateTime.parse(shiftEndStr)
+                                  : DateTime.now();
+                          workedHours = end.difference(start).inSeconds / 3600;
+                          earned = workedHours * salaryPerHour;
+                          netEarned = (earned - advance).clamp(0, earned);
+                        }
 
-                return {
-                  'id': staff['id'],
-                  'name': staff['username'] ?? 'غير معروف'.tr(),
-                  'workedHours': workedHours,
-                  'earned': earned,
-                  'advance': advance,
-                  'netEarned': netEarned,
-                };
-              }).toList();
+                        return {
+                          'id': staff['id'],
+                          'name': staff['username'] ?? 'غير معروف'.tr(),
+                          'workedHours': workedHours,
+                          'earned': earned,
+                          'advance': advance,
+                          'netEarned': netEarned,
+                        };
+                      }).toList();
 
-              // 2️⃣ إضافة الأجور للمصروفات
-              for (var staff in staffEarnings) {
-                if (staff['netEarned'] > 0) {
-                  /*   await DBHelper.addExpense(
+                  // 2️⃣ إضافة الأجور للمصروفات
+                  for (var staff in staffEarnings) {
+                    if (staff['netEarned'] > 0) {
+                      /*   await DBHelper.addExpense(
                     description: "أجر ${staff['name']}",
                     amount: staff['netEarned'],
                     shiftId: widget.shiftId,
                     addedBy: widget.staffName,
                   );*/
-                  await DBHelper.addStaffDueSalary({
-                    'id': staff['id'],
-                    'name': staff['name'],
-                    'shiftId': widget.shiftId,
-                    'hours': staff['workedHours'],
-                    'earned': staff['earned'],
-                    'advance': staff['advance'],
-                    'net': staff['netEarned'],
-                  });
-                }
-              }
-              final db = await DBHelper.database;
-              final allShifts = await db.query('staff_shifts');
-              print('جميع الشيفتات في staff_shifts:');
-              for (var row in allShifts) {
-                print(row);
-              }
+                      await DBHelper.addStaffDueSalary({
+                        'id': staff['id'],
+                        'name': staff['name'],
+                        'shiftId': widget.shiftId,
+                        'hours': staff['workedHours'],
+                        'earned': staff['earned'],
+                        'advance': staff['advance'],
+                        'net': staff['netEarned'],
+                      });
+                    }
+                  }
+                  final db = await DBHelper.database;
+                  final allShifts = await db.query('staff_shifts');
+                  print('جميع الشيفتات في staff_shifts:');
+                  for (var row in allShifts) {
+                    print(row);
+                  }
 
-              // 3️⃣ إغلاق الموظفين الفرعيين
-              await DBHelper.closeAllOpenSubStaffShifts();
-              print('widget.shiftId = ${widget.shiftId}');
+                  // 3️⃣ إغلاق الموظفين الفرعيين
+                  await DBHelper.closeAllOpenSubStaffShifts();
+                  print('widget.shiftId = ${widget.shiftId}');
 
-              await Future.delayed(
-                const Duration(milliseconds: 300),
-              ); // تأخير بسيط للتأكيد
-              subStaffUpdateCubit.markUpdated();
-              final updated = await DBHelper.database.then(
-                (db) => db.query(
-                  'sub_staff',
-                  where: 'supervisor_shift_id = ?',
-                  whereArgs: [widget.shiftId],
-                ),
-              );
-              print(updated);
+                  await Future.delayed(
+                    const Duration(milliseconds: 300),
+                  ); // تأخير بسيط للتأكيد
+                  subStaffUpdateCubit.markUpdated();
+                  final updated = await DBHelper.database.then(
+                    (db) => db.query(
+                      'sub_staff',
+                      where: 'supervisor_shift_id = ?',
+                      whereArgs: [widget.shiftId],
+                    ),
+                  );
+                  print(updated);
 
-              // 4️⃣ إغلاق الشيفت الرئيسي
-              final closed = await _closeShift();
+                  // 4️⃣ إغلاق الشيفت الرئيسي
+                  final closed = await _closeShift();
 
-              // 5️⃣ بعد القفل: خروج كامل لشاشة اللوجين مع تصفير الستاك كله —
-              // pushAndRemoveUntil أضمن من popUntil(#first): مفيش أي دايلوج
-              // قديم أو شاشة مكدسة تقدر تفضل فوق اللوجين.
-              if (closed) {
-                if (!mounted) return;
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => LoginScreen()),
-                  (route) => false,
-                );
-              } else {
-                AppToast.show('⚠️ لا يمكن الرجوع قبل قفل جميع الترابيزات والبلايستيشن'.tr(), kind: FeedbackKind.error);
-              }
-            },
+                  // 5️⃣ بعد القفل: خروج كامل لشاشة اللوجين مع تصفير الستاك كله —
+                  // pushAndRemoveUntil أضمن من popUntil(#first): مفيش أي دايلوج
+                  // قديم أو شاشة مكدسة تقدر تفضل فوق اللوجين.
+                  if (closed) {
+                    if (!mounted) return;
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                      (route) => false,
+                    );
+                  } else {
+                    AppToast.show(
+                      '⚠️ لا يمكن الرجوع قبل قفل جميع الترابيزات والبلايستيشن'
+                          .tr(),
+                      kind: FeedbackKind.error,
+                    );
+                  }
+                },
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -538,84 +657,88 @@ class _StaffDashboardState extends State<StaffDashboard> {
   Future<String> _canCloseShift(BuildContext context) async {
     // 🔹 ترابيزات المشروبات
     final tables = await DBHelper.getAllTables();
-    final openTables = tables
-        .where((t) => t['active_invoice_id'] != null)
-        .toList();
+    final openTables =
+        tables.where((t) => t['active_invoice_id'] != null).toList();
 
     if (openTables.isNotEmpty) {
       final action = await showDialog<String>(
         context: context,
-        builder: (_) => AppDialog(
-          title: Text('⚠️ لا يمكن قفل الشيفت'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('يوجد ترابيزات مفتوحة:'.tr()),
-              SizedBox(height: 8),
-              ...openTables.map((t) => Text('• ${t['name']}')),
-              SizedBox(height: 10),
-              Text(
-                'تقدر تسلّم الشيفت (بالترابيزات المفتوحة وحسابها) لموظف تاني ويكمّله.'.tr(),
-                style: TextStyle(fontSize: 12),
+        builder:
+            (_) => AppDialog(
+              title: Text('⚠️ لا يمكن قفل الشيفت'.tr()),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('يوجد ترابيزات مفتوحة:'.tr()),
+                  SizedBox(height: 8),
+                  ...openTables.map((t) => Text('• ${t['name']}')),
+                  SizedBox(height: 10),
+                  Text(
+                    'تقدر تسلّم الشيفت (بالترابيزات المفتوحة وحسابها) لموظف تاني ويكمّله.'
+                        .tr(),
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('حسناً'.tr()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('حسناً'.tr()),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, 'handover'),
+                  child: Text('🤝 تسليم الشيفت'.tr()),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, 'handover'),
-              child: Text('🤝 تسليم الشيفت'.tr()),
-            ),
-          ],
-        ),
       );
       return action == 'handover' ? 'handover' : 'blocked';
     }
 
     // 🔹 أجهزة البلايستيشن
-    final psInvoices = (await DBHelper.getActiveInvoices())
-        .where((inv) => (inv['console_id'] ?? 0) != 0)
-        .toList();
+    final psInvoices =
+        (await DBHelper.getActiveInvoices())
+            .where((inv) => (inv['console_id'] ?? 0) != 0)
+            .toList();
 
     if (psInvoices.isNotEmpty) {
       final action = await showDialog<String>(
         context: context,
-        builder: (_) => AppDialog(
-          title: Text('⚠️ لا يمكن قفل الشيفت'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('يوجد أجهزة بلايستيشن تعمل حالياً:'.tr()),
-              SizedBox(height: 8),
-              ...psInvoices.map(
-                (inv) => Text(
-                  '• جهاز رقم {v1}'.tr({'v1': inv['console_id']}),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        builder:
+            (_) => AppDialog(
+              title: Text('⚠️ لا يمكن قفل الشيفت'.tr()),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('يوجد أجهزة بلايستيشن تعمل حالياً:'.tr()),
+                  SizedBox(height: 8),
+                  ...psInvoices.map(
+                    (inv) => Text(
+                      '• جهاز رقم {v1}'.tr({'v1': inv['console_id']}),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'تقدر تسلّم الشيفت (بالجلسات المفتوحة وحسابها) لموظف تاني ويكمّله.'
+                        .tr(),
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('حسناً'.tr()),
                 ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'تقدر تسلّم الشيفت (بالجلسات المفتوحة وحسابها) لموظف تاني ويكمّله.'.tr(),
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('حسناً'.tr()),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, 'handover'),
+                  child: Text('🤝 تسليم الشيفت'.tr()),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, 'handover'),
-              child: Text('🤝 تسليم الشيفت'.tr()),
-            ),
-          ],
-        ),
       );
       return action == 'handover' ? 'handover' : 'blocked';
     }
@@ -664,8 +787,14 @@ class _StaffDashboardState extends State<StaffDashboard> {
     final closed = await _executeShiftClose();
     if (!closed) return false;
 
-    final label = moved > 0 ? ' مع {moved} فاتورة مفتوحة'.tr({'moved': moved}) : '';
-    AppToast.show('✅ تم تسليم الشيفت{label} للموظف {targetName}'.tr({'label': label, 'targetName': targetName}));
+    final label =
+        moved > 0 ? ' مع {moved} فاتورة مفتوحة'.tr({'moved': moved}) : '';
+    AppToast.show(
+      '✅ تم تسليم الشيفت{label} للموظف {targetName}'.tr({
+        'label': label,
+        'targetName': targetName,
+      }),
+    );
     // ✍️ الـ pop بيتعمل في الفلو الخارجي لزرار القفل (بعد ما _closeShift ترجع
     // true) — عشان ما نعملش pop مرتين من كونتِكست ممكن يكون اتنفرد.
     return true;
@@ -685,45 +814,50 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     return showDialog<Map<String, Object?>?>(
       context: context,
-      builder: (dlg) => AppDialog(
-        title: Text('🤝 تسليم الشيفت لموظف تاني'.tr()),
-        content: SizedBox(
-          width: 340,
-          child: users.isEmpty
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('مفيش موظفين تانيين مسجلين.'.tr()),
-                    SizedBox(height: 4),
-                    Text(
-                      'ضيف موظف من شاشة إدارة المستخدمين الأول.'.tr(),
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: users.length,
-                  itemBuilder: (_, i) {
-                    final u = users[i];
-                    return ListTile(
-                      dense: true,
-                      leading: Icon(Icons.person_outline),
-                      title: Text('${u['username'] ?? ''}'),
-                      subtitle: Text(
-                          'الدور: {v1}'.tr({'v1': _roleLabel(u['role']?.toString() ?? '')})),
-                      onTap: () => Navigator.pop(dlg, u),
-                    );
-                  },
-                ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dlg),
-            child: Text('إلغاء'.tr()),
+      builder:
+          (dlg) => AppDialog(
+            title: Text('🤝 تسليم الشيفت لموظف تاني'.tr()),
+            content: SizedBox(
+              width: 340,
+              child:
+                  users.isEmpty
+                      ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('مفيش موظفين تانيين مسجلين.'.tr()),
+                          SizedBox(height: 4),
+                          Text(
+                            'ضيف موظف من شاشة إدارة المستخدمين الأول.'.tr(),
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      )
+                      : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: users.length,
+                        itemBuilder: (_, i) {
+                          final u = users[i];
+                          return ListTile(
+                            dense: true,
+                            leading: Icon(Icons.person_outline),
+                            title: Text('${u['username'] ?? ''}'),
+                            subtitle: Text(
+                              'الدور: {v1}'.tr({
+                                'v1': _roleLabel(u['role']?.toString() ?? ''),
+                              }),
+                            ),
+                            onTap: () => Navigator.pop(dlg, u),
+                          );
+                        },
+                      ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dlg),
+                child: Text('إلغاء'.tr()),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -756,7 +890,9 @@ class _StaffDashboardState extends State<StaffDashboard> {
     } catch (e) {
       debugPrint('⚠️ فشل رفع النسخة على السيرفر بعد قفل الشيفت: $e');
     }
-    AppToast.show('تم قفل الشيفت في {v1}'.tr({'v1': DateFormat('HH:mm').format(now)}));
+    AppToast.show(
+      'تم قفل الشيفت في {v1}'.tr({'v1': DateFormat('HH:mm').format(now)}),
+    );
     return true;
   }
 
@@ -793,7 +929,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
                   isValid = true;
                   Navigator.pop(ctx);
                 } else {
-                  AppToast.show('كلمة المرور غير صحيحة'.tr(), kind: FeedbackKind.error);
+                  AppToast.show(
+                    'كلمة المرور غير صحيحة'.tr(),
+                    kind: FeedbackKind.error,
+                  );
                 }
               },
               child: Text('تأكيد'.tr()),
@@ -820,9 +959,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
     vodafoneCashNotes = await DBHelper.getVodafoneCashNotes(widget.shiftId);
     final rawInvoices = await DBHelper.getInvoicesByShift(shiftId);
     final productsSummary = await DBHelper.getShiftProductsSummary(shiftId);
-    final invoices = rawInvoices
-        .map((inv) => Map<String, dynamic>.from(inv))
-        .toList();
+    final invoices =
+        rawInvoices.map((inv) => Map<String, dynamic>.from(inv)).toList();
 
     // 🆕 حساب المدفوع فعليًا (paid_partial) لكل فاتورة، بما فيها الآجل الجزئي
     for (var inv in invoices) {
@@ -888,10 +1026,11 @@ class _StaffDashboardState extends State<StaffDashboard> {
       // ✅ الدفعات اللي حصلت بعد إنشاء الدين فقط
       // (الدفعة الجزئية القديمة المرحّلة تاريخها قبل تاريخ الدين، فمستبعدة هنا
       // لأنها أصلاً متطروحة جوه total_amount من _endSession)
-      final paymentsAfterCreation = payments.where((p) {
-        final paidAt = DateTime.tryParse(p['paid_at']?.toString() ?? '');
-        return paidAt != null && !paidAt.isBefore(debtDate);
-      }).toList();
+      final paymentsAfterCreation =
+          payments.where((p) {
+            final paidAt = DateTime.tryParse(p['paid_at']?.toString() ?? '');
+            return paidAt != null && !paidAt.isBefore(debtDate);
+          }).toList();
 
       final paidAfter = paymentsAfterCreation.fold<double>(
         0.0,
@@ -913,22 +1052,18 @@ class _StaffDashboardState extends State<StaffDashboard> {
       where: 'id = ?',
       whereArgs: [shiftId],
     );
-    final checkIn = shiftRow.isNotEmpty
-        ? shiftRow.first['check_in'] as String?
-        : null;
-    final checkOut = shiftRow.isNotEmpty
-        ? shiftRow.first['check_out'] as String?
-        : null;
+    final checkIn =
+        shiftRow.isNotEmpty ? shiftRow.first['check_in'] as String? : null;
+    final checkOut =
+        shiftRow.isNotEmpty ? shiftRow.first['check_out'] as String? : null;
 
     final rangeStart = checkIn ?? DateTime.now().toIso8601String();
     final rangeEnd = checkOut ?? DateTime.now().toIso8601String();
 
     // 🆕 مجموعة IDs بتاعة فواتير الشيفت الحالي (عشان نستثني ديونها من "المحصّل")
     // 🆕 مجموعة IDs بتاعة فواتير الشيفت الحالي (عشان نستثني ديونها من "المحصّل")
-    final currentShiftInvoiceIds = invoices
-        .map((inv) => inv['id'])
-        .whereType<int>()
-        .toSet();
+    final currentShiftInvoiceIds =
+        invoices.map((inv) => inv['id']).whereType<int>().toSet();
 
     // 🔧 قراءة مباشرة من debt_payments بدون أي JOIN خالص
     // (customer_name و invoice_id بقوا متسجلين جوه الجدول نفسه)
@@ -940,11 +1075,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
     );
 
     // 🔧 استبعاد أي دفعة خاصة بدين اتسجل واتحصّل في نفس الشيفت
-    final debtPaymentsRows = debtPaymentsRowsRaw.where((p) {
-      final invId = p['invoice_id'];
-      if (invId == null) return true;
-      return !currentShiftInvoiceIds.contains(invId as int);
-    }).toList();
+    final debtPaymentsRows =
+        debtPaymentsRowsRaw.where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !currentShiftInvoiceIds.contains(invId as int);
+        }).toList();
 
     // 🔧 استبعاد أي دفعة خاصة بدين اتسجل واتحصّل في نفس الشيفت
     // (لأن فاتورته أصلاً بقت 'paid' واتحسبت ضمن الأجهزة/المشروبات)
@@ -1000,9 +1136,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
       0.0,
       (double sum, d) => sum + ((d['remaining_amount'] as double?) ?? 0.0),
     );
-    final cancelledInvoices = invoices
-        .where((inv) => inv['payment_type'] == 'ملغي')
-        .toList();
+    final cancelledInvoices =
+        invoices.where((inv) => inv['payment_type'] == 'ملغي').toList();
 
     final totalCancelled = cancelledInvoices.fold<double>(
       0.0,
@@ -1030,561 +1165,660 @@ class _StaffDashboardState extends State<StaffDashboard> {
           marginAll: 2 * PdfPageFormat.mm,
         ),
         textDirection: pw.TextDirection.rtl,
-        build: (context) => [
-          pw.Container(
-            alignment: pw.Alignment.center,
-            padding: const pw.EdgeInsets.only(bottom: 5),
-            child: pw.Column(
-              children: [
-                pw.Text(
-                  ' $placeName ',
-                  style: pw.TextStyle(
-                    fontSize: 22,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+        build:
+            (context) => [
+              pw.Container(
+                alignment: pw.Alignment.center,
+                padding: const pw.EdgeInsets.only(bottom: 5),
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      ' $placeName ',
+                      style: pw.TextStyle(
+                        fontSize: 22,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          pw.Center(
-            child: pw.Text(
-              'تقرير نهاية الشيفت'.tr(),
-              style: pw.TextStyle(font: fontBold, fontSize: 10),
-            ),
-          ),
-          pw.Text(
-            'الموظف: {v1}'.tr({'v1': widget.staffName}),
-            style: pw.TextStyle(font: fontRegular, fontSize: 8),
-          ),
-          pw.Text(
-            'التاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}),
-            style: pw.TextStyle(font: fontRegular, fontSize: 8),
-          ),
-          pw.Divider(thickness: 0.5),
-
-          // الفواتير
-          pw.Text(
-            'الفواتير:'.tr(),
-            style: pw.TextStyle(font: fontBold, fontSize: 9),
-          ),
-          ...invoices.map((inv) {
-            final customer = (inv['customer_name'] ?? '').toString().trim();
-            final customerName = customer.isEmpty ? 'غير معروف'.tr() : customer;
-            final device = (inv['device_cost'] ?? 0).toDouble();
-            final drinks = (inv['drinks_cost'] ?? 0).toDouble();
-            final products = ((inv['products_cost'] ?? 0) as num).toDouble();
-            final cigarettes = (inv['cigarettes_cost'] ?? 0).toDouble();
-            final shisha = (inv['shisha_cost'] ?? 0).toDouble();
-            final discount = (inv['discount'] ?? 0).toDouble();
-            final total =
-                (inv['total_cost'] as num?)?.toDouble() ??
-                (device + drinks + products + cigarettes + shisha - discount);
-            // 🆕 المدفوع فعليًا والباقي
-            final paidPartial = (inv['paid_partial'] as double?) ?? 0.0;
-            final totalCostCalc = (inv['total_cost_calc'] as double?) ?? total;
-            final remaining = totalCostCalc - paidPartial;
-            final isPartiallyPaid =
-                remaining > 0.01 && inv['payment_type'] != 'ملغي';
-
-            final start = inv['start_time'] != null
-                ? DateFormat('HH:mm').format(DateTime.parse(inv['start_time']))
-                : '-';
-            final end = inv['end_time'] != null
-                ? DateFormat('HH:mm').format(DateTime.parse(inv['end_time']))
-                : '-';
-
-            final isOnCredit = (inv['payment_type'] ?? '') == 'علي الحساب';
-
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  'الزبون: {customerName}{v2}'.tr({'customerName': customerName, 'v2': isOnCredit ? ' (علي الحساب)'.tr() : ''}),
-                  style: pw.TextStyle(
-                    font: isOnCredit ? fontBold : fontRegular,
-                    fontSize: 8,
-                  ),
+              ),
+              pw.Center(
+                child: pw.Text(
+                  'تقرير نهاية الشيفت'.tr(),
+                  style: pw.TextStyle(font: fontBold, fontSize: 10),
                 ),
+              ),
+              pw.Text(
+                'الموظف: {v1}'.tr({'v1': widget.staffName}),
+                style: pw.TextStyle(font: fontRegular, fontSize: 8),
+              ),
+              pw.Text(
+                'التاريخ: {v1}'.tr({
+                  'v1': DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()),
+                }),
+                style: pw.TextStyle(font: fontRegular, fontSize: 8),
+              ),
+              pw.Divider(thickness: 0.5),
+
+              // الفواتير
+              pw.Text(
+                'الفواتير:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              ...invoices.map((inv) {
+                final customer = (inv['customer_name'] ?? '').toString().trim();
+                final customerName =
+                    customer.isEmpty ? 'غير معروف'.tr() : customer;
+                final device = (inv['device_cost'] ?? 0).toDouble();
+                final drinks = (inv['drinks_cost'] ?? 0).toDouble();
+                final products =
+                    ((inv['products_cost'] ?? 0) as num).toDouble();
+                final cigarettes = (inv['cigarettes_cost'] ?? 0).toDouble();
+                final shisha = (inv['shisha_cost'] ?? 0).toDouble();
+                final discount = (inv['discount'] ?? 0).toDouble();
+                final total =
+                    (inv['total_cost'] as num?)?.toDouble() ??
+                    (device +
+                        drinks +
+                        products +
+                        cigarettes +
+                        shisha -
+                        discount);
+                // 🆕 المدفوع فعليًا والباقي
+                final paidPartial = (inv['paid_partial'] as double?) ?? 0.0;
+                final totalCostCalc =
+                    (inv['total_cost_calc'] as double?) ?? total;
+                final remaining = totalCostCalc - paidPartial;
+                final isPartiallyPaid =
+                    remaining > 0.01 && inv['payment_type'] != 'ملغي';
+
+                final start =
+                    inv['start_time'] != null
+                        ? DateFormat(
+                          'HH:mm',
+                        ).format(DateTime.parse(inv['start_time']))
+                        : '-';
+                final end =
+                    inv['end_time'] != null
+                        ? DateFormat(
+                          'HH:mm',
+                        ).format(DateTime.parse(inv['end_time']))
+                        : '-';
+
+                final isOnCredit = (inv['payment_type'] ?? '') == 'علي الحساب';
+
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'الزبون: {customerName}{v2}'.tr({
+                        'customerName': customerName,
+                        'v2': isOnCredit ? ' (علي الحساب)'.tr() : '',
+                      }),
+                      style: pw.TextStyle(
+                        font: isOnCredit ? fontBold : fontRegular,
+                        fontSize: 8,
+                      ),
+                    ),
+                    pw.Text(
+                      'من {start} إلى {end}'.tr({'start': start, 'end': end}),
+                      style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          'جهاز :'.tr(),
+                          style: pw.TextStyle(fontSize: 7, font: fontBold),
+                        ),
+                        pw.Text(
+                          '${device.toStringAsFixed(2)} ${Money.txt}',
+                          style: pw.TextStyle(fontSize: 7, font: fontBold),
+                        ),
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          ' مشروبات :'.tr(),
+                          style: pw.TextStyle(fontSize: 7, font: fontBold),
+                        ),
+                        pw.Text(
+                          '${drinks.toStringAsFixed(2)} ${Money.txt}',
+                          style: pw.TextStyle(fontSize: 7, font: fontBold),
+                        ),
+                      ],
+                    ),
+                    if (products > 0)
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'منتجات / مأكولات :'.tr(),
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                          pw.Text(
+                            '${products.toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                        ],
+                      ), // 🆕 سجاير — تتطبع بس لو موجودة
+                    if (cigarettes > 0)
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'سجائر :'.tr(),
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                          pw.Text(
+                            '${cigarettes.toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                        ],
+                      ),
+                    // 🆕 شيشة — تتطبع بس لو موجودة
+                    if (shisha > 0)
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'شيشة :'.tr(),
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                          pw.Text(
+                            '${shisha.toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(fontSize: 7, font: fontBold),
+                          ),
+                        ],
+                      ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          'الخصم:'.tr(),
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                        pw.Text(
+                          '${discount.toStringAsFixed(2)} ${Money.txt}',
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                      ],
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          'الإجمالي:'.tr(),
+                          style: pw.TextStyle(font: fontBold, fontSize: 8),
+                        ),
+                        pw.Text(
+                          '${total.toStringAsFixed(2)} ${Money.txt}',
+                          style: pw.TextStyle(font: fontBold, fontSize: 8),
+                        ),
+                      ],
+                    ),
+                    if (isPartiallyPaid) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'مدفوع:'.tr(),
+                            style: pw.TextStyle(
+                              font: fontRegular,
+                              fontSize: 7,
+                              color: PdfColors.teal800,
+                            ),
+                          ),
+                          pw.Text(
+                            '${paidPartial.toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(
+                              font: fontBold,
+                              fontSize: 7,
+                              color: PdfColors.teal800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'الباقي:'.tr(),
+                            style: pw.TextStyle(
+                              font: fontRegular,
+                              fontSize: 7,
+                              color: PdfColors.red800,
+                            ),
+                          ),
+                          pw.Text(
+                            '${remaining.toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(
+                              font: fontBold,
+                              fontSize: 7,
+                              color: PdfColors.red800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    pw.Divider(thickness: 0.3),
+                  ],
+                );
+              }),
+              // 🆕 قسم الفواتير الملغية
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'الفواتير الملغية:'.tr(),
+                style: pw.TextStyle(
+                  font: fontBold,
+                  fontSize: 9,
+                  color: PdfColors.grey700,
+                ),
+              ),
+              if (cancelledInvoices.isEmpty)
                 pw.Text(
-                  'من {start} إلى {end}'.tr({'start': start, 'end': end}),
+                  'لا توجد فواتير ملغية'.tr(),
                   style: pw.TextStyle(font: fontRegular, fontSize: 7),
-                ),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'جهاز :'.tr(),
-                      style: pw.TextStyle(fontSize: 7, font: fontBold),
-                    ),
-                    pw.Text(
-                      '${device.toStringAsFixed(2)} ${Money.txt}',
-                      style: pw.TextStyle(fontSize: 7, font: fontBold),
-                    ),
-                  ],
-                ),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      ' مشروبات :'.tr(),
-                      style: pw.TextStyle(fontSize: 7, font: fontBold),
-                    ),
-                    pw.Text(
-                      '${drinks.toStringAsFixed(2)} ${Money.txt}',
-                      style: pw.TextStyle(fontSize: 7, font: fontBold),
-                    ),
-                  ],
-                ),
-                if (products > 0)
-                  pw.Row(
+                )
+              else
+                ...cancelledInvoices.map((inv) {
+                  final customer =
+                      (inv['customer_name'] ?? '').toString().trim();
+                  final customerName =
+                      customer.isEmpty ? 'غير معروف'.tr() : customer;
+                  final total = (inv['total_cost'] as num?)?.toDouble() ?? 0.0;
+                  final start =
+                      inv['start_time'] != null
+                          ? DateFormat(
+                            'HH:mm',
+                          ).format(DateTime.parse(inv['start_time']))
+                          : '-';
+                  return pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
                       pw.Text(
-                        'منتجات / مأكولات :'.tr(),
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                      pw.Text(
-                        '${products.toStringAsFixed(2)} ${Money.txt}',
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                    ],
-                  ), // 🆕 سجاير — تتطبع بس لو موجودة
-                if (cigarettes > 0)
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'سجائر :'.tr(),
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                      pw.Text(
-                        '${cigarettes.toStringAsFixed(2)} ${Money.txt}',
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                    ],
-                  ),
-                // 🆕 شيشة — تتطبع بس لو موجودة
-                if (shisha > 0)
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'شيشة :'.tr(),
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                      pw.Text(
-                        '${shisha.toStringAsFixed(2)} ${Money.txt}',
-                        style: pw.TextStyle(fontSize: 7, font: fontBold),
-                      ),
-                    ],
-                  ),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'الخصم:'.tr(),
-                      style: pw.TextStyle(font: fontBold, fontSize: 7),
-                    ),
-                    pw.Text(
-                      '${discount.toStringAsFixed(2)} ${Money.txt}',
-                      style: pw.TextStyle(font: fontBold, fontSize: 7),
-                    ),
-                  ],
-                ),
-                pw.SizedBox(height: 2),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'الإجمالي:'.tr(),
-                      style: pw.TextStyle(font: fontBold, fontSize: 8),
-                    ),
-                    pw.Text(
-                      '${total.toStringAsFixed(2)} ${Money.txt}',
-                      style: pw.TextStyle(font: fontBold, fontSize: 8),
-                    ),
-                  ],
-                ),
-                if (isPartiallyPaid) ...[
-                  pw.SizedBox(height: 2),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'مدفوع:'.tr(),
+                        '$customerName ($start)',
                         style: pw.TextStyle(
+                          fontSize: 7,
                           font: fontRegular,
-                          fontSize: 7,
-                          color: PdfColors.teal800,
+                          color: PdfColors.grey700,
                         ),
                       ),
                       pw.Text(
-                        '${paidPartial.toStringAsFixed(2)} ${Money.txt}',
+                        '${total.toStringAsFixed(2)} ${Money.txt}',
                         style: pw.TextStyle(
-                          font: fontBold,
                           fontSize: 7,
-                          color: PdfColors.teal800,
+                          font: fontBold,
+                          color: PdfColors.grey700,
                         ),
                       ),
                     ],
-                  ),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'الباقي:'.tr(),
-                        style: pw.TextStyle(
-                          font: fontRegular,
-                          fontSize: 7,
-                          color: PdfColors.red800,
-                        ),
-                      ),
-                      pw.Text(
-                        '${remaining.toStringAsFixed(2)} ${Money.txt}',
-                        style: pw.TextStyle(
-                          font: fontBold,
-                          fontSize: 7,
-                          color: PdfColors.red800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                pw.Divider(thickness: 0.3),
-              ],
-            );
-          }),
-          // 🆕 قسم الفواتير الملغية
-          pw.SizedBox(height: 4),
-          pw.Text(
-            'الفواتير الملغية:'.tr(),
-            style: pw.TextStyle(
-              font: fontBold,
-              fontSize: 9,
-              color: PdfColors.grey700,
-            ),
-          ),
-          if (cancelledInvoices.isEmpty)
-            pw.Text(
-              'لا توجد فواتير ملغية'.tr(),
-              style: pw.TextStyle(font: fontRegular, fontSize: 7),
-            )
-          else
-            ...cancelledInvoices.map((inv) {
-              final customer = (inv['customer_name'] ?? '').toString().trim();
-              final customerName = customer.isEmpty ? 'غير معروف'.tr() : customer;
-              final total = (inv['total_cost'] as num?)?.toDouble() ?? 0.0;
-              final start = inv['start_time'] != null
-                  ? DateFormat(
-                      'HH:mm',
-                    ).format(DateTime.parse(inv['start_time']))
-                  : '-';
-              return pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    '$customerName ($start)',
-                    style: pw.TextStyle(
-                      fontSize: 7,
-                      font: fontRegular,
-                      color: PdfColors.grey700,
-                    ),
-                  ),
-                  pw.Text(
-                    '${total.toStringAsFixed(2)} ${Money.txt}',
-                    style: pw.TextStyle(
-                      fontSize: 7,
-                      font: fontBold,
-                      color: PdfColors.grey700,
-                    ),
-                  ),
-                ],
-              );
-            }),
-          if (cancelledInvoices.isNotEmpty)
-            pw.Text(
-              'إجمالي الملغي (غير محسوب): {v1} {v2}'.tr({'v1': totalCancelled.toStringAsFixed(2), 'v2': Money.txt}),
-              style: pw.TextStyle(
-                fontSize: 7,
-                font: fontBold,
-                color: PdfColors.grey700,
-              ),
-            ),
-          // 🆕 جدول تفاصيل الأصناف والمنتجات المباعة في الشيفت
-          pw.SizedBox(height: 4),
-          pw.Text(
-            'الأصناف والمنتجات المباعة:'.tr(),
-            style: pw.TextStyle(font: fontBold, fontSize: 9),
-          ),
-          if (productsSummary.isEmpty)
-            pw.Text(
-              'لا توجد أصناف مباعة في هذا الشيفت'.tr(),
-              style: pw.TextStyle(font: fontRegular, fontSize: 7),
-            )
-          else ...[
-            pw.SizedBox(height: 2),
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(vertical: 2),
-              decoration: const pw.BoxDecoration(
-                border: pw.Border(
-                  bottom: pw.BorderSide(width: 0.5),
-                  top: pw.BorderSide(width: 0.5),
-                ),
-              ),
-              child: pw.Row(
-                children: [
-                  pw.Expanded(
-                    flex: 4,
-                    child: pw.Text('الصنف'.tr(), style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                  ),
-                  pw.Expanded(
-                    flex: 2,
-                    child: pw.Text('الكمية'.tr(), textAlign: pw.TextAlign.center, style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                  ),
-                  pw.Expanded(
-                    flex: 2,
-                    child: pw.Text('السعر'.tr(), textAlign: pw.TextAlign.center, style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                  ),
-                  pw.Expanded(
-                    flex: 3,
-                    child: pw.Text('الإجمالي'.tr(), textAlign: pw.TextAlign.left, style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                  ),
-                ],
-              ),
-            ),
-            ...productsSummary.map((p) {
-              final name = (p['product_name'] ?? '').toString();
-              final qty = ((p['total_qty'] ?? 0) as num).toInt();
-              final price = ((p['unit_price'] ?? 0) as num).toDouble();
-              final total = ((p['total_amount'] ?? 0) as num).toDouble();
-              return pw.Padding(
-                padding: const pw.EdgeInsets.symmetric(vertical: 1),
-                child: pw.Row(
-                  children: [
-                    pw.Expanded(
-                      flex: 4,
-                      child: pw.Text(name, style: pw.TextStyle(font: fontRegular, fontSize: 7)),
-                    ),
-                    pw.Expanded(
-                      flex: 2,
-                      child: pw.Text('$qty', textAlign: pw.TextAlign.center, style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                    ),
-                    pw.Expanded(
-                      flex: 2,
-                      child: pw.Text(price.toStringAsFixed(1), textAlign: pw.TextAlign.center, style: pw.TextStyle(font: fontRegular, fontSize: 7)),
-                    ),
-                    pw.Expanded(
-                      flex: 3,
-                      child: pw.Text('{v1} ج'.tr({'v1': total.toStringAsFixed(2)}), textAlign: pw.TextAlign.left, style: pw.TextStyle(font: fontBold, fontSize: 7)),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            pw.Divider(thickness: 0.5),
-          ],
-
-          // المصروفات
-          pw.Text(
-            'المصروفات:'.tr(),
-            style: pw.TextStyle(font: fontBold, fontSize: 9),
-          ),
-          ...expenses.map(
-            (e) => pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
+                  );
+                }),
+              if (cancelledInvoices.isNotEmpty)
                 pw.Text(
-                  e['description'],
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-                pw.Text(
-                  '${(e['amount'] ?? 0).toStringAsFixed(2)} ${Money.txt}',
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-              ],
-            ),
-          ),
-
-          // الديون الجديدة (اللي اتسجلت في الشيفت ده)
-          pw.Text(
-            'الاجل الجديد:'.tr(),
-            style: pw.TextStyle(font: fontBold, fontSize: 9),
-          ),
-          ...debts.map((d) {
-            final remaining =
-                (d['remaining_amount'] as double?) ??
-                ((d['total_amount'] as num?)?.toDouble() ?? 0.0);
-            return pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(
-                  d['customer_name'],
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-                pw.Text(
-                  '${remaining.toStringAsFixed(2)} ${Money.txt}',
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-              ],
-            );
-          }),
-
-          // 🆕 قسم المحصّل من الآجل
-          pw.SizedBox(height: 4),
-          pw.Text(
-            'محصّل من الآجل:'.tr(),
-            style: pw.TextStyle(font: fontBold, fontSize: 9),
-          ),
-          if (debtPaymentsRows.isEmpty)
-            pw.Text(
-              'لا يوجد تحصيل في هذا الشيفت'.tr(),
-              style: pw.TextStyle(font: fontRegular, fontSize: 7),
-            )
-          else
-            ...debtPaymentsRows.map((p) {
-              final customer = (p['customer_name'] ?? 'غير معروف'.tr()).toString();
-              final amount = ((p['amount'] ?? 0) as num).toDouble();
-              final discount = ((p['discount'] ?? 0) as num).toDouble();
-              final time = p['paid_at'] != null
-                  ? DateFormat(
-                      'HH:mm',
-                    ).format(DateTime.parse(p['paid_at'] as String))
-                  : '-';
-              return pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    '$customer ($time)',
-                    style: pw.TextStyle(fontSize: 7, font: fontRegular),
-                  ),
-                  pw.Text(
-                    discount > 0
-                        ? '{v1} {v2} (خصم {v3})'.tr({'v1': amount.toStringAsFixed(2), 'v2': Money.txt, 'v3': discount.toStringAsFixed(2)})
-                        : '${amount.toStringAsFixed(2)} ${Money.txt}',
-                    style: pw.TextStyle(fontSize: 7, font: fontBold),
-                  ),
-                ],
-              );
-            }),
-
-          // الملخص
-          pw.SizedBox(height: 4),
-          pw.Divider(thickness: 0.5),
-          pw.Center(
-            child: pw.Column(
-              children: [
-                pw.Text(
-                  'ملخص الشيفت'.tr(),
-                  style: pw.TextStyle(font: fontBold, fontSize: 9),
-                ),
-                pw.Text(
-                  'إجمالي الأجهزة: {v1} {v2}'.tr({'v1': totalDevicesPaid.toStringAsFixed(2), 'v2': Money.txt}),
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-                pw.SizedBox(height: 2),
-                pw.Text(
-                  'إجمالي المشروبات: {v1} {v2}'.tr({'v1': totalDrinksPaid.toStringAsFixed(2), 'v2': Money.txt}),
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-                pw.SizedBox(height: 2),
-                if (totalProductsPaid > 0) ...[
-                  pw.Text(
-                    'إجمالي المنتجات/المأكولات: {v1} {v2}'.tr({'v1': totalProductsPaid.toStringAsFixed(2), 'v2': Money.txt}),
-                    style: pw.TextStyle(fontSize: 7, font: fontBold),
-                  ),
-                  pw.SizedBox(height: 2),
-                ],
-                // 🆕 عرض السجاير والشيشة لو موجودين
-                if (totalCigarettes > 0) ...[
-                  pw.Text(
-                    'إجمالي السجائر: {v1} {v2}'.tr({'v1': totalCigarettes.toStringAsFixed(2), 'v2': Money.txt}),
-                    style: pw.TextStyle(fontSize: 7, font: fontBold),
-                  ),
-                  pw.SizedBox(height: 2),
-                ],
-                if (totalShisha > 0) ...[
-                  pw.Text(
-                    'إجمالي الشيشة: {v1} {v2}'.tr({'v1': totalShisha.toStringAsFixed(2), 'v2': Money.txt}),
-                    style: pw.TextStyle(fontSize: 7, font: fontBold),
-                  ),
-                  pw.SizedBox(height: 2),
-                ],
-                pw.Text(
-                  'المصروفات: {v1} {v2}'.tr({'v1': totalExpenses.toStringAsFixed(2), 'v2': Money.txt}),
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
-                ),
-                pw.SizedBox(height: 2),
-
-                // 🆕 السطر المهم اللي كان ناقص
-                pw.Text(
-                  ' محصّل من الآجل: {v1} {v2}'.tr({'v1': totalDebtCollected.toStringAsFixed(2), 'v2': Money.txt}),
-                  style: pw.TextStyle(
-                    fontSize: 8,
-                    font: fontBold,
-                    color: PdfColors.teal800,
-                  ),
-                ),
-                if (totalDebtDiscount > 0)
-                  pw.Text(
-                    'خصم على التحصيل: {v1} {v2}'.tr({'v1': totalDebtDiscount.toStringAsFixed(2), 'v2': Money.txt}),
-                    style: pw.TextStyle(fontSize: 7, font: fontRegular),
-                  ),
-                pw.SizedBox(height: 2),
-
-                pw.Text(
-                  'الاجل الجديد: {v1} {v2}'.tr({'v1': (totalDebts).toStringAsFixed(2), 'v2': Money.txt}),
+                  'إجمالي الملغي (غير محسوب): {v1} {v2}'.tr({
+                    'v1': totalCancelled.toStringAsFixed(2),
+                    'v2': Money.txt,
+                  }),
                   style: pw.TextStyle(
                     fontSize: 7,
                     font: fontBold,
-                    color: PdfColors.red800,
+                    color: PdfColors.grey700,
                   ),
                 ),
+              // 🆕 جدول تفاصيل الأصناف والمنتجات المباعة في الشيفت
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'الأصناف والمنتجات المباعة:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              if (productsSummary.isEmpty)
+                pw.Text(
+                  'لا توجد أصناف مباعة في هذا الشيفت'.tr(),
+                  style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                )
+              else ...[
                 pw.SizedBox(height: 2),
-                // 🆕 الخصم يظهر بس لو حصل، في الآخر قبل المجموع النهائي
-                if (totalDiscounts > 0) ...[
-                  pw.Text(
-                    'إجمالي الخصومات: {v1} {v2}'.tr({'v1': totalDiscounts.toStringAsFixed(2), 'v2': Money.txt}),
-                    style: pw.TextStyle(
-                      fontSize: 7,
-                      font: fontBold,
-                      color: PdfColors.orange800,
+                pw.Container(
+                  padding: const pw.EdgeInsets.symmetric(vertical: 2),
+                  decoration: const pw.BoxDecoration(
+                    border: pw.Border(
+                      bottom: pw.BorderSide(width: 0.5),
+                      top: pw.BorderSide(width: 0.5),
                     ),
                   ),
-                  pw.SizedBox(height: 2),
-                ],
-                pw.Text(
-                  'المجموع الكلي: {v1} {v2}'.tr({'v1': grandTotal.toStringAsFixed(2), 'v2': Money.txt}),
-                  style: pw.TextStyle(font: fontBold, fontSize: 8),
+                  child: pw.Row(
+                    children: [
+                      pw.Expanded(
+                        flex: 4,
+                        child: pw.Text(
+                          'الصنف'.tr(),
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 2,
+                        child: pw.Text(
+                          'الكمية'.tr(),
+                          textAlign: pw.TextAlign.center,
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 2,
+                        child: pw.Text(
+                          'السعر'.tr(),
+                          textAlign: pw.TextAlign.center,
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 3,
+                        child: pw.Text(
+                          'الإجمالي'.tr(),
+                          textAlign: pw.TextAlign.left,
+                          style: pw.TextStyle(font: fontBold, fontSize: 7),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                // ...
-                /*   pw.Text(
+                ...productsSummary.map((p) {
+                  final name = (p['product_name'] ?? '').toString();
+                  final qty = ((p['total_qty'] ?? 0) as num).toInt();
+                  final price = ((p['unit_price'] ?? 0) as num).toDouble();
+                  final total = ((p['total_amount'] ?? 0) as num).toDouble();
+                  return pw.Padding(
+                    padding: const pw.EdgeInsets.symmetric(vertical: 1),
+                    child: pw.Row(
+                      children: [
+                        pw.Expanded(
+                          flex: 4,
+                          child: pw.Text(
+                            name,
+                            style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                          ),
+                        ),
+                        pw.Expanded(
+                          flex: 2,
+                          child: pw.Text(
+                            '$qty',
+                            textAlign: pw.TextAlign.center,
+                            style: pw.TextStyle(font: fontBold, fontSize: 7),
+                          ),
+                        ),
+                        pw.Expanded(
+                          flex: 2,
+                          child: pw.Text(
+                            price.toStringAsFixed(1),
+                            textAlign: pw.TextAlign.center,
+                            style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                          ),
+                        ),
+                        pw.Expanded(
+                          flex: 3,
+                          child: pw.Text(
+                            '{v1} ج'.tr({'v1': total.toStringAsFixed(2)}),
+                            textAlign: pw.TextAlign.left,
+                            style: pw.TextStyle(font: fontBold, fontSize: 7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                pw.Divider(thickness: 0.5),
+              ],
+
+              // المصروفات
+              pw.Text(
+                'المصروفات:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              ...expenses.map(
+                (e) => pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      e['description'],
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                    pw.Text(
+                      '${(e['amount'] ?? 0).toStringAsFixed(2)} ${Money.txt}',
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                  ],
+                ),
+              ),
+
+              // الديون الجديدة (اللي اتسجلت في الشيفت ده)
+              pw.Text(
+                'الاجل الجديد:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              ...debts.map((d) {
+                final remaining =
+                    (d['remaining_amount'] as double?) ??
+                    ((d['total_amount'] as num?)?.toDouble() ?? 0.0);
+                return pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      d['customer_name'],
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                    pw.Text(
+                      '${remaining.toStringAsFixed(2)} ${Money.txt}',
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                  ],
+                );
+              }),
+
+              // 🆕 قسم المحصّل من الآجل
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'محصّل من الآجل:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              if (debtPaymentsRows.isEmpty)
+                pw.Text(
+                  'لا يوجد تحصيل في هذا الشيفت'.tr(),
+                  style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                )
+              else
+                ...debtPaymentsRows.map((p) {
+                  final customer =
+                      (p['customer_name'] ?? 'غير معروف'.tr()).toString();
+                  final amount = ((p['amount'] ?? 0) as num).toDouble();
+                  final discount = ((p['discount'] ?? 0) as num).toDouble();
+                  final time =
+                      p['paid_at'] != null
+                          ? DateFormat(
+                            'HH:mm',
+                          ).format(DateTime.parse(p['paid_at'] as String))
+                          : '-';
+                  return pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        '$customer ($time)',
+                        style: pw.TextStyle(fontSize: 7, font: fontRegular),
+                      ),
+                      pw.Text(
+                        discount > 0
+                            ? '{v1} {v2} (خصم {v3})'.tr({
+                              'v1': amount.toStringAsFixed(2),
+                              'v2': Money.txt,
+                              'v3': discount.toStringAsFixed(2),
+                            })
+                            : '${amount.toStringAsFixed(2)} ${Money.txt}',
+                        style: pw.TextStyle(fontSize: 7, font: fontBold),
+                      ),
+                    ],
+                  );
+                }),
+
+              // الملخص
+              pw.SizedBox(height: 4),
+              pw.Divider(thickness: 0.5),
+              pw.Center(
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      'ملخص الشيفت'.tr(),
+                      style: pw.TextStyle(font: fontBold, fontSize: 9),
+                    ),
+                    pw.Text(
+                      'إجمالي الأجهزة: {v1} {v2}'.tr({
+                        'v1': totalDevicesPaid.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      'إجمالي المشروبات: {v1} {v2}'.tr({
+                        'v1': totalDrinksPaid.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                    pw.SizedBox(height: 2),
+                    if (totalProductsPaid > 0) ...[
+                      pw.Text(
+                        'إجمالي المنتجات/المأكولات: {v1} {v2}'.tr({
+                          'v1': totalProductsPaid.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(fontSize: 7, font: fontBold),
+                      ),
+                      pw.SizedBox(height: 2),
+                    ],
+                    // 🆕 عرض السجاير والشيشة لو موجودين
+                    if (totalCigarettes > 0) ...[
+                      pw.Text(
+                        'إجمالي السجائر: {v1} {v2}'.tr({
+                          'v1': totalCigarettes.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(fontSize: 7, font: fontBold),
+                      ),
+                      pw.SizedBox(height: 2),
+                    ],
+                    if (totalShisha > 0) ...[
+                      pw.Text(
+                        'إجمالي الشيشة: {v1} {v2}'.tr({
+                          'v1': totalShisha.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(fontSize: 7, font: fontBold),
+                      ),
+                      pw.SizedBox(height: 2),
+                    ],
+                    pw.Text(
+                      'المصروفات: {v1} {v2}'.tr({
+                        'v1': totalExpenses.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                    pw.SizedBox(height: 2),
+
+                    // 🆕 السطر المهم اللي كان ناقص
+                    pw.Text(
+                      ' محصّل من الآجل: {v1} {v2}'.tr({
+                        'v1': totalDebtCollected.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(
+                        fontSize: 8,
+                        font: fontBold,
+                        color: PdfColors.teal800,
+                      ),
+                    ),
+                    if (totalDebtDiscount > 0)
+                      pw.Text(
+                        'خصم على التحصيل: {v1} {v2}'.tr({
+                          'v1': totalDebtDiscount.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(fontSize: 7, font: fontRegular),
+                      ),
+                    pw.SizedBox(height: 2),
+
+                    pw.Text(
+                      'الاجل الجديد: {v1} {v2}'.tr({
+                        'v1': (totalDebts).toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(
+                        fontSize: 7,
+                        font: fontBold,
+                        color: PdfColors.red800,
+                      ),
+                    ),
+                    pw.SizedBox(height: 2),
+                    // 🆕 الخصم يظهر بس لو حصل، في الآخر قبل المجموع النهائي
+                    if (totalDiscounts > 0) ...[
+                      pw.Text(
+                        'إجمالي الخصومات: {v1} {v2}'.tr({
+                          'v1': totalDiscounts.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(
+                          fontSize: 7,
+                          font: fontBold,
+                          color: PdfColors.orange800,
+                        ),
+                      ),
+                      pw.SizedBox(height: 2),
+                    ],
+                    pw.Text(
+                      'المجموع الكلي: {v1} {v2}'.tr({
+                        'v1': grandTotal.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(font: fontBold, fontSize: 8),
+                    ),
+                    // ...
+                    /*   pw.Text(
                     'المجموع الكلي (قبل الخصم): ${grandTotalBeforeDiscount.toStringAsFixed(2)} ${Money.txt}',
                     style: pw.TextStyle(font: fontBold, fontSize: 8)),*/
-                pw.Text(
-                  ('المجموع الكلي (بعد الخصم+الاجل): '.tr() + '${(grandTotal - totalDebts).toStringAsFixed(2)} ${Money.txt}'),
-                  style: pw.TextStyle(font: fontBold, fontSize: 8),
-                ),
-                /*   pw.Text(
+                    pw.Text(
+                      ('المجموع الكلي (بعد الخصم+الاجل): '.tr() +
+                          '${(grandTotal - totalDebts).toStringAsFixed(2)} ${Money.txt}'),
+                      style: pw.TextStyle(font: fontBold, fontSize: 8),
+                    ),
+                    /*   pw.Text(
                     ' بعد الخصم المجموع الكلي: ${grandTotaldis.toStringAsFixed(2)} ${Money.txt}',
                     style: pw.TextStyle(font: fontBold, fontSize: 8)),*/
-                /*  pw.SizedBox(height: 2),
+                    /*  pw.SizedBox(height: 2),
                 pw.Text(
                     'إجمالي الخصومات: ${totalDiscounts.toStringAsFixed(2)} ${Money.txt}',
                     style: pw.TextStyle(fontSize: 7, font: fontBold)),
                 pw.SizedBox(height: 2),*/
-                pw.Text(
-                  'فودافون كاش (معلومة فقط): {v1} {v2}'.tr({'v1': vodafoneCashTotal, 'v2': Money.txt}),
-                  style: pw.TextStyle(font: fontBold, fontSize: 8),
-                ),
+                    pw.Text(
+                      'فودافون كاش (معلومة فقط): {v1} {v2}'.tr({
+                        'v1': vodafoneCashTotal,
+                        'v2': Money.txt,
+                      }),
+                      style: pw.TextStyle(font: fontBold, fontSize: 8),
+                    ),
 
-                pw.Text(
-                  'تم بحمد الله '.tr(),
-                  style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    pw.Text(
+                      'تم بحمد الله '.tr(),
+                      style: pw.TextStyle(fontSize: 7, font: fontBold),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
       ),
     );
 
@@ -1650,9 +1884,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
       final paid = (paidRes.first['s'] as num?)?.toDouble() ?? 0.0;
       final totalAmount = ((row['total_amount'] ?? 0) as num).toDouble();
       row['paid_amount'] = paid;
-      row['remaining_amount'] = (totalAmount - paid)
-          .clamp(0, double.infinity)
-          .toDouble();
+      row['remaining_amount'] =
+          (totalAmount - paid).clamp(0, double.infinity).toDouble();
       rows.add(row);
     }
 
@@ -1714,326 +1947,432 @@ class _StaffDashboardState extends State<StaffDashboard> {
                         onChanged: (val) {
                           setStateSheet(() {
                             final query = val.toLowerCase();
-                            filteredRows = rows.where((r) {
-                              final customer =
-                                  (r['customer_name'] ?? r['person_name'] ?? '')
-                                      .toString()
-                                      .toLowerCase();
-                              return customer.contains(query);
-                            }).toList();
+                            filteredRows =
+                                rows.where((r) {
+                                  final customer =
+                                      (r['customer_name'] ??
+                                              r['person_name'] ??
+                                              '')
+                                          .toString()
+                                          .toLowerCase();
+                                  return customer.contains(query);
+                                }).toList();
                           });
                         },
                       ),
                       SizedBox(height: 8),
                       Expanded(
-                        child: filteredRows.isEmpty
-                            ? Center(child: Text('لا توجد نتائج'.tr()))
-                            : ListView.separated(
-                                controller: controller,
-                                itemCount: filteredRows.length,
-                                separatorBuilder: (_, __) => Divider(),
-                                itemBuilder: (context, i) {
-                                  final r = filteredRows[i];
-                                  final dateStr = r['date']?.toString();
-                                  DateTime? dt;
-                                  try {
-                                    dt = dateStr != null
-                                        ? DateTime.parse(dateStr)
-                                        : null;
-                                  } catch (_) {
-                                    dt = null;
-                                  }
-                                  final dateText = dt != null
-                                      ? DateFormat(
-                                          'yyyy-MM-dd HH:mm',
-                                        ).format(dt)
-                                      : 'غير معروف';
+                        child:
+                            filteredRows.isEmpty
+                                ? Center(child: Text('لا توجد نتائج'.tr()))
+                                : ListView.separated(
+                                  controller: controller,
+                                  itemCount: filteredRows.length,
+                                  separatorBuilder: (_, __) => Divider(),
+                                  itemBuilder: (context, i) {
+                                    final r = filteredRows[i];
+                                    final dateStr = r['date']?.toString();
+                                    DateTime? dt;
+                                    try {
+                                      dt =
+                                          dateStr != null
+                                              ? DateTime.parse(dateStr)
+                                              : null;
+                                    } catch (_) {
+                                      dt = null;
+                                    }
+                                    final dateText =
+                                        dt != null
+                                            ? DateFormat(
+                                              'yyyy-MM-dd HH:mm',
+                                            ).format(dt)
+                                            : 'غير معروف';
 
-                                  // 🆕 المتبقي الحقيقي (بعد طرح debt_payments)
-                                  final total =
-                                      (r['remaining_amount'] as double?) ?? 0.0;
-                                  final customer =
-                                      (r['customer_name'] ??
-                                              r['person_name'] ??
-                                              'غير معروف'.tr())
-                                          .toString();
+                                    // 🆕 المتبقي الحقيقي (بعد طرح debt_payments)
+                                    final total =
+                                        (r['remaining_amount'] as double?) ??
+                                        0.0;
+                                    final customer =
+                                        (r['customer_name'] ??
+                                                r['person_name'] ??
+                                                'غير معروف'.tr())
+                                            .toString();
 
-                                  return ListTile(
-                                    title: Text(
-                                      customer,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                    return ListTile(
+                                      title: Text(
+                                        customer,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    subtitle: Text(
-                                      'التاريخ: {dateText}\nفاتورة: {v2}'.tr({'dateText': dateText, 'v2': r['invoice_id'] ?? '—'}),
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '${total.toStringAsFixed(2)} ${Money.txt}',
-                                          style: TextStyle(
-                                            color: Colors.redAccent,
-                                            fontWeight: FontWeight.bold,
+                                      subtitle: Text(
+                                        'التاريخ: {dateText}\nفاتورة: {v2}'.tr({
+                                          'dateText': dateText,
+                                          'v2': r['invoice_id'] ?? '—',
+                                        }),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            '${total.toStringAsFixed(2)} ${Money.txt}',
+                                            style: TextStyle(
+                                              color: Colors.redAccent,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.print,
-                                            color: Colors.blue,
-                                          ),
-                                          tooltip: 'طباعة الفاتورة'.tr(),
-                                          onPressed: () async {
-                                            final r = filteredRows[i];
-                                            final customer =
-                                                (r['customer_name'] ??
-                                                        r['person_name'] ??
-                                                        'غير معروف'.tr())
-                                                    .toString();
+                                          SizedBox(width: 8),
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.print,
+                                              color: Colors.blue,
+                                            ),
+                                            tooltip: 'طباعة الفاتورة'.tr(),
+                                            onPressed: () async {
+                                              final r = filteredRows[i];
+                                              final customer =
+                                                  (r['customer_name'] ??
+                                                          r['person_name'] ??
+                                                          'غير معروف'.tr())
+                                                      .toString();
 
-                                            final debtId = (r['id'] as num)
-                                                .toInt();
-                                            final db = await DBHelper.database;
+                                              final debtId =
+                                                  (r['id'] as num).toInt();
+                                              final db =
+                                                  await DBHelper.database;
 
-                                            final items = await db.query(
-                                              'debt_items',
-                                              where: 'debt_id = ?',
-                                              whereArgs: [debtId],
-                                            );
-                                            final debtItems = items
-                                                .map(
-                                                  (e) =>
-                                                      Map<String, dynamic>.from(
-                                                        e,
-                                                      ),
-                                                )
-                                                .toList();
-
-                                            final payments = await db.query(
-                                              'debt_payments',
-                                              where: 'debt_id = ?',
-                                              whereArgs: [debtId],
-                                            );
-
-                                            // 🆕 نستخدم remaining_amount بدل total_amount
-                                            final remainingForPrint =
-                                                (r['remaining_amount']
-                                                    as double?) ??
-                                                0.0;
-                                            final totalAmountRaw =
-                                                ((r['total_amount'] ?? 0)
-                                                        as num)
-                                                    .toDouble();
-
-                                            final debtDetails =
-                                                <Map<String, dynamic>>[
-                                                  {
-                                                    'date': r['date'],
-                                                    'items': debtItems,
-                                                    'total': remainingForPrint,
-                                                    'original':
-                                                        ((r['original_amount'] ??
-                                                                    totalAmountRaw)
-                                                                as num)
-                                                            .toDouble(),
-                                                    'paid':
-                                                        (r['paid_amount']
-                                                            as double?) ??
-                                                        0.0,
-                                                    'payments': payments
-                                                        .map(
-                                                          (p) =>
-                                                              Map<
-                                                                String,
-                                                                dynamic
-                                                              >.from(p),
-                                                        )
-                                                        .toList(),
-                                                  },
-                                                ];
-
-                                            // 🔧 الطباعة هنا مش بتعدل أي بيانات، فمفيش
-                                            // خطورة، بس برضو نحوطها try/catch للأمان
-                                            try {
-                                              await printDebtInvoice(
-                                                customer,
-                                                debtDetails,
-                                                0,
-                                                0,
+                                              final items = await db.query(
+                                                'debt_items',
+                                                where: 'debt_id = ?',
+                                                whereArgs: [debtId],
                                               );
-                                            } catch (e) {
-                                              print(
-                                                '⚠️ فشلت طباعة الفاتورة: $e',
+                                              final debtItems =
+                                                  items
+                                                      .map(
+                                                        (e) => Map<
+                                                          String,
+                                                          dynamic
+                                                        >.from(e),
+                                                      )
+                                                      .toList();
+
+                                              final payments = await db.query(
+                                                'debt_payments',
+                                                where: 'debt_id = ?',
+                                                whereArgs: [debtId],
                                               );
-                                            }
-                                          },
-                                        ),
-                                        SizedBox(width: 8),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.check_circle,
-                                            color: Colors.green,
+
+                                              // 🆕 نستخدم remaining_amount بدل total_amount
+                                              final remainingForPrint =
+                                                  (r['remaining_amount']
+                                                      as double?) ??
+                                                  0.0;
+                                              final totalAmountRaw =
+                                                  ((r['total_amount'] ?? 0)
+                                                          as num)
+                                                      .toDouble();
+
+                                              final debtDetails = <
+                                                Map<String, dynamic>
+                                              >[
+                                                {
+                                                  'date': r['date'],
+                                                  'items': debtItems,
+                                                  'total': remainingForPrint,
+                                                  'original':
+                                                      ((r['original_amount'] ??
+                                                                  totalAmountRaw)
+                                                              as num)
+                                                          .toDouble(),
+                                                  'paid':
+                                                      (r['paid_amount']
+                                                          as double?) ??
+                                                      0.0,
+                                                  'payments':
+                                                      payments
+                                                          .map(
+                                                            (p) => Map<
+                                                              String,
+                                                              dynamic
+                                                            >.from(p),
+                                                          )
+                                                          .toList(),
+                                                },
+                                              ];
+
+                                              // 🔧 الطباعة هنا مش بتعدل أي بيانات، فمفيش
+                                              // خطورة، بس برضو نحوطها try/catch للأمان
+                                              try {
+                                                await printDebtInvoice(
+                                                  customer,
+                                                  debtDetails,
+                                                  0,
+                                                  0,
+                                                );
+                                              } catch (e) {
+                                                print(
+                                                  '⚠️ فشلت طباعة الفاتورة: $e',
+                                                );
+                                              }
+                                            },
                                           ),
-                                          tooltip: 'تحصيل الدين'.tr(),
-                                          onPressed: () async {
-                                            final r = filteredRows[i];
-                                            final customer =
-                                                (r['customer_name'] ??
-                                                        r['person_name'] ??
-                                                        'غير معروف'.tr())
-                                                    .toString();
-                                            // 🆕 المتبقي الحقيقي هو الأساس للتحصيل
-                                            final total =
-                                                (r['remaining_amount']
-                                                    as double?) ??
-                                                0.0;
-                                            final originalInvoiceId =
-                                                r['invoice_id'];
+                                          SizedBox(width: 8),
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                            ),
+                                            tooltip: 'تحصيل الدين'.tr(),
+                                            onPressed: () async {
+                                              final r = filteredRows[i];
+                                              final customer =
+                                                  (r['customer_name'] ??
+                                                          r['person_name'] ??
+                                                          'غير معروف'.tr())
+                                                      .toString();
+                                              // 🆕 المتبقي الحقيقي هو الأساس للتحصيل
+                                              final total =
+                                                  (r['remaining_amount']
+                                                      as double?) ??
+                                                  0.0;
+                                              final originalInvoiceId =
+                                                  r['invoice_id'];
 
-                                            double amountToPay = total;
-                                            double discount = 0;
-                                            bool shouldPrint =
-                                                false; // 🆕 افتراضيًا مفعّل
+                                              double amountToPay = total;
+                                              double discount = 0;
+                                              bool shouldPrint =
+                                                  false; // 🆕 افتراضيًا مفعّل
 
-                                            final confirm = await showDialog<bool>(
-                                              context: context,
-                                              builder: (context) {
-                                                return StatefulBuilder(
-                                                  builder: (context, setDialogState) {
-                                                    return AppDialog(
-                                                      title: Text(
-                                                        'تحصيل دين {customer}'.tr({'customer': customer}),
-                                                      ),
-                                                      content: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Text(
-                                                            'إجمالي الدين: {v1} {v2}'.tr({'v1': total.toStringAsFixed(2), 'v2': Money.txt}),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          TextField(
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            decoration: InputDecoration(
-                                                              labelText:
-                                                                  'المبلغ المدفوع'.tr(),
-                                                              hintText: total
-                                                                  .toStringAsFixed(
-                                                                    2,
-                                                                  ),
+                                              final confirm = await showDialog<
+                                                bool
+                                              >(
+                                                context: context,
+                                                builder: (context) {
+                                                  return StatefulBuilder(
+                                                    builder: (
+                                                      context,
+                                                      setDialogState,
+                                                    ) {
+                                                      return AppDialog(
+                                                        title: Text(
+                                                          'تحصيل دين {customer}'
+                                                              .tr({
+                                                                'customer':
+                                                                    customer,
+                                                              }),
+                                                        ),
+                                                        content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              'إجمالي الدين: {v1} {v2}'.tr({
+                                                                'v1': total
+                                                                    .toStringAsFixed(
+                                                                      2,
+                                                                    ),
+                                                                'v2': Money.txt,
+                                                              }),
                                                             ),
-                                                            onChanged: (v) {
-                                                              setDialogState(() {
-                                                                amountToPay =
-                                                                    double.tryParse(
-                                                                      v,
-                                                                    ) ??
-                                                                    total;
-                                                                if (amountToPay >
-                                                                    total) {
+                                                            SizedBox(height: 8),
+                                                            TextField(
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .number,
+                                                              decoration: InputDecoration(
+                                                                labelText:
+                                                                    'المبلغ المدفوع'
+                                                                        .tr(),
+                                                                hintText: total
+                                                                    .toStringAsFixed(
+                                                                      2,
+                                                                    ),
+                                                              ),
+                                                              onChanged: (v) {
+                                                                setDialogState(() {
                                                                   amountToPay =
+                                                                      double.tryParse(
+                                                                        v,
+                                                                      ) ??
                                                                       total;
-                                                                }
-                                                              });
-                                                            },
-                                                          ),
-
-                                                          SizedBox(height: 8),
-                                                          // 🆕 خيار الطباعة
-                                                          CheckboxListTile(
-                                                            value: shouldPrint,
-                                                            onChanged: (val) {
-                                                              setDialogState(
-                                                                () {
-                                                                  shouldPrint =
-                                                                      val ??
-                                                                      true;
-                                                                },
-                                                              );
-                                                            },
-                                                            title: Text(
-                                                              'طباعة إيصال بعد التحصيل'.tr(),
+                                                                  if (amountToPay >
+                                                                      total) {
+                                                                    amountToPay =
+                                                                        total;
+                                                                  }
+                                                                });
+                                                              },
                                                             ),
-                                                            controlAffinity:
-                                                                ListTileControlAffinity
-                                                                    .leading,
-                                                            contentPadding:
-                                                                EdgeInsets.zero,
+
+                                                            SizedBox(height: 8),
+                                                            // 🆕 خيار الطباعة
+                                                            CheckboxListTile(
+                                                              value:
+                                                                  shouldPrint,
+                                                              onChanged: (val) {
+                                                                setDialogState(
+                                                                  () {
+                                                                    shouldPrint =
+                                                                        val ??
+                                                                        true;
+                                                                  },
+                                                                );
+                                                              },
+                                                              title: Text(
+                                                                'طباعة إيصال بعد التحصيل'
+                                                                    .tr(),
+                                                              ),
+                                                              controlAffinity:
+                                                                  ListTileControlAffinity
+                                                                      .leading,
+                                                              contentPadding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed:
+                                                                () =>
+                                                                    Navigator.pop(
+                                                                      context,
+                                                                      false,
+                                                                    ),
+                                                            child: Text(
+                                                              'إلغاء'.tr(),
+                                                            ),
+                                                          ),
+                                                          ElevatedButton(
+                                                            onPressed:
+                                                                () =>
+                                                                    Navigator.pop(
+                                                                      context,
+                                                                      true,
+                                                                    ),
+                                                            child: Text(
+                                                              'تحصيل'.tr(),
+                                                            ),
                                                           ),
                                                         ],
-                                                      ),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                context,
-                                                                false,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+
+                                              if (confirm != true) return;
+
+                                              final db =
+                                                  await DBHelper.database;
+                                              final debtId =
+                                                  (r['id'] as num).toInt();
+
+                                              await DBHelper.addCashDrawerEntry(
+                                                amountToPay,
+                                                'income',
+                                                'debt',
+                                                cashier: widget.staffName,
+                                              );
+
+                                              final remainingAmount =
+                                                  total -
+                                                  amountToPay -
+                                                  discount;
+
+                                              final items = await db.query(
+                                                'debt_items',
+                                                where: 'debt_id = ?',
+                                                whereArgs: [debtId],
+                                              );
+
+                                              final bool isRechargeOnly =
+                                                  items.length == 1 &&
+                                                  items.first['drink_name'] ==
+                                                      'شحن رصيد';
+
+                                              // ============================
+                                              // حالة خاصة: شحن رصيد فقط
+                                              // ============================
+                                              if (isRechargeOnly) {
+                                                if (amountToPay < total) {
+                                                  final remaining =
+                                                      total - amountToPay;
+
+                                                  // 1️⃣ التوثيق الأول قبل أي حاجة تانية
+                                                  await db.insert(
+                                                    'debt_payments',
+                                                    {
+                                                      'debt_id': debtId,
+                                                      'amount': amountToPay,
+                                                      'discount': 0,
+                                                      'paid_at':
+                                                          DateTime.now()
+                                                              .toIso8601String(),
+                                                      'customer_name': customer,
+                                                      'invoice_id':
+                                                          originalInvoiceId,
+                                                      'shift_id':
+                                                          widget.shiftId,
+                                                    },
+                                                  );
+
+                                                  // 🆕 مبقاش فيه تحديث لـ total_amount هنا —
+                                                  // total_amount بتفضل ثابتة، وبس debt_payments
+                                                  // هي مصدر تتبّع المدفوع/المتبقي
+
+                                                  if (!mounted) return;
+                                                  setStateSheet(() {
+                                                    final updated = Map<
+                                                      String,
+                                                      dynamic
+                                                    >.from(r);
+                                                    // 🆕 نحدّث remaining_amount بدل total_amount
+                                                    updated['remaining_amount'] =
+                                                        remaining;
+                                                    updated['paid_amount'] =
+                                                        ((updated['paid_amount']
+                                                                as double?) ??
+                                                            0.0) +
+                                                        amountToPay;
+                                                    filteredRows[i] = updated;
+                                                  });
+
+                                                  if (!mounted) return;
+                                                  AppToast.show(
+                                                    '💰 تم دفع {v1} {v2}، المتبقي {v3} {v4}'
+                                                        .tr({
+                                                          'v1': amountToPay
+                                                              .toStringAsFixed(
+                                                                2,
                                                               ),
-                                                          child: Text('إلغاء'.tr()),
-                                                        ),
-                                                        ElevatedButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                context,
-                                                                true,
+                                                          'v2': Money.txt,
+                                                          'v3': remaining
+                                                              .toStringAsFixed(
+                                                                2,
                                                               ),
-                                                          child: Text('تحصيل'.tr()),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
+                                                          'v4': Money.txt,
+                                                        }),
+                                                  );
+                                                  return;
+                                                }
 
-                                            if (confirm != true) return;
+                                                // دفع كامل شحن الرصيد
+                                                final double cost =
+                                                    (items.first['total']
+                                                            as num)
+                                                        .toDouble();
 
-                                            final db = await DBHelper.database;
-                                            final debtId = (r['id'] as num)
-                                                .toInt();
-
-                                            await DBHelper.addCashDrawerEntry(
-                                              amountToPay,
-                                              'income',
-                                              'debt',
-                                              cashier: widget.staffName,
-                                            );
-
-                                            final remainingAmount =
-                                                total - amountToPay - discount;
-
-                                            final items = await db.query(
-                                              'debt_items',
-                                              where: 'debt_id = ?',
-                                              whereArgs: [debtId],
-                                            );
-
-                                            final bool isRechargeOnly =
-                                                items.length == 1 &&
-                                                items.first['drink_name'] ==
-                                                    'شحن رصيد';
-
-                                            // ============================
-                                            // حالة خاصة: شحن رصيد فقط
-                                            // ============================
-                                            if (isRechargeOnly) {
-                                              if (amountToPay < total) {
-                                                final remaining =
-                                                    total - amountToPay;
-
-                                                // 1️⃣ التوثيق الأول قبل أي حاجة تانية
+                                                // 1️⃣ التوثيق الأول
                                                 await db.insert(
                                                   'debt_payments',
                                                   {
                                                     'debt_id': debtId,
-                                                    'amount': amountToPay,
+                                                    'amount': total,
                                                     'discount': 0,
-                                                    'paid_at': DateTime.now()
-                                                        .toIso8601String(),
+                                                    'paid_at':
+                                                        DateTime.now()
+                                                            .toIso8601String(),
                                                     'customer_name': customer,
                                                     'invoice_id':
                                                         originalInvoiceId,
@@ -2041,253 +2380,247 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                                   },
                                                 );
 
-                                                // 🆕 مبقاش فيه تحديث لـ total_amount هنا —
-                                                // total_amount بتفضل ثابتة، وبس debt_payments
-                                                // هي مصدر تتبّع المدفوع/المتبقي
+                                                // 2️⃣ باقي العمليات
+                                                if (originalInvoiceId != null) {
+                                                  await db.update(
+                                                    'invoices',
+                                                    {'payment_type': 'paid'},
+                                                    where: 'id = ?',
+                                                    whereArgs: [
+                                                      originalInvoiceId,
+                                                    ],
+                                                  );
+                                                }
+
+                                                await DBHelper.recordTransaction(
+                                                  cost: cost,
+                                                  received: total,
+                                                  shiftId: widget.shiftId,
+                                                );
+
+                                                await db
+                                                    .insert('invoice_items', {
+                                                      'invoice_id':
+                                                          originalInvoiceId,
+                                                      'drink_id': 0,
+                                                      'drink_name': 'شحن رصيد',
+                                                      'qty': 1,
+                                                      'price': cost,
+                                                      'total': total,
+                                                    });
+
+                                                await db.delete(
+                                                  'debts',
+                                                  where: 'id = ?',
+                                                  whereArgs: [debtId],
+                                                );
+                                                await db.delete(
+                                                  'debt_items',
+                                                  where: 'debt_id = ?',
+                                                  whereArgs: [debtId],
+                                                );
 
                                                 if (!mounted) return;
                                                 setStateSheet(() {
-                                                  final updated =
-                                                      Map<String, dynamic>.from(
-                                                        r,
-                                                      );
-                                                  // 🆕 نحدّث remaining_amount بدل total_amount
-                                                  updated['remaining_amount'] =
-                                                      remaining;
-                                                  updated['paid_amount'] =
-                                                      ((updated['paid_amount']
-                                                              as double?) ??
-                                                          0.0) +
-                                                      amountToPay;
-                                                  filteredRows[i] = updated;
+                                                  filteredRows.removeAt(i);
                                                 });
 
                                                 if (!mounted) return;
-                                                AppToast.show('💰 تم دفع {v1} {v2}، المتبقي {v3} {v4}'.tr({'v1': amountToPay.toStringAsFixed(2), 'v2': Money.txt, 'v3': remaining.toStringAsFixed(2), 'v4': Money.txt}),);
+                                                AppToast.show(
+                                                  '✅ تم تسديد شحن الرصيد بالكامل'
+                                                      .tr(),
+                                                );
                                                 return;
                                               }
 
-                                              // دفع كامل شحن الرصيد
-                                              final double cost =
-                                                  (items.first['total'] as num)
-                                                      .toDouble();
+                                              // ============================
+                                              // الحالة العادية (غير شحن رصيد)
+                                              // ============================
 
-                                              // 1️⃣ التوثيق الأول
+                                              // 1️⃣ التوثيق أولاً — قبل أي طباعة أو تعديل
                                               await db.insert('debt_payments', {
                                                 'debt_id': debtId,
-                                                'amount': total,
-                                                'discount': 0,
-                                                'paid_at': DateTime.now()
-                                                    .toIso8601String(),
+                                                'amount': amountToPay,
+                                                'discount': discount,
+                                                'paid_at':
+                                                    DateTime.now()
+                                                        .toIso8601String(),
                                                 'customer_name': customer,
                                                 'invoice_id': originalInvoiceId,
                                                 'shift_id': widget.shiftId,
                                               });
 
-                                              // 2️⃣ باقي العمليات
-                                              if (originalInvoiceId != null) {
-                                                await db.update(
-                                                  'invoices',
-                                                  {'payment_type': 'paid'},
+                                              // 2️⃣ لو الدين خلص، نقفل الفاتورة ونمسح الدين
+                                              //    (مبقاش فيه تحديث لـ total_amount هنا)
+                                              if (remainingAmount <= 0) {
+                                                if (originalInvoiceId != null) {
+                                                  await db.update(
+                                                    'invoices',
+                                                    {'payment_type': 'paid'},
+                                                    where: 'id = ?',
+                                                    whereArgs: [
+                                                      originalInvoiceId,
+                                                    ],
+                                                  );
+                                                }
+                                                await db.delete(
+                                                  'debts',
                                                   where: 'id = ?',
-                                                  whereArgs: [
-                                                    originalInvoiceId,
-                                                  ],
+                                                  whereArgs: [r['id']],
                                                 );
                                               }
-
-                                              await DBHelper.recordTransaction(
-                                                cost: cost,
-                                                received: total,
-                                                shiftId: widget.shiftId,
-                                              );
-
-                                              await db.insert('invoice_items', {
-                                                'invoice_id': originalInvoiceId,
-                                                'drink_id': 0,
-                                                'drink_name': 'شحن رصيد',
-                                                'qty': 1,
-                                                'price': cost,
-                                                'total': total,
-                                              });
-
-                                              await db.delete(
-                                                'debts',
-                                                where: 'id = ?',
-                                                whereArgs: [debtId],
-                                              );
-                                              await db.delete(
-                                                'debt_items',
-                                                where: 'debt_id = ?',
-                                                whereArgs: [debtId],
-                                              );
 
                                               if (!mounted) return;
                                               setStateSheet(() {
-                                                filteredRows.removeAt(i);
+                                                if (remainingAmount <= 0) {
+                                                  filteredRows.removeAt(i);
+                                                } else {
+                                                  final updatedRow =
+                                                      Map<String, dynamic>.from(
+                                                        r,
+                                                      );
+                                                  // 🆕 نحدّث remaining_amount بدل total_amount
+                                                  updatedRow['remaining_amount'] =
+                                                      remainingAmount;
+                                                  updatedRow['paid_amount'] =
+                                                      ((updatedRow['paid_amount']
+                                                              as double?) ??
+                                                          0.0) +
+                                                      amountToPay;
+                                                  filteredRows[i] = updatedRow;
+                                                }
                                               });
 
-                                              if (!mounted) return;
-                                              AppToast.show('✅ تم تسديد شحن الرصيد بالكامل'.tr(),);
-                                              return;
-                                            }
+                                              // 3️⃣ الطباعة آخر خطوة، وجوه try/catch
+                                              //    عشان لو فشلت البيانات تبقى خلاص متسجلة صح
+                                              if (shouldPrint) {
+                                                // 🆕 الشرط ده بس
+                                                try {
+                                                  final rawDebtItems =
+                                                      await DBHelper.getDebtItems(
+                                                        debtId,
+                                                      );
+                                                  final debtItems =
+                                                      rawDebtItems
+                                                          .map<
+                                                            Map<String, dynamic>
+                                                          >(
+                                                            (e) => Map<
+                                                              String,
+                                                              dynamic
+                                                            >.from(e),
+                                                          )
+                                                          .toList();
 
-                                            // ============================
-                                            // الحالة العادية (غير شحن رصيد)
-                                            // ============================
-
-                                            // 1️⃣ التوثيق أولاً — قبل أي طباعة أو تعديل
-                                            await db.insert('debt_payments', {
-                                              'debt_id': debtId,
-                                              'amount': amountToPay,
-                                              'discount': discount,
-                                              'paid_at': DateTime.now()
-                                                  .toIso8601String(),
-                                              'customer_name': customer,
-                                              'invoice_id': originalInvoiceId,
-                                              'shift_id': widget.shiftId,
-                                            });
-
-                                            // 2️⃣ لو الدين خلص، نقفل الفاتورة ونمسح الدين
-                                            //    (مبقاش فيه تحديث لـ total_amount هنا)
-                                            if (remainingAmount <= 0) {
-                                              if (originalInvoiceId != null) {
-                                                await db.update(
-                                                  'invoices',
-                                                  {'payment_type': 'paid'},
-                                                  where: 'id = ?',
-                                                  whereArgs: [
-                                                    originalInvoiceId,
-                                                  ],
-                                                );
-                                              }
-                                              await db.delete(
-                                                'debts',
-                                                where: 'id = ?',
-                                                whereArgs: [r['id']],
-                                              );
-                                            }
-
-                                            if (!mounted) return;
-                                            setStateSheet(() {
-                                              if (remainingAmount <= 0) {
-                                                filteredRows.removeAt(i);
-                                              } else {
-                                                final updatedRow =
-                                                    Map<String, dynamic>.from(
-                                                      r,
-                                                    );
-                                                // 🆕 نحدّث remaining_amount بدل total_amount
-                                                updatedRow['remaining_amount'] =
-                                                    remainingAmount;
-                                                updatedRow['paid_amount'] =
-                                                    ((updatedRow['paid_amount']
-                                                            as double?) ??
-                                                        0.0) +
-                                                    amountToPay;
-                                                filteredRows[i] = updatedRow;
-                                              }
-                                            });
-
-                                            // 3️⃣ الطباعة آخر خطوة، وجوه try/catch
-                                            //    عشان لو فشلت البيانات تبقى خلاص متسجلة صح
-                                            if (shouldPrint) {
-                                              // 🆕 الشرط ده بس
-                                              try {
-                                                final rawDebtItems =
-                                                    await DBHelper.getDebtItems(
-                                                      debtId,
-                                                    );
-                                                final debtItems = rawDebtItems
-                                                    .map<Map<String, dynamic>>(
-                                                      (e) =>
-                                                          Map<
-                                                            String,
-                                                            dynamic
-                                                          >.from(e),
-                                                    )
-                                                    .toList();
-
-                                                await printDebtInvoice(
-                                                  customer,
-                                                  debtItems,
-                                                  amountToPay,
-                                                  discount,
-                                                );
-                                              } catch (e) {
-                                                print(
-                                                  '⚠️ فشلت الطباعة لكن الدفعة اتسجلت بنجاح: $e',
-                                                );
-                                              }
-                                            } // 🆕
-                                            if (!mounted) return;
-                                            AppToast.show('✅ تم تحصيل دين {customer}، المدفوع: {v2} {v3}، الخصم: {v4} {v5}'.tr({'customer': customer, 'v2': amountToPay.toStringAsFixed(2), 'v3': Money.txt, 'v4': discount.toStringAsFixed(2), 'v5': Money.txt}),);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () async {
-                                      final items = await DBHelper.getDebtItems(
-                                        (r['id'] as num).toInt(),
-                                      );
-                                      if (!mounted) return;
-                                      // 🆕 المتبقي الحقيقي هنا كمان
-                                      final total =
-                                          (r['remaining_amount'] as double?) ??
-                                          0.0;
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => AppDialog(
-                                          title: Text('تفاصيل دين {v1}'.tr({'v1': customer})),
-                                          content: SingleChildScrollView(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'المبلغ المتبقي: {v1} {v2}'.tr({'v1': total.toStringAsFixed(2), 'v2': Money.txt}),
-                                                ),
-                                                SizedBox(height: 8),
-                                                Text('تفاصيل:'.tr()),
-                                                ...items.map((it) {
-                                                  final name =
-                                                      it['drink_name'] ??
-                                                      'غير معروف'.tr();
-                                                  final qty = it['qty'] ?? 0;
-                                                  final price =
-                                                      ((it['price'] ?? 0)
-                                                              as num)
-                                                          .toDouble();
-                                                  final t =
-                                                      ((it['total'] ?? 0)
-                                                              as num)
-                                                          .toDouble();
-                                                  return Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          vertical: 4.0,
-                                                        ),
-                                                    child: Text(
-                                                      '$name x$qty — ${t.toStringAsFixed(2)} ${Money.txt}',
-                                                    ),
+                                                  await printDebtInvoice(
+                                                    customer,
+                                                    debtItems,
+                                                    amountToPay,
+                                                    discount,
                                                   );
-                                                }).toList(),
-                                              ],
-                                            ),
+                                                } catch (e) {
+                                                  print(
+                                                    '⚠️ فشلت الطباعة لكن الدفعة اتسجلت بنجاح: $e',
+                                                  );
+                                                }
+                                              } // 🆕
+                                              if (!mounted) return;
+                                              AppToast.show(
+                                                '✅ تم تحصيل دين {customer}، المدفوع: {v2} {v3}، الخصم: {v4} {v5}'
+                                                    .tr({
+                                                      'customer': customer,
+                                                      'v2': amountToPay
+                                                          .toStringAsFixed(2),
+                                                      'v3': Money.txt,
+                                                      'v4': discount
+                                                          .toStringAsFixed(2),
+                                                      'v5': Money.txt,
+                                                    }),
+                                              );
+                                            },
                                           ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              child: Text('إغلاق'.tr()),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                                        ],
+                                      ),
+                                      onTap: () async {
+                                        final items =
+                                            await DBHelper.getDebtItems(
+                                              (r['id'] as num).toInt(),
+                                            );
+                                        if (!mounted) return;
+                                        // 🆕 المتبقي الحقيقي هنا كمان
+                                        final total =
+                                            (r['remaining_amount']
+                                                as double?) ??
+                                            0.0;
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (_) => AppDialog(
+                                                title: Text(
+                                                  'تفاصيل دين {v1}'.tr({
+                                                    'v1': customer,
+                                                  }),
+                                                ),
+                                                content: SingleChildScrollView(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'المبلغ المتبقي: {v1} {v2}'
+                                                            .tr({
+                                                              'v1': total
+                                                                  .toStringAsFixed(
+                                                                    2,
+                                                                  ),
+                                                              'v2': Money.txt,
+                                                            }),
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text('تفاصيل:'.tr()),
+                                                      ...items.map((it) {
+                                                        final name =
+                                                            it['drink_name'] ??
+                                                            'غير معروف'.tr();
+                                                        final qty =
+                                                            it['qty'] ?? 0;
+                                                        final price =
+                                                            ((it['price'] ?? 0)
+                                                                    as num)
+                                                                .toDouble();
+                                                        final t =
+                                                            ((it['total'] ?? 0)
+                                                                    as num)
+                                                                .toDouble();
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                vertical: 4.0,
+                                                              ),
+                                                          child: Text(
+                                                            '$name x$qty — ${t.toStringAsFixed(2)} ${Money.txt}',
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed:
+                                                        () => Navigator.pop(
+                                                          context,
+                                                        ),
+                                                    child: Text('إغلاق'.tr()),
+                                                  ),
+                                                ],
+                                              ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                       ),
                     ],
                   ),
@@ -2868,55 +3201,61 @@ class _StaffDashboardState extends State<StaffDashboard> {
     // نافذة اختيار العميل أو إدخاله
     final customerName = await showDialog<String>(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AppDialog(
-          title: Text('اختر أو أضف عميل'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedCustomer,
-                isExpanded: true,
-                hint: Text('اختر عميل موجود'.tr()),
-                items: [
-                  DropdownMenuItem<String>(value: '', child: Text('بدون اسم'.tr())),
-                  ...customers.map((c) {
-                    return DropdownMenuItem<String>(
-                      value: c['customer_name'] as String,
-                      child: Text(c['customer_name'] as String),
-                    );
-                  }).toList(),
-                ],
-                onChanged: (val) => setState(() => selectedCustomer = val),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: customerNameCtrl,
-                decoration: InputDecoration(
-                  labelText: 'أو أدخل عميل جديد'.tr(),
-                  border: OutlineInputBorder(),
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AppDialog(
+                  title: Text('اختر أو أضف عميل'.tr()),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: selectedCustomer,
+                        isExpanded: true,
+                        hint: Text('اختر عميل موجود'.tr()),
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: '',
+                            child: Text('بدون اسم'.tr()),
+                          ),
+                          ...customers.map((c) {
+                            return DropdownMenuItem<String>(
+                              value: c['customer_name'] as String,
+                              child: Text(c['customer_name'] as String),
+                            );
+                          }).toList(),
+                        ],
+                        onChanged:
+                            (val) => setState(() => selectedCustomer = val),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: customerNameCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'أو أدخل عميل جديد'.tr(),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final name = customerNameCtrl.text.trim();
+                        Navigator.pop(
+                          context,
+                          name.isNotEmpty ? name : selectedCustomer,
+                        );
+                      },
+                      child: Text('ابدأ'.tr()),
+                    ),
+                  ],
                 ),
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = customerNameCtrl.text.trim();
-                Navigator.pop(
-                  context,
-                  name.isNotEmpty ? name : selectedCustomer,
-                );
-              },
-              child: Text('ابدأ'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
 
     if (customerName == null) return;
@@ -2981,62 +3320,72 @@ class _StaffDashboardState extends State<StaffDashboard> {
     final paymentChoice = await showDialog<String>(
       barrierDismissible: false,
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AppDialog(
-          title:  Text('خصم وطريقة الدفع للتيك أواي'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: discountController,
-                keyboardType: TextInputType.number,
-                decoration:  InputDecoration(
-                  labelText: 'الخصم'.tr(),
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  setState(() {
-                    final double totalAmount = drinksCost;
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AppDialog(
+                  title: Text('خصم وطريقة الدفع للتيك أواي'.tr()),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: discountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'الخصم'.tr(),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            final double totalAmount = drinksCost;
 
-                    double entered = double.tryParse(val) ?? 0.0;
+                            double entered = double.tryParse(val) ?? 0.0;
 
-                    if (entered > totalAmount) {
-                      discountController.text = totalAmount.toStringAsFixed(2);
+                            if (entered > totalAmount) {
+                              discountController.text = totalAmount
+                                  .toStringAsFixed(2);
 
-                      discount = totalAmount;
+                              discount = totalAmount;
 
-                      discountController.selection = TextSelection.fromPosition(
-                        TextPosition(offset: discountController.text.length),
-                      );
-                    } else if (entered < 0) {
-                      discount = 0;
-                    } else {
-                      discount = entered;
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'الإجمالي بعد الخصم: {v1} ج'.tr({'v1': (drinksCost - discount).clamp(0, double.infinity).toStringAsFixed(2)}),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              // 🆕 خيار الطباعة
-              CheckboxListTile(
-                value: shouldPrint,
-                onChanged: (val) {
-                  setState(() {
-                    shouldPrint = val ?? false;
-                  });
-                },
-                title:  Text('طباعة الفاتورة'.tr()),
-                controlAffinity: ListTileControlAffinity.leading,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ],
-          ),
-          /*         actions: [
+                              discountController
+                                  .selection = TextSelection.fromPosition(
+                                TextPosition(
+                                  offset: discountController.text.length,
+                                ),
+                              );
+                            } else if (entered < 0) {
+                              discount = 0;
+                            } else {
+                              discount = entered;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'الإجمالي بعد الخصم: {v1} ج'.tr({
+                          'v1': (drinksCost - discount)
+                              .clamp(0, double.infinity)
+                              .toStringAsFixed(2),
+                        }),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      // 🆕 خيار الطباعة
+                      CheckboxListTile(
+                        value: shouldPrint,
+                        onChanged: (val) {
+                          setState(() {
+                            shouldPrint = val ?? false;
+                          });
+                        },
+                        title: Text('طباعة الفاتورة'.tr()),
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                  /*         actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context, 'cancel');
@@ -3058,55 +3407,58 @@ class _StaffDashboardState extends State<StaffDashboard> {
               child: const Text('دفع كامل'),
             ),
           ],*/
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      foregroundColor: Colors.grey.shade700,
+                  actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  actions: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              foregroundColor: Colors.grey.shade700,
+                            ),
+                            onPressed: () => Navigator.pop(context, 'cancel'),
+                            child: Text(
+                              'إلغاء'.tr(),
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, 'debt'),
+                            child: Text(
+                              'على الحساب'.tr(),
+                              style: TextStyle(fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, 'paid'),
+                            child: Text(
+                              'دفع كامل'.tr(),
+                              style: TextStyle(fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () => Navigator.pop(context, 'cancel'),
-                    child:  Text('إلغاء'.tr(), style: TextStyle(fontSize: 13)),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onPressed: () => Navigator.pop(context, 'debt'),
-                    child:  Text(
-                      'على الحساب'.tr(),
-                      style: TextStyle(fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onPressed: () => Navigator.pop(context, 'paid'),
-                    child:  Text(
-                      'دفع كامل'.tr(),
-                      style: TextStyle(fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
     );
 
     if (paymentChoice == null || paymentChoice == 'cancel') {
@@ -3146,34 +3498,38 @@ class _StaffDashboardState extends State<StaffDashboard> {
             bool isButtonEnabled = false;
 
             return StatefulBuilder(
-              builder: (context, setState) => AppDialog(
-                title:  Text('تسجيل الدين'.tr()),
-                content: TextField(
-                  controller: nameController,
-                  decoration:  InputDecoration(
-                    labelText: 'اسم العميل'.tr(),
-                    border: OutlineInputBorder(),
+              builder:
+                  (context, setState) => AppDialog(
+                    title: Text('تسجيل الدين'.tr()),
+                    content: TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'اسم العميل'.tr(),
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          isButtonEnabled = value.trim().isNotEmpty;
+                        });
+                      },
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'cancel'),
+                        child: Text('إلغاء'.tr()),
+                      ),
+                      ElevatedButton(
+                        onPressed:
+                            isButtonEnabled
+                                ? () => Navigator.pop(
+                                  context,
+                                  nameController.text.trim(),
+                                )
+                                : null,
+                        child: Text('حفظ'.tr()),
+                      ),
+                    ],
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      isButtonEnabled = value.trim().isNotEmpty;
-                    });
-                  },
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'cancel'),
-                    child:  Text('إلغاء'.tr()),
-                  ),
-                  ElevatedButton(
-                    onPressed: isButtonEnabled
-                        ? () =>
-                              Navigator.pop(context, nameController.text.trim())
-                        : null,
-                    child:  Text('حفظ'.tr()),
-                  ),
-                ],
-              ),
             );
           },
         );
@@ -3278,9 +3634,13 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     // 🆕 إشعار نهائي يوضح إن الأوردر اتسجل بنجاح
     if (mounted) {
-      final message = paymentChoice == 'debt'
-          ? '✅ تم تسجيل الأوردر على الحساب — الإجمالي: {v1} {v2}'.tr({'v1': totalAfterDiscount.toStringAsFixed(2), 'v2': Money.txt})
-          : '✅ تم إنهاء الأوردر بنجاح — الإجمالي: ${totalAfterDiscount.toStringAsFixed(2)} ${Money.txt}';
+      final message =
+          paymentChoice == 'debt'
+              ? '✅ تم تسجيل الأوردر على الحساب — الإجمالي: {v1} {v2}'.tr({
+                'v1': totalAfterDiscount.toStringAsFixed(2),
+                'v2': Money.txt,
+              })
+              : '✅ تم إنهاء الأوردر بنجاح — الإجمالي: ${totalAfterDiscount.toStringAsFixed(2)} ${Money.txt}';
 
       AppToast.show(message, kind: FeedbackKind.success);
     }
@@ -3532,4 +3892,3 @@ class _StaffDashboardState extends State<StaffDashboard> {
         : _buildMobileBody(context);
   }
 }
-

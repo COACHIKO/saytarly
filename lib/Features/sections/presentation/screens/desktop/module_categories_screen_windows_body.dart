@@ -11,8 +11,13 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
     final totalDrinks = _rows.fold<int>(0, (sum, r) => sum + r.drinks);
 
     return DesktopPageScaffold(
-      title: 'قوائم قسم «{v1}»'.tr({'v1': m.name}),
-      subtitle: ('{v1} قائمة فرعية • {totalDrinks} منتج — '.tr({'v1': _rows.length, 'totalDrinks': totalDrinks}) + 'دي اللي بتظهر كـ تابات في إدارة القسم والكاشير'.tr()),
+      title: 'قوائم قسم «{v1}»'.tr({'v1': m.displayName}),
+      subtitle:
+          ('{v1} قائمة فرعية • {totalDrinks} منتج — '.tr({
+                'v1': _rows.length,
+                'totalDrinks': totalDrinks,
+              }) +
+              'دي اللي بتظهر كـ تابات في إدارة القسم والكاشير'.tr()),
       titleLeading: DesktopIconBadge(
         icon: m.iconData,
         color: m.accentColor,
@@ -27,61 +32,64 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
         ),
       ],
       scrollable: false,
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _rows.isEmpty
+      child:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : _rows.isEmpty
               ? DesktopEmptyState(
-                  icon: Icons.playlist_add,
-                  title: 'لسه مفيش قوائم فرعية في القسم ده'.tr(),
-                  message: ('ضيف قوائم زي «سخن / بارد / غازية» — '.tr() + 'وهتظهر كـ تابات جوه إدارة القسم وشاشة الكاشير.'.tr()),
-                  action: DesktopButton.primary(
-                    label: 'قائمة جديدة'.tr(),
-                    icon: Icons.add,
-                    onPressed: () => _openForm(),
-                  ),
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ==================== مؤشرات سريعة ====================
-                      DesktopResponsiveGrid(
-                        minTileWidth: 240,
-                        children: [
-                          DesktopStatCard(
-                            label: 'القوائم الفرعية'.tr(),
-                            value: '${_rows.length}',
-                            icon: Icons.playlist_play,
-                            color: m.accentColor,
-                          ),
-                          DesktopStatCard(
-                            label: 'قوائم مفعّلة'.tr(),
-                            value:
-                                '${_rows.where((r) => r.category.isEnabled).length}',
-                            icon: Icons.toggle_on_outlined,
-                            color: palette.success,
-                          ),
-                          DesktopStatCard(
-                            label: 'إجمالي المنتجات'.tr(),
-                            value: '$totalDrinks',
-                            icon: Icons.local_cafe_outlined,
-                            color: palette.info,
-                          ),
-                        ],
-                      ),
-                       SizedBox(height: DesktopTokens.gapLg),
-
-                      DesktopSectionTitle(
-                        title: 'القوائم الفرعية'.tr(),
-                        count: _rows.length,
-                      ),
-                      const SizedBox(height: DesktopTokens.gapXs),
-
-                      for (var i = 0; i < _rows.length; i++)
-                        _windowsCategoryRow(context, _rows[i], i),
-                    ],
-                  ),
+                icon: Icons.playlist_add,
+                title: 'لسه مفيش قوائم فرعية في القسم ده'.tr(),
+                message:
+                    ('ضيف قوائم زي «سخن / بارد / غازية» — '.tr() +
+                        'وهتظهر كـ تابات جوه إدارة القسم وشاشة الكاشير.'.tr()),
+                action: DesktopButton.primary(
+                  label: 'قائمة جديدة'.tr(),
+                  icon: Icons.add,
+                  onPressed: () => _openForm(),
                 ),
+              )
+              : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ==================== مؤشرات سريعة ====================
+                    DesktopResponsiveGrid(
+                      minTileWidth: 240,
+                      children: [
+                        DesktopStatCard(
+                          label: 'القوائم الفرعية'.tr(),
+                          value: '${_rows.length}',
+                          icon: Icons.playlist_play,
+                          color: m.accentColor,
+                        ),
+                        DesktopStatCard(
+                          label: 'قوائم مفعّلة'.tr(),
+                          value:
+                              '${_rows.where((r) => r.category.isEnabled).length}',
+                          icon: Icons.toggle_on_outlined,
+                          color: palette.success,
+                        ),
+                        DesktopStatCard(
+                          label: 'إجمالي المنتجات'.tr(),
+                          value: '$totalDrinks',
+                          icon: Icons.local_cafe_outlined,
+                          color: palette.info,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: DesktopTokens.gapLg),
+
+                    DesktopSectionTitle(
+                      title: 'القوائم الفرعية'.tr(),
+                      count: _rows.length,
+                    ),
+                    const SizedBox(height: DesktopTokens.gapXs),
+
+                    for (var i = 0; i < _rows.length; i++)
+                      _windowsCategoryRow(context, _rows[i], i),
+                  ],
+                ),
+              ),
     );
   }
 
@@ -115,7 +123,9 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
               ),
               alignment: Alignment.center,
               child: Text(
-                c.name.characters.first,
+                c.displayName.trim().isEmpty
+                    ? '•'
+                    : c.displayName.characters.first,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
@@ -133,7 +143,7 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
                     children: [
                       Flexible(
                         child: Text(
-                          c.name,
+                          c.displayName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleSmall?.copyWith(
@@ -165,7 +175,7 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
                 ],
               ),
             ),
-             SizedBox(width: DesktopTokens.gapSm),
+            SizedBox(width: DesktopTokens.gapSm),
             DesktopToolbarIconButton(
               icon: Icons.arrow_upward_rounded,
               tooltip: 'تحريك لفوق'.tr(),
@@ -178,17 +188,10 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
                   index == _rows.length - 1 ? null : () => _move(index, 1),
             ),
             const SizedBox(width: DesktopTokens.gapSm),
-            Switch(
-              value: c.isEnabled,
-              onChanged: (v) => _toggle(row, v),
-            ),
+            Switch(value: c.isEnabled, onChanged: (v) => _toggle(row, v)),
             PopupMenuButton<String>(
               tooltip: 'أوامر القائمة'.tr(),
-              icon: Icon(
-                Icons.more_vert,
-                size: 20,
-                color: palette.textMuted,
-              ),
+              icon: Icon(Icons.more_vert, size: 20, color: palette.textMuted),
               onSelected: (v) {
                 switch (v) {
                   case 'edit':
@@ -205,13 +208,20 @@ extension _ModuleCategoriesWindowsBody on _ModuleCategoriesScreenState {
                     break;
                 }
               },
-              itemBuilder: (_) =>  [
-                PopupMenuItem(value: 'edit', child: Text('تعديل الاسم'.tr())),
-                PopupMenuItem(value: 'up', child: Text('تحريك لفوق'.tr())),
-                PopupMenuItem(value: 'down', child: Text('تحريك لتحت'.tr())),
-                PopupMenuDivider(),
-                PopupMenuItem(value: 'delete', child: Text('حذف'.tr())),
-              ],
+              itemBuilder:
+                  (_) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Text('تعديل الاسم'.tr()),
+                    ),
+                    PopupMenuItem(value: 'up', child: Text('تحريك لفوق'.tr())),
+                    PopupMenuItem(
+                      value: 'down',
+                      child: Text('تحريك لتحت'.tr()),
+                    ),
+                    PopupMenuDivider(),
+                    PopupMenuItem(value: 'delete', child: Text('حذف'.tr())),
+                  ],
             ),
           ],
         ),

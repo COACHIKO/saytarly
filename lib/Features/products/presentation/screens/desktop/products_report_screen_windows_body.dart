@@ -15,7 +15,10 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
 
     return DesktopPageScaffold(
       title: 'تقرير المنتجات'.tr(),
-      subtitle: '{v1} • {soldItemsCount} صنف'.tr({'v1': _periodLabel(), 'soldItemsCount': soldItemsCount}),
+      subtitle: '{v1} • {soldItemsCount} صنف'.tr({
+        'v1': _periodLabel(),
+        'soldItemsCount': soldItemsCount,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -76,7 +79,7 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg),
+          SizedBox(height: DesktopTokens.gapLg),
 
           // ==================== جدول المنتجات ====================
           DesktopSectionTitle(
@@ -88,12 +91,12 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
             ),
           ),
           if (_isLoading)
-             Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 60),
               child: Center(child: CircularProgressIndicator()),
             )
           else if (items.isEmpty)
-             DesktopEmptyState(
+            DesktopEmptyState(
               icon: Icons.shopping_bag_outlined,
               title: 'لا توجد مبيعات منتجات في هذه الفترة'.tr(),
               message: 'جرّب تغيّر الفترة أو القسم من الفلاتر اللي فوق.'.tr(),
@@ -122,7 +125,7 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
     return Row(
       children: [
         DesktopSegmented<String>(
-          items:  [
+          items: [
             DesktopSegmentItem<String>(
               value: 'day',
               label: 'يومي'.tr(),
@@ -170,7 +173,7 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
         );
       case 'shift':
         if (_shifts.isEmpty) {
-          return  DesktopInfoChip(
+          return DesktopInfoChip(
             label: 'لا توجد شيفتات'.tr(),
             icon: Icons.info_outline,
           );
@@ -183,10 +186,7 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
             for (final s in _shifts)
               DropdownMenuItem<int?>(
                 value: s['id'] as int,
-                child: Text(
-                  _shiftLabel(s),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(_shiftLabel(s), overflow: TextOverflow.ellipsis),
               ),
           ],
           onChanged: (v) {
@@ -205,11 +205,11 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
       icon: Icons.category_outlined,
       value: _selectedModuleId,
       items: [
-         DropdownMenuItem<int?>(value: null, child: Text('كل الأقسام'.tr())),
+        DropdownMenuItem<int?>(value: null, child: Text('كل الأقسام'.tr())),
         for (final m in _modules)
           DropdownMenuItem<int?>(
             value: m['id'] as int,
-            child: Text(m['name'] as String? ?? ''),
+            child: Text(AppModule.displayNameFromMap(m)),
           ),
       ],
       onChanged: (v) {
@@ -292,7 +292,11 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
           Expanded(flex: 4, child: Text('الصنف'.tr(), style: style)),
           Expanded(
             flex: 2,
-            child: Text('اتباع'.tr(), textAlign: TextAlign.center, style: style),
+            child: Text(
+              'اتباع'.tr(),
+              textAlign: TextAlign.center,
+              style: style,
+            ),
           ),
           Expanded(
             flex: 2,
@@ -318,9 +322,10 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
     final discountAmount = item['discount_amount'] as double;
     final debtRevenue = item['debt_revenue'] as double;
     final debtCollected = item['debt_collected_revenue'] as double;
-    final unit = item['is_weighted'] as bool
-        ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم')
-        : '';
+    final unit =
+        item['is_weighted'] as bool
+            ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم'.tr())
+            : '';
     final lowStock = remaining <= 5;
     final hasExtra =
         discountAmount > 0 || debtRevenue > 0.01 || debtCollected > 0.01;
@@ -395,19 +400,25 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
               children: [
                 if (discountAmount > 0)
                   DesktopInfoChip(
-                    label: 'خصم {v1}'.tr({'v1': discountAmount.toStringAsFixed(2)}),
+                    label: 'خصم {v1}'.tr({
+                      'v1': discountAmount.toStringAsFixed(2),
+                    }),
                     color: _ProductsReportScreenState.discountColor,
                     dense: true,
                   ),
                 if (debtRevenue > 0.01)
                   DesktopInfoChip(
-                    label: 'آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}),
+                    label: 'آجل {v1}'.tr({
+                      'v1': debtRevenue.toStringAsFixed(2),
+                    }),
                     color: palette.danger,
                     dense: true,
                   ),
                 if (debtCollected > 0.01)
                   DesktopInfoChip(
-                    label: 'اتحصّل {v1}'.tr({'v1': debtCollected.toStringAsFixed(2)}),
+                    label: 'اتحصّل {v1}'.tr({
+                      'v1': debtCollected.toStringAsFixed(2),
+                    }),
                     color: palette.success,
                     dense: true,
                   ),
@@ -429,7 +440,8 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
       double debt,
       double debtCollected,
       double net,
-    }) totals,
+    })
+    totals,
   ) {
     return DesktopCard(
       color: palette.accentSoft,
@@ -525,7 +537,8 @@ extension _ProductsReportScreenWindowsBody on _ProductsReportScreenState {
     double debt,
     double debtCollected,
     double net,
-  }) _windowsTotals() {
+  })
+  _windowsTotals() {
     final revenue = _report.fold<double>(
       0,
       (sum, item) => sum + (item['revenue'] as double),

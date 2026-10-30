@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:saytarly/core/database/db_helper.dart';
+import 'package:saytarly/core/design/saytarly_theme.dart';
 import 'package:saytarly/core/services/lan_backup_server.dart';
 import 'package:saytarly/core/utils/DeviceFingerprint.dart';
 import 'package:saytarly/core/utils/money.dart';
@@ -128,25 +129,34 @@ class ActivationGateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<ThemeCubit>(
       create: (_) => ThemeCubit(),
-      child: Builder(builder: (context) {
-        return BlocBuilder<ThemeCubit, ThemeMode>(builder: (context, mode) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            themeMode: mode,
-            theme: Theme.of(context),
-            home: Directionality(
-              textDirection: TextDirection.rtl,
-              child: ActivationScreen(
-                isExpired: isExpired,
-                onActivated: () {
-                  // Successful activation → launch the real app.
-                  runApp(const SaytarlyApp());
-                },
-              ),
-            ),
+      child: Builder(
+        builder: (context) {
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, mode) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                themeMode: mode,
+                theme: SaytarlyTheme.light(
+                  fontFamily: SaytarlyTheme.arabicFont,
+                ),
+                darkTheme: SaytarlyTheme.dark(
+                  fontFamily: SaytarlyTheme.arabicFont,
+                ),
+                home: Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: ActivationScreen(
+                    isExpired: isExpired,
+                    onActivated: () {
+                      // Successful activation → launch the real app.
+                      runApp(const SaytarlyApp());
+                    },
+                  ),
+                ),
+              );
+            },
           );
-        });
-      }),
+        },
+      ),
     );
   }
 }

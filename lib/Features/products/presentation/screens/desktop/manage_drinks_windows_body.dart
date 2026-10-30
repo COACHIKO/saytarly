@@ -14,9 +14,8 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
 
     final cats = _visibleCategories;
     final catKeys = cats.map((c) => c['key'] as String? ?? '').toSet();
-    final uncategorized = drinks
-        .where((d) => !catKeys.contains(d.temperature))
-        .toList();
+    final uncategorized =
+        drinks.where((d) => !catKeys.contains(d.temperature)).toList();
     final hasOther = uncategorized.isNotEmpty;
 
     // الفلتر المختار — لو القسم اتقفل من السوبر ادمن بنرجع لـ "الكل".
@@ -38,19 +37,21 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
       visible = drinks.where((d) => d.temperature == selected).toList();
     }
     if (query.isNotEmpty) {
-      visible = visible
-          .where((d) => d.name.toLowerCase().contains(query))
-          .toList();
+      visible = visible.where((d) => d.matchesQuery(query)).toList();
     }
 
     final lowStockCount = drinks.where((d) => d.qty > 0 && d.qty < 10).length;
     final outOfStockCount = drinks.where((d) => d.qty <= 0).length;
 
     return DesktopPageScaffold(
-      title: widget.moduleName != null
-          ? 'إدارة {v1}'.tr({'v1': widget.moduleName})
-          : 'إدارة المشروبات',
-      subtitle: '{v1} قائمة فرعية • {v2} منتج'.tr({'v1': cats.length, 'v2': drinks.length}),
+      title:
+          widget.moduleName != null
+              ? 'إدارة {v1}'.tr({'v1': widget.moduleName})
+              : 'إدارة المشروبات'.tr(),
+      subtitle: '{v1} قائمة فرعية • {v2} منتج'.tr({
+        'v1': cats.length,
+        'v2': drinks.length,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.upload_outlined,
@@ -86,7 +87,7 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
                 for (final c in cats)
                   DesktopSegmentItem<String>(
                     value: c['key'] as String? ?? '',
-                    label: c['name'] as String? ?? '',
+                    label: AppModuleCategory.displayNameFromMap(c),
                   ),
                 if (hasOther)
                   DesktopSegmentItem<String>(
@@ -96,9 +97,10 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
                   ),
               ],
               value: selected ?? _windowsAllKey,
-              onChanged: (v) => _refresh(
-                () => _selectedCategoryKey = v == _windowsAllKey ? null : v,
-              ),
+              onChanged:
+                  (v) => _refresh(
+                    () => _selectedCategoryKey = v == _windowsAllKey ? null : v,
+                  ),
             ),
           const Spacer(),
           DesktopSearchField(
@@ -107,67 +109,70 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
           ),
         ],
       ),
-      child: cats.isEmpty
-          ? _windowsEmptyCategoriesNote()
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DesktopResponsiveGrid(
-                  minTileWidth: 240,
-                  maxColumns: 3,
-                  children: [
-                    DesktopStatCard(
-                      label: 'إجمالي المنتجات'.tr(),
-                      value: '${drinks.length}',
-                      icon: Icons.local_cafe_outlined,
-                      color: palette.accent,
-                      hint: widget.moduleName,
-                    ),
-                    DesktopStatCard(
-                      label: 'مخزون قليل (أقل من 10)'.tr(),
-                      value: '$lowStockCount',
-                      icon: Icons.warning_amber_rounded,
-                      color: palette.warning,
-                    ),
-                    DesktopStatCard(
-                      label: 'نفد من المخزون'.tr(),
-                      value: '$outOfStockCount',
-                      icon: Icons.remove_shopping_cart_outlined,
-                      color: palette.danger,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: DesktopTokens.gapLg),
-                if (visible.isEmpty)
-                  DesktopEmptyState(
-                    icon: Icons.search_off,
-                    title: 'لا توجد منتجات هنا'.tr(),
-                    message: query.isNotEmpty
-                        ? 'جرّب كلمة بحث تانية أو اختار قائمة فرعية تانية.'.tr()
-                        : 'ضيف أول منتج للقائمة دي.',
-                    action: DesktopButton.primary(
-                      label: 'إضافة منتج'.tr(),
-                      icon: Icons.add,
-                      onPressed: _showForm,
-                    ),
-                  )
-                else
+      child:
+          cats.isEmpty
+              ? _windowsEmptyCategoriesNote()
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   DesktopResponsiveGrid(
-                    minTileWidth: 260,
-                    maxColumns: 5,
+                    minTileWidth: 240,
+                    maxColumns: 3,
                     children: [
-                      for (final c in visible)
-                        _windowsDrinkCard(
-                          context,
-                          palette,
-                          c,
-                          _sectionLabel(c),
-                        ),
+                      DesktopStatCard(
+                        label: 'إجمالي المنتجات'.tr(),
+                        value: '${drinks.length}',
+                        icon: Icons.local_cafe_outlined,
+                        color: palette.accent,
+                        hint: widget.moduleName,
+                      ),
+                      DesktopStatCard(
+                        label: 'مخزون قليل (أقل من 10)'.tr(),
+                        value: '$lowStockCount',
+                        icon: Icons.warning_amber_rounded,
+                        color: palette.warning,
+                      ),
+                      DesktopStatCard(
+                        label: 'نفد من المخزون'.tr(),
+                        value: '$outOfStockCount',
+                        icon: Icons.remove_shopping_cart_outlined,
+                        color: palette.danger,
+                      ),
                     ],
                   ),
-                const SizedBox(height: DesktopTokens.gapLg),
-              ],
-            ),
+                  const SizedBox(height: DesktopTokens.gapLg),
+                  if (visible.isEmpty)
+                    DesktopEmptyState(
+                      icon: Icons.search_off,
+                      title: 'لا توجد منتجات هنا'.tr(),
+                      message:
+                          query.isNotEmpty
+                              ? 'جرّب كلمة بحث تانية أو اختار قائمة فرعية تانية.'
+                                  .tr()
+                              : 'ضيف أول منتج للقائمة دي.'.tr(),
+                      action: DesktopButton.primary(
+                        label: 'إضافة منتج'.tr(),
+                        icon: Icons.add,
+                        onPressed: _showForm,
+                      ),
+                    )
+                  else
+                    DesktopResponsiveGrid(
+                      minTileWidth: 260,
+                      maxColumns: 5,
+                      children: [
+                        for (final c in visible)
+                          _windowsDrinkCard(
+                            context,
+                            palette,
+                            c,
+                            _sectionLabel(c),
+                          ),
+                      ],
+                    ),
+                  const SizedBox(height: DesktopTokens.gapLg),
+                ],
+              ),
     );
   }
 
@@ -185,16 +190,18 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
     String sectionLabel,
   ) {
     final theme = Theme.of(context);
-    final qtyColor = c.qty <= 0
-        ? palette.textMuted
-        : (c.qty < 10 ? palette.danger : palette.success);
+    final qtyColor =
+        c.qty <= 0
+            ? palette.textMuted
+            : (c.qty < 10 ? palette.danger : palette.success);
 
     return DesktopCard(
       hover: true,
       selected: selectedDrinkId == c.id,
-      onTap: () => _refresh(() {
-        selectedDrinkId = selectedDrinkId == c.id ? null : c.id;
-      }),
+      onTap:
+          () => _refresh(() {
+            selectedDrinkId = selectedDrinkId == c.id ? null : c.id;
+          }),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -212,7 +219,7 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      c.name,
+                      c.displayName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -256,12 +263,13 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
               _windowsIconAction(
                 icon: Icons.restaurant_menu_outlined,
                 tooltip: 'الوصفة'.tr(),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DrinkRecipeScreen(drinkId: c.id!),
-                  ),
-                ),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DrinkRecipeScreen(drinkId: c.id!),
+                      ),
+                    ),
               ),
               _windowsIconAction(
                 icon: Icons.add_circle_outline,
@@ -295,45 +303,48 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
 
     await showDialog<void>(
       context: context,
-      builder: (_) => AppDialog(
-        title:  Text('زيادة الكمية'.tr()),
-        content: TextField(
-          controller: qtyController,
-          keyboardType: TextInputType.number,
-          decoration:  InputDecoration(
-            labelText: 'ادخل العدد'.tr(),
-            border: OutlineInputBorder(),
+      builder:
+          (_) => AppDialog(
+            title: Text('زيادة الكمية'.tr()),
+            content: TextField(
+              controller: qtyController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'ادخل العدد'.tr(),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  final addedQty = int.tryParse(qtyController.text.trim());
+                  if (addedQty != null && addedQty > 0) {
+                    final newQty = c.qty + addedQty;
+                    await DBHelper.updateDrinkQty(c.id!, newQty);
+                    _load();
+                  }
+                  navigator.pop();
+                },
+                child: Text('تأكيد'.tr()),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:  Text('إلغاء'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              final addedQty = int.tryParse(qtyController.text.trim());
-              if (addedQty != null && addedQty > 0) {
-                final newQty = c.qty + addedQty;
-                await DBHelper.updateDrinkQty(c.id!, newQty);
-                _load();
-              }
-              navigator.pop();
-            },
-            child:  Text('تأكيد'.tr()),
-          ),
-        ],
-      ),
     );
   }
 
   /// القسم لسه مفيهوش قوائم فرعية — نفس رسالة الموبايل.
   Widget _windowsEmptyCategoriesNote() {
-    return  DesktopEmptyState(
+    return DesktopEmptyState(
       icon: Icons.category_outlined,
       title: 'القسم ده لسه مفيهوش قوائم فرعية (زي: سخن/بارد)'.tr(),
-      message: ('روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم '.tr() + 'وضيف القوائم.'.tr()),
+      message:
+          ('روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم '.tr() +
+              'وضيف القوائم.'.tr()),
     );
   }
 
@@ -362,7 +373,11 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
                   color: hovering ? palette.border : Colors.transparent,
                 ),
               ),
-              child: Icon(icon, size: 16, color: color ?? palette.textSecondary),
+              child: Icon(
+                icon,
+                size: 16,
+                color: color ?? palette.textSecondary,
+              ),
             ),
           );
         },

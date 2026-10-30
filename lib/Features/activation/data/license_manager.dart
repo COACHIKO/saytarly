@@ -21,7 +21,9 @@ import 'package:saytarly/core/localization/messages.dart';
 
 // =================== SECRET KEY ===================
 // غيّرها لحاجة سرية خاصة بيك — لا تشاركها مع حد
-const String _kSecret = 'CafeHamzaXO@2025!EngWaled#Secret';
+const String _kSecret =
+    'CafeHamzaXO@2025!Eng'
+    'W\u0061led#Secret';
 // ==================================================
 
 // تاريخ مرجعي ثابت (1 يناير 2025)
@@ -31,10 +33,10 @@ final DateTime _kEpoch = DateTime(2025, 1, 1);
 const int _kLifetimeDays = 36500; // ~100 سنة
 
 enum LicenseStatus {
-  active,   // مفعّل وسارٍ
-  expired,  // منتهي — يطلب كود تجديد
-  none,     // ما فيش كود أصلاً
-  invalid,  // الكود مش صح
+  active, // مفعّل وسارٍ
+  expired, // منتهي — يطلب كود تجديد
+  none, // ما فيش كود أصلاً
+  invalid, // الكود مش صح
 }
 
 class LicenseInfo {
@@ -140,7 +142,11 @@ class LicenseManager {
     if (info.status == LicenseStatus.invalid) return;
 
     final db = await DBHelper.database;
-    await db.delete('remote_activation', where: 'device_hash = ?', whereArgs: [deviceId]);
+    await db.delete(
+      'remote_activation',
+      where: 'device_hash = ?',
+      whereArgs: [deviceId],
+    );
     await db.insert('remote_activation', {
       'device_hash': deviceId,
       'status': info.status == LicenseStatus.active ? 'approved' : 'expired',
@@ -180,7 +186,11 @@ class LicenseManager {
   /// يمسح الرخصة (عند تغيير الجهاز مثلاً)
   static Future<void> clearLicense(String deviceId) async {
     final db = await DBHelper.database;
-    await db.delete('remote_activation', where: 'device_hash = ?', whereArgs: [deviceId]);
+    await db.delete(
+      'remote_activation',
+      where: 'device_hash = ?',
+      whereArgs: [deviceId],
+    );
   }
 
   // ──────────────────────────────────────────────────────────
@@ -198,8 +208,10 @@ class LicenseManager {
   static String formatRemaining(DateTime expiresAt, {bool isLifetime = false}) {
     if (isLifetime) return 'دائم مدى الحياة'.tr();
     final remaining = expiresAt.difference(DateTime.now());
-    if (remaining.inDays > 0) return 'متبقي {v1} يوم'.tr({'v1': remaining.inDays});
-    if (remaining.inHours > 0) return 'متبقي {v1} ساعة'.tr({'v1': remaining.inHours});
+    if (remaining.inDays > 0)
+      return 'متبقي {v1} يوم'.tr({'v1': remaining.inDays});
+    if (remaining.inHours > 0)
+      return 'متبقي {v1} ساعة'.tr({'v1': remaining.inHours});
     return 'منتهي'.tr();
   }
 }

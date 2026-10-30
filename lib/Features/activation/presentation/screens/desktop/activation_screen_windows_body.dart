@@ -23,10 +23,7 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
           Positioned(
             bottom: -200,
             left: -150,
-            child: _glowCircle(
-              isExpired ? palette.warning : palette.info,
-              440,
-            ),
+            child: _glowCircle(isExpired ? palette.warning : palette.info, 440),
           ),
           Center(
             child: SingleChildScrollView(
@@ -38,16 +35,19 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                   children: [
                     // ── أيقونة + عنوان ──
                     DesktopIconBadge(
-                      icon: isExpired
-                          ? Icons.timer_off_rounded
-                          : Icons.lock_open_rounded,
+                      icon:
+                          isExpired
+                              ? Icons.timer_off_rounded
+                              : Icons.lock_open_rounded,
                       color: isExpired ? palette.warning : palette.accent,
                       size: 64,
                       radius: DesktopTokens.radiusXl,
                     ),
                     const SizedBox(height: DesktopTokens.gapMd),
                     Text(
-                      isExpired ? 'انتهت مدة الترخيص'.tr() : 'تفعيل البرنامج',
+                      isExpired
+                          ? 'انتهت مدة الترخيص'.tr()
+                          : 'تفعيل البرنامج'.tr(),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w900,
@@ -58,8 +58,10 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                     const SizedBox(height: DesktopTokens.gapXs),
                     Text(
                       isExpired
-                          ? 'تواصل مع المهندس للتجديد وأرسل له كود الجهاز بالأسفل'.tr()
-                          : 'أرسل كود الجهاز للمهندس وادخل كود التفعيل الذي سيرسله لك',
+                          ? 'تواصل مع المهندس للتجديد وأرسل له كود الجهاز بالأسفل'
+                              .tr()
+                          : 'أرسل كود الجهاز للمهندس وادخل كود التفعيل الذي سيرسله لك'
+                              .tr(),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: palette.textMuted,
@@ -69,10 +71,14 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                     ),
                     const SizedBox(height: DesktopTokens.gapMd),
                     DesktopInfoChip(
-                      label: isExpired ? 'الرخصة منتهية'.tr() : 'الجهاز غير مفعّل',
-                      icon: isExpired
-                          ? Icons.hourglass_disabled_outlined
-                          : Icons.devices_other_outlined,
+                      label:
+                          isExpired
+                              ? 'الرخصة منتهية'.tr()
+                              : 'الجهاز غير مفعّل'.tr(),
+                      icon:
+                          isExpired
+                              ? Icons.hourglass_disabled_outlined
+                              : Icons.devices_other_outlined,
                       color: isExpired ? palette.warning : palette.info,
                     ),
                     const SizedBox(height: DesktopTokens.gapLg),
@@ -108,34 +114,36 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                               border: Border.all(color: palette.border),
                             ),
                             alignment: Alignment.center,
-                            child: _loadingId
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: palette.accent,
+                            child:
+                                _loadingId
+                                    ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: palette.accent,
+                                      ),
+                                    )
+                                    : SelectableText(
+                                      _deviceId,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontSize: 13.5,
+                                        letterSpacing: 1.4,
+                                        fontWeight: FontWeight.w600,
+                                        color: palette.textPrimary,
+                                      ),
                                     ),
-                                  )
-                                : SelectableText(
-                                    _deviceId,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 13.5,
-                                      letterSpacing: 1.4,
-                                      fontWeight: FontWeight.w600,
-                                      color: palette.textPrimary,
-                                    ),
-                                  ),
                           ),
                           const SizedBox(height: DesktopTokens.gapSm),
                           DesktopButton.ghost(
                             label: 'نسخ كود الجهاز'.tr(),
                             icon: Icons.copy_rounded,
-                            onPressed: () => Clipboard.setData(
-                              ClipboardData(text: _deviceId),
-                            ),
+                            onPressed:
+                                () => Clipboard.setData(
+                                  ClipboardData(text: _deviceId),
+                                ),
                           ),
                           const SizedBox(height: DesktopTokens.gapLg),
                           Text(
@@ -257,9 +265,7 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                                     size: 17,
                                     color: palette.success,
                                   ),
-                                  const SizedBox(
-                                    width: DesktopTokens.gapSm,
-                                  ),
+                                  const SizedBox(width: DesktopTokens.gapSm),
                                   Expanded(
                                     child: Text(
                                       _successMsg!,
@@ -298,59 +304,26 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              icon: _activating
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.2,
-                                        color: Colors.white,
+                              icon:
+                                  _activating
+                                      ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                      : const Icon(
+                                        Icons.verified_rounded,
+                                        size: 19,
                                       ),
-                                    )
-                                  : const Icon(
-                                      Icons.verified_rounded,
-                                      size: 19,
-                                    ),
                               label: Text(
                                 _activating
                                     ? 'جاري التفعيل...'.tr()
-                                    : 'تفعيل البرنامج',
+                                    : 'تفعيل البرنامج'.tr(),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: DesktopTokens.gapLg),
-
-                          // ── معلومات الاتصال ──
-                          Divider(color: palette.border, height: 1),
-                          const SizedBox(height: DesktopTokens.gapMd),
-                          Text(
-                            'Eng: Waled Mabrok',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: palette.textPrimary,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.phone,
-                                size: 15,
-                                color: palette.success,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '01032548232',
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: palette.textSecondary,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),
@@ -374,10 +347,7 @@ extension _ActivationScreenWindowsBody on _ActivationScreenState {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
-            colors: [
-              color.withValues(alpha: 0.14),
-              color.withValues(alpha: 0),
-            ],
+            colors: [color.withValues(alpha: 0.14), color.withValues(alpha: 0)],
           ),
         ),
       ),

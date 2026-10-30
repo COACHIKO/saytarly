@@ -2,13 +2,11 @@ part of '../manage_drinks.dart';
 
 /// جسم إدارة المنتجات — نسخة الموبايل (زي ما كانت بالظبط).
 extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
-
   Widget _buildMobileBody(BuildContext context) {
     final cats = _visibleCategories;
     final catKeys = cats.map((c) => c['key'] as String? ?? '').toSet();
-    final uncategorized = drinks
-        .where((d) => !catKeys.contains(d.temperature))
-        .toList();
+    final uncategorized =
+        drinks.where((d) => !catKeys.contains(d.temperature)).toList();
     final hasOther = uncategorized.isNotEmpty;
     final tabCount = cats.length + (hasOther ? 1 : 0);
 
@@ -19,28 +17,30 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
           title: Text(
             widget.moduleName != null
                 ? 'إدارة {v1}'.tr({'v1': widget.moduleName})
-                : 'إدارة المشروبات',
+                : 'إدارة المشروبات'.tr(),
           ),
-          bottom: tabCount == 0
-              ? null
-              : TabBar(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  indicatorColor: Colors.transparent,
-                  indicatorWeight: 0,
-                  indicatorPadding: EdgeInsets.zero,
-                  dividerColor: Colors.transparent,
-                  indicator: BoxDecoration(
-                    color: Color(0xFF6FCF97),
-                    borderRadius: BorderRadius.circular(12),
+          bottom:
+              tabCount == 0
+                  ? null
+                  : TabBar(
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    indicatorColor: Colors.transparent,
+                    indicatorWeight: 0,
+                    indicatorPadding: EdgeInsets.zero,
+                    dividerColor: Colors.transparent,
+                    indicator: BoxDecoration(
+                      color: Color(0xFF6FCF97),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelColor: Colors.white,
+                    isScrollable: tabCount > 4,
+                    tabs: [
+                      for (final c in cats)
+                        Tab(text: AppModuleCategory.displayNameFromMap(c)),
+                      if (hasOther) Tab(text: 'أخرى'.tr()),
+                    ],
                   ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  isScrollable: tabCount > 4,
-                  tabs: [
-                    for (final c in cats) Tab(text: c['name'] as String? ?? ''),
-                    if (hasOther)  Tab(text: 'أخرى'.tr()),
-                  ],
-                ),
           actions: [
             IconButton(
               icon: Icon(Icons.upload, size: isMobile ? 22 : 18),
@@ -82,22 +82,23 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
             ),
           ],
         ),
-        body: tabCount == 0
-            ? _buildEmptyCategoriesHint()
-            : TabBarView(
-                children: [
-                  for (final c in cats)
-                    _buildDrinkList(
-                      drinks
-                          .where(
-                            (d) =>
-                                d.temperature == (c['key'] as String? ?? ''),
-                          )
-                          .toList(),
-                    ),
-                  if (hasOther) _buildDrinkList(uncategorized),
-                ],
-              ),
+        body:
+            tabCount == 0
+                ? _buildEmptyCategoriesHint()
+                : TabBarView(
+                  children: [
+                    for (final c in cats)
+                      _buildDrinkList(
+                        drinks
+                            .where(
+                              (d) =>
+                                  d.temperature == (c['key'] as String? ?? ''),
+                            )
+                            .toList(),
+                      ),
+                    if (hasOther) _buildDrinkList(uncategorized),
+                  ],
+                ),
       ),
     );
   }
@@ -109,11 +110,13 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
         padding: const EdgeInsets.all(30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:  [
+          children: [
             Icon(Icons.category_outlined, size: 60, color: Colors.grey),
             SizedBox(height: 14),
             Text(
-              ('القسم ده لسه مفيهوش قوائم فرعية (زي: سخن/بارد).\n'.tr() + 'روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم وضيف القوائم.'.tr()),
+              ('القسم ده لسه مفيهوش قوائم فرعية (زي: سخن/بارد).\n'.tr() +
+                  'روح للوحة السوبر ادمن → أقسام المنتجات → افتح القسم وضيف القوائم.'
+                      .tr()),
               textAlign: TextAlign.center,
             ),
           ],
@@ -121,7 +124,6 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
       ),
     );
   }
-
 
   Widget _buildDrinkList(List<DrinkModel> drinkList) {
     if (drinkList.isEmpty) {
@@ -137,9 +139,10 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
 
           // ✅ تحديد إذا العنصر محدد
           final isSelected = c.id == selectedDrinkId;
-          final bgColor = isSelected
-              ? Colors.deepPurple.shade100
-              : Theme.of(context).cardColor;
+          final bgColor =
+              isSelected
+                  ? Colors.deepPurple.shade100
+                  : Theme.of(context).cardColor;
 
           Color qtyColor;
           if (c.qty <= 0) {
@@ -157,8 +160,10 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: ListTile(
               textColor: qtyColor,
-              title: Text(c.name),
-              subtitle: Text('السعر: {v1} | الكمية: {v2}'.tr({'v1': c.price, 'v2': c.qty})),
+              title: Text(c.displayName),
+              subtitle: Text(
+                'السعر: {v1} | الكمية: {v2}'.tr({'v1': c.price, 'v2': c.qty}),
+              ),
               onTap: () {
                 _refresh(() {
                   if (selectedDrinkId == c.id) {
@@ -190,37 +195,41 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
                       final qtyController = TextEditingController();
                       showDialog(
                         context: context,
-                        builder: (_) => AppDialog(
-                          title: Text('زيادة الكمية'.tr()),
-                          content: TextField(
-                            controller: qtyController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'ادخل العدد'.tr(),
-                              border: OutlineInputBorder(),
+                        builder:
+                            (_) => AppDialog(
+                              title: Text('زيادة الكمية'.tr()),
+                              content: TextField(
+                                controller: qtyController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: 'ادخل العدد'.tr(),
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('إلغاء'.tr()),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final addedQty = int.tryParse(
+                                      qtyController.text.trim(),
+                                    );
+                                    if (addedQty != null && addedQty > 0) {
+                                      final newQty = (c.qty ?? 0) + addedQty;
+                                      await DBHelper.updateDrinkQty(
+                                        c.id!,
+                                        newQty,
+                                      );
+                                      _load();
+                                    }
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('تأكيد'.tr()),
+                                ),
+                              ],
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text('إلغاء'.tr()),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                final addedQty = int.tryParse(
-                                  qtyController.text.trim(),
-                                );
-                                if (addedQty != null && addedQty > 0) {
-                                  final newQty = (c.qty ?? 0) + addedQty;
-                                  await DBHelper.updateDrinkQty(c.id!, newQty);
-                                  _load();
-                                }
-                                Navigator.pop(context);
-                              },
-                              child: Text('تأكيد'.tr()),
-                            ),
-                          ],
-                        ),
                       );
                     },
                   ),
@@ -244,4 +253,3 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
     );
   }
 }
-

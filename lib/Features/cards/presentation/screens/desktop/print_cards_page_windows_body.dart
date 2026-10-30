@@ -16,8 +16,11 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
 
     return DesktopPageScaffold(
       title: 'طباعة كروت الإنترنت'.tr(),
-      subtitle:
-          '{v1} كارت لكل صفحة • شبكة {v2} × {v3}'.tr({'v1': _PrintCardsPageState.totalCards, 'v2': _PrintCardsPageState.columns, 'v3': _PrintCardsPageState.rows}),
+      subtitle: '{v1} كارت لكل صفحة • شبكة {v2} × {v3}'.tr({
+        'v1': _PrintCardsPageState.totalCards,
+        'v2': _PrintCardsPageState.columns,
+        'v3': _PrintCardsPageState.rows,
+      }),
       actions: [
         DesktopButton.ghost(
           label: 'اختيار صورة أو PDF'.tr(),
@@ -25,14 +28,15 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
           onPressed: canPick ? pickImage : null,
         ),
         DesktopButton.primary(
-          label: isExtracting ? 'جارٍ الاستخراج...'.tr() : 'استخراج وحفظ',
+          label: isExtracting ? 'جارٍ الاستخراج...'.tr() : 'استخراج وحفظ'.tr(),
           icon: Icons.save_alt,
-          onPressed: canExtract
-              ? () async {
-                  await extractAndSaveCards();
-                  await _loadQueueFiles();
-                }
-              : null,
+          onPressed:
+              canExtract
+                  ? () async {
+                    await extractAndSaveCards();
+                    await _loadQueueFiles();
+                  }
+                  : null,
         ),
       ],
       child: Column(
@@ -64,85 +68,97 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
               ),
               DesktopStatCard(
                 label: 'الملف المختار'.tr(),
-                value: imageBytes == null
-                    ? 'مفيش ملف'.tr()
-                    : (_isPdf ? 'PDF • {_pdfPageCount} صفحة'.tr({'_pdfPageCount': _pdfPageCount}) : 'صورة'),
-                icon: imageBytes == null
-                    ? Icons.upload_file_outlined
-                    : (_isPdf
-                          ? Icons.picture_as_pdf_outlined
-                          : Icons.image_outlined),
+                value:
+                    imageBytes == null
+                        ? 'مفيش ملف'.tr()
+                        : (_isPdf
+                            ? 'PDF • {_pdfPageCount} صفحة'.tr({
+                              '_pdfPageCount': _pdfPageCount,
+                            })
+                            : 'صورة'.tr()),
+                icon:
+                    imageBytes == null
+                        ? Icons.upload_file_outlined
+                        : (_isPdf
+                            ? Icons.picture_as_pdf_outlined
+                            : Icons.image_outlined),
                 color: palette.warning,
               ),
             ],
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== معاينة الورقة ====================
           DesktopSectionTitle(title: 'معاينة ورقة الكروت'.tr()),
           DesktopCard(
-            padding:  EdgeInsets.all(DesktopTokens.gapSm),
+            padding: EdgeInsets.all(DesktopTokens.gapSm),
             child: SizedBox(
               width: double.infinity,
               height: 420,
-              child: imageBytes == null
-                  ? DesktopEmptyState(
-                      icon: Icons.add_photo_alternate_outlined,
-                      title: 'اختر صورة ورقة الكروت'.tr(),
-                      message:
-                          '{v1} كارت في شبكة {v2} × {v3}'.tr({'v1': _PrintCardsPageState.totalCards, 'v2': _PrintCardsPageState.columns, 'v3': _PrintCardsPageState.rows}),
-                      action: DesktopButton.primary(
-                        label: 'اختيار صورة أو PDF'.tr(),
-                        icon: Icons.image_outlined,
-                        onPressed: canPick ? pickImage : null,
-                      ),
-                    )
-                  : Stack(
-                      children: [
-                        Positioned.fill(
-                          child: InteractiveViewer(
-                            minScale: 0.5,
-                            maxScale: 4,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                DesktopTokens.radiusMd,
-                              ),
-                              child: Image.memory(
-                                imageBytes!,
-                                fit: BoxFit.contain,
+              child:
+                  imageBytes == null
+                      ? DesktopEmptyState(
+                        icon: Icons.add_photo_alternate_outlined,
+                        title: 'اختر صورة ورقة الكروت'.tr(),
+                        message: '{v1} كارت في شبكة {v2} × {v3}'.tr({
+                          'v1': _PrintCardsPageState.totalCards,
+                          'v2': _PrintCardsPageState.columns,
+                          'v3': _PrintCardsPageState.rows,
+                        }),
+                        action: DesktopButton.primary(
+                          label: 'اختيار صورة أو PDF'.tr(),
+                          icon: Icons.image_outlined,
+                          onPressed: canPick ? pickImage : null,
+                        ),
+                      )
+                      : Stack(
+                        children: [
+                          Positioned.fill(
+                            child: InteractiveViewer(
+                              minScale: 0.5,
+                              maxScale: 4,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  DesktopTokens.radiusMd,
+                                ),
+                                child: Image.memory(
+                                  imageBytes!,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 10,
-                          left: 10,
-                          child: DesktopInfoChip(
-                            label: _isPdf
-                                ? 'PDF جاهز • {_pdfPageCount} صفحة'.tr({'_pdfPageCount': _pdfPageCount})
-                                : 'الصورة جاهزة',
-                            icon: Icons.check_circle_outline,
-                            color: palette.success,
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: DesktopInfoChip(
+                              label:
+                                  _isPdf
+                                      ? 'PDF جاهز • {_pdfPageCount} صفحة'.tr({
+                                        '_pdfPageCount': _pdfPageCount,
+                                      })
+                                      : 'الصورة جاهزة',
+                              icon: Icons.check_circle_outline,
+                              color: palette.success,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
             ),
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== الطباعة من المخزون ====================
-          DesktopSectionTitle(title: 'الطباعة من المخزون'.tr(), count: queueCount),
+          DesktopSectionTitle(
+            title: 'الطباعة من المخزون'.tr(),
+            count: queueCount,
+          ),
           DesktopCard(
             child: Row(
               children: [
-                Icon(
-                  Icons.print_rounded,
-                  size: 20,
-                  color: palette.accentText,
-                ),
+                Icon(Icons.print_rounded, size: 20, color: palette.accentText),
                 const SizedBox(width: DesktopTokens.gapSm),
                 Text(
                   'عدد الكروت:'.tr(),
@@ -195,16 +211,19 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
                 DesktopButton.primary(
                   label: isPrinting ? 'جارٍ الطباعة...'.tr() : 'طباعة',
                   icon: Icons.print_rounded,
-                  onPressed: canPrint
-                      ? () async {
-                          await printFromQueue();
-                          await _loadQueueFiles();
-                        }
-                      : null,
+                  onPressed:
+                      canPrint
+                          ? () async {
+                            await printFromQueue();
+                            await _loadQueueFiles();
+                          }
+                          : null,
                 ),
                 const Spacer(),
                 DesktopInfoChip(
-                  label: 'المتاح: {queueCount} كارت'.tr({'queueCount': queueCount}),
+                  label: 'المتاح: {queueCount} كارت'.tr({
+                    'queueCount': queueCount,
+                  }),
                   icon: Icons.inventory_2_outlined,
                   color: palette.success,
                 ),
@@ -212,7 +231,7 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
             ),
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== شبكة كروت المخزون ====================
           DesktopSectionTitle(title: 'كروت المخزون'.tr(), count: queueCount),
@@ -221,7 +240,8 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
               icon: Icons.inbox_outlined,
               title: 'المخزون فاضي'.tr(),
               message:
-                  'اختر صورة ورقة كروت واستخرجها — الكروت هتتحفظ هنا وتقدر تطبع منها في أي وقت.'.tr(),
+                  'اختر صورة ورقة كروت واستخرجها — الكروت هتتحفظ هنا وتقدر تطبع منها في أي وقت.'
+                      .tr(),
             )
           else
             DesktopResponsiveGrid(
@@ -238,11 +258,7 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
   }
 
   /// كارت صغير لكرت محفوظ في المخزون — بهوفر وحدود ناعمة.
-  Widget _pcCardTile(
-    BuildContext context,
-    DesktopPalette palette,
-    File file,
-  ) {
+  Widget _pcCardTile(BuildContext context, DesktopPalette palette, File file) {
     return DesktopCard(
       hover: true,
       padding: const EdgeInsets.all(DesktopTokens.gapXs),
@@ -255,11 +271,12 @@ extension _PrintCardsPageWindowsBody on _PrintCardsPageState {
             child: Image.file(
               file,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Icon(
-                Icons.broken_image_outlined,
-                color: palette.textMuted,
-                size: 22,
-              ),
+              errorBuilder:
+                  (_, _, _) => Icon(
+                    Icons.broken_image_outlined,
+                    color: palette.textMuted,
+                    size: 22,
+                  ),
             ),
           ),
         ),

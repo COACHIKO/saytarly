@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:saytarly/core/desktop/desktop_tokens.dart';
 
-/// كارت سطح المكتب — الـ building block الأساسي لكل الصفحات.
+/// The primary surface used by desktop pages.
 ///
-/// يدعم: هوفر ناعم (رفع + حدود أوضح)، اختيار (selected)، وظل خفيف.
+/// Defaults to a white card with a hairline border and an almost invisible
+/// shadow. Separation comes from borders first, elevation second.
 class DesktopCard extends StatefulWidget {
   const DesktopCard({
     super.key,
@@ -17,6 +18,7 @@ class DesktopCard extends StatefulWidget {
     this.hover = false,
     this.selected = false,
     this.onTap,
+    this.shadow = true,
   });
 
   final Widget child;
@@ -26,10 +28,13 @@ class DesktopCard extends StatefulWidget {
   final Color? borderColor;
   final double radius;
 
-  /// يفعّل تفاعل الهوفر (رفع + حدود أقوى).
+  /// Enables hover elevation + a stronger border.
   final bool hover;
   final bool selected;
   final VoidCallback? onTap;
+
+  /// Set false for dense surfaces (tables, nested panels).
+  final bool shadow;
 
   @override
   State<DesktopCard> createState() => _DesktopCardState();
@@ -44,12 +49,13 @@ class _DesktopCardState extends State<DesktopCard> {
     final interactive = widget.onTap != null && widget.hover;
     final lifted = interactive && _hovering;
 
-    final borderColor = widget.borderColor ??
+    final borderColor =
+        widget.borderColor ??
         (lifted
             ? palette.borderStrong
             : widget.selected
-                ? palette.accent.withValues(alpha: 0.55)
-                : palette.border);
+            ? palette.accent.withValues(alpha: 0.55)
+            : palette.border);
 
     final Widget card = AnimatedContainer(
       duration: DesktopTokens.fast,
@@ -59,17 +65,26 @@ class _DesktopCardState extends State<DesktopCard> {
       transform: Matrix4.translationValues(0, lifted ? -2 : 0, 0),
       transformAlignment: Alignment.center,
       decoration: BoxDecoration(
-        color: widget.color ??
+        color:
+            widget.color ??
             (widget.selected ? palette.accentSoft : palette.surface),
         borderRadius: BorderRadius.circular(widget.radius),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: palette.shadow.withValues(alpha: lifted ? 0.9 : 0.45),
-            blurRadius: lifted ? 24 : 14,
-            offset: Offset(0, lifted ? 10 : 6),
-          ),
-        ],
+        boxShadow:
+            !widget.shadow
+                ? null
+                : [
+                  BoxShadow(
+                    color: palette.shadow.withValues(
+                      alpha:
+                          palette.isDark
+                              ? (lifted ? 0.55 : 0.30)
+                              : (lifted ? 0.10 : 0.045),
+                    ),
+                    blurRadius: lifted ? 28 : 16,
+                    offset: Offset(0, lifted ? 14 : 7),
+                  ),
+                ],
       ),
       child: widget.child,
     );
@@ -89,17 +104,19 @@ class _DesktopCardState extends State<DesktopCard> {
   }
 }
 
-/// شريط عنوان قسم صغير — [مربط ألوان] + عنوان + عدّاد اختياري + عنصر إجراء.
+/// Section title used above grids and lists.
 class DesktopSectionTitle extends StatelessWidget {
   const DesktopSectionTitle({
     super.key,
     required this.title,
     this.count,
     this.trailing,
+    this.subtitle,
     this.padding = const EdgeInsets.only(bottom: DesktopTokens.gapMd),
   });
 
   final String title;
+  final String? subtitle;
   final int? count;
   final Widget? trailing;
   final EdgeInsetsGeometry padding;
@@ -112,6 +129,7 @@ class DesktopSectionTitle extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: 4,
@@ -122,34 +140,68 @@ class DesktopSectionTitle extends StatelessWidget {
             ),
           ),
           const SizedBox(width: DesktopTokens.gapSm),
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: palette.textPrimary,
-              fontSize: 16,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: palette.textPrimary,
+                          fontSize: 16.5,
+                        ),
+                      ),
+                    ),
+                    if (count != null) ...[
+                      const SizedBox(width: DesktopTokens.gapSm),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: palette.accentSoft,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: palette.accent.withValues(alpha: 0.16),
+                          ),
+                        ),
+                        child: Text(
+                          '$count',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: palette.accentText,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: palette.textMuted,
+                      fontSize: 11.5,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          if (count != null) ...[
-            const SizedBox(width: DesktopTokens.gapSm),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: palette.surfaceSoft,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: palette.border),
-              ),
-              child: Text(
-                '$count',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: palette.textMuted,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
           if (trailing != null) ...[
-            const Spacer(),
+            const SizedBox(width: DesktopTokens.gapMd),
             trailing!,
           ],
         ],
@@ -158,14 +210,14 @@ class DesktopSectionTitle extends StatelessWidget {
   }
 }
 
-/// أيقونة داخل مربع ملوّن مائل — تُستخدم في الكروت والتايلز والـ stats.
+/// Icon inside a soft tinted square.
 class DesktopIconBadge extends StatelessWidget {
   const DesktopIconBadge({
     super.key,
     required this.icon,
     this.color,
     this.size = 42,
-    this.radius = DesktopTokens.radiusSm,
+    this.radius = DesktopTokens.radiusMd,
     this.background,
   });
 
@@ -184,17 +236,16 @@ class DesktopIconBadge extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: background ?? tint.withValues(alpha: palette.isDark ? 0.18 : 0.12),
+        color: background ?? palette.soft(tint),
         borderRadius: BorderRadius.circular(radius),
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: tint, size: size * 0.48),
+      child: Icon(icon, color: palette.onSoft(tint), size: size * 0.46),
     );
   }
 }
 
-/// تايل إجراء عريض — أيقونة + عنوان + وصف + سهم — للاستخدام في الشبكات
-/// الرئيسية في لوحات التحكم. يدعم الهوفر بشكل كامل.
+/// Wide action tile used in dashboard quick-access grids.
 class DesktopActionTile extends StatelessWidget {
   const DesktopActionTile({
     super.key,
@@ -224,13 +275,15 @@ class DesktopActionTile extends StatelessWidget {
     return DesktopCard(
       hover: true,
       onTap: onTap,
-      padding: EdgeInsets.all(compact ? DesktopTokens.gapMd : DesktopTokens.gapMd + 2),
+      padding: EdgeInsets.all(
+        compact ? DesktopTokens.gapMd : DesktopTokens.gapMd + 2,
+      ),
       child: Row(
         children: [
           DesktopIconBadge(
             icon: icon,
             color: tint,
-            size: compact ? 40 : 46,
+            size: compact ? 40 : 44,
             radius: DesktopTokens.radiusMd,
           ),
           const SizedBox(width: DesktopTokens.gapMd),
@@ -244,9 +297,9 @@ class DesktopActionTile extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: palette.textPrimary,
-                    fontSize: compact ? 13.5 : 15,
+                    fontSize: compact ? 13.5 : 14.5,
                   ),
                 ),
                 if (subtitle != null) ...[
@@ -257,7 +310,8 @@ class DesktopActionTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: palette.textMuted,
-                      fontSize: compact ? 11 : 12,
+                      fontSize: compact ? 11 : 11.8,
+                      height: 1.4,
                     ),
                   ),
                 ],
@@ -270,9 +324,9 @@ class DesktopActionTile extends StatelessWidget {
           ],
           const SizedBox(width: DesktopTokens.gapXs),
           Icon(
-            Icons.chevron_left,
+            Icons.chevron_left_rounded,
             size: 18,
-            color: palette.textMuted.withValues(alpha: 0.7),
+            color: palette.textMuted.withValues(alpha: 0.65),
           ),
         ],
       ),

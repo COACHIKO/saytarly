@@ -11,10 +11,11 @@ extension _SettingsWindowsBody on _SettingsScreenState {
   Widget _buildWindowsBody(BuildContext context) {
     final palette = DesktopPalette.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final languageCode = context.watch<LocaleCubit>().state.locale.languageCode;
 
     return DesktopPageScaffold(
       title: 'الإعدادات'.tr(),
-      subtitle: 'المظهر والبيانات والنسخ الاحتياطي وخصائص الجهاز'.tr(),
+      subtitle: 'المظهر واللغة والبيانات والنسخ الاحتياطي وخصائص الجهاز'.tr(),
       maxWidth: 980,
       actions: [
         DesktopButton.primary(
@@ -22,243 +23,267 @@ extension _SettingsWindowsBody on _SettingsScreenState {
           icon: Icons.backup_outlined,
           onPressed: _backupNow,
         ),
-         DesktopThemeToggle(),
+        DesktopThemeToggle(),
       ],
-      child: _loading
-          ?  Padding(
-              padding: EdgeInsets.symmetric(vertical: 90),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ==================== المظهر العام ====================
-                _windowsSection('المظهر العام'.tr(), [
-                  _windowsSwitchRow(
-                    icon: isDark
-                        ? Icons.dark_mode_outlined
-                        : Icons.light_mode_outlined,
-                    iconColor: palette.accent,
-                    title: 'الوضع الليلي'.tr(),
-                    subtitle: isDark
-                        ? 'الوضع الليلي مفعّل الآن'.tr()
-                        : 'الوضع النهاري مفعّل الآن',
-                    value: isDark,
-                    onChanged: (_) =>
-                        context.read<ThemeCubit>().toggle(),
-                  ),
-                ]),
-
-                // ==================== منتجات إضافية ====================
-                _windowsSection('منتجات إضافية'.tr(), [
-                  _windowsSwitchRow(
-                    icon: Icons.smoking_rooms_outlined,
-                    iconColor: palette.warning,
-                    title: 'بيع السجائر'.tr(),
-                    subtitle: _cigarettesEnabled
-                        ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'.tr()
-                        : 'متوقف — مش هتظهر في شاشة البيع',
-                    value: _cigarettesEnabled,
-                    onChanged: _changeCigarettesEnabled,
-                  ),
-                  _windowsSwitchRow(
-                    icon: Icons.blur_on_rounded,
-                    iconColor: palette.info,
-                    title: 'بيع الشيشة'.tr(),
-                    subtitle: _shishaEnabled
-                        ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'.tr()
-                        : 'متوقف — مش هتظهر في شاشة البيع',
-                    value: _shishaEnabled,
-                    onChanged: _changeShishaEnabled,
-                  ),
-                ]),
-
-                // ==================== شاشة إضافة المشروبات ====================
-                _windowsSection('شاشة إضافة المشروبات'.tr(), [
-                  _windowsOptionRow(
-                    icon: Icons.view_list_rounded,
-                    title: 'قائمة'.tr(),
-                    subtitle: 'عرض المشروبات كقائمة عادية'.tr(),
-                    selected: !_posMode,
-                    onTap: () => _changeDrinksMode(false),
-                  ),
-                  _windowsOptionRow(
-                    icon: Icons.grid_view_rounded,
-                    title: 'كاشير'.tr(),
-                    subtitle: 'عرض المشروبات كشبكة أزرار سريعة'.tr(),
-                    selected: _posMode,
-                    onTap: () => _changeDrinksMode(true),
-                  ),
-                ]),
-
-                // ==================== شكل لوحة الأدمن ====================
-                _windowsSection('شكل لوحة الأدمن'.tr(), [
-                  for (final d in DashStyle.values)
+      child:
+          _loading
+              ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 90),
+                child: Center(child: CircularProgressIndicator()),
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ==================== اللغة ====================
+                  _windowsSection('اللغة'.tr(), [
                     _windowsOptionRow(
-                      icon: _dashStyleIcon(d),
-                      title: _dashStyleLabel(d),
-                      selected: _dashStyle == d,
-                      onTap: () => _changeDashStyle(d),
+                      icon: Icons.language_rounded,
+                      title: 'العربية'.tr(),
+                      subtitle: 'واجهة عربية كاملة من اليمين لليسار'.tr(),
+                      selected: languageCode == 'ar',
+                      onTap: () => _changeLanguage('ar'),
                     ),
-                ]),
-
-                // ==================== شكل تقرير الشيفتات ====================
-                _windowsSection('شكل تقرير الشيفتات'.tr(), [
-                  for (final d in ReportDesign.values)
                     _windowsOptionRow(
-                      icon: _reportDesignIcon(d),
-                      title: _reportDesignLabel(d),
-                      selected: _reportDesign == d,
-                      onTap: () => _changeReportDesign(d),
+                      icon: Icons.translate_rounded,
+                      title: 'English',
+                      subtitle: 'Full English interface, left to right',
+                      selected: languageCode == 'en',
+                      onTap: () => _changeLanguage('en'),
                     ),
-                ]),
+                  ]),
 
-                // ==================== تخصيص النظام لنشاطك ====================
-                _windowsSection('تخصيص النظام لنشاطك'.tr(), [
-                  _windowsNavRow(
-                    icon: Icons.currency_exchange,
-                    iconColor: palette.accent,
-                    title: 'العملة والطباعة'.tr(),
-                    subtitle: 'رمز العملة، عرض ورق الفاتورة، اسم الطابعة'.tr(),
-                    onTap: _editMoneyAndPrint,
-                  ),
-                  _windowsNavRow(
-                    icon: Icons.receipt_long,
-                    iconColor: palette.info,
-                    title: 'نصوص الفاتورة'.tr(),
-                    subtitle: 'جملة الشكر / تليفون / عنوان / الرقم الضريبي'.tr(),
-                    onTap: _editReceiptTexts,
-                  ),
-                  _windowsNavRow(
-                    icon: Icons.straighten,
-                    title: 'وحدات الخامات'.tr(),
-                    subtitle: 'عدّل قائمة الوحدات على مزاج نشاطك'.tr(),
-                    onTap: _editUnits,
-                  ),
-                  _windowsNavRow(
-                    icon: Icons.palette_outlined,
-                    title: 'لون الهوية'.tr(),
-                    subtitle: 'بيغيّر ألوان الثيم كلها باللون اللي تختاره'.tr(),
-                    onTap: _changeBrandColor,
-                  ),
-                ]),
+                  // ==================== المظهر العام ====================
+                  _windowsSection('المظهر العام'.tr(), [
+                    _windowsSwitchRow(
+                      icon:
+                          isDark
+                              ? Icons.dark_mode_outlined
+                              : Icons.light_mode_outlined,
+                      iconColor: palette.accent,
+                      title: 'الوضع الليلي'.tr(),
+                      subtitle:
+                          isDark
+                              ? 'الوضع الليلي مفعّل الآن'.tr()
+                              : 'الوضع النهاري مفعّل الآن'.tr(),
+                      value: isDark,
+                      onChanged: (_) => context.read<ThemeCubit>().toggle(),
+                    ),
+                  ]),
 
-                // ==================== النسخ الاحتياطي والبيانات ====================
-                _windowsSection('النسخ الاحتياطي والبيانات'.tr(), [
-                  _windowsNavRow(
-                    icon: Icons.backup_outlined,
-                    iconColor: palette.accent,
-                    title: 'نسخ احتياطي كامل'.tr(),
-                    subtitle: 'حفظ نسخة من كل بيانات البرنامج'.tr(),
-                    onTap: _backupNow,
-                  ),
-                  _windowsNavRow(
-                    icon: Icons.restore_outlined,
-                    iconColor: palette.info,
-                    title: 'استرجاع نسخة احتياطية'.tr(),
-                    subtitle: 'استبدال البيانات الحالية بنسخة محفوظة'.tr(),
-                    onTap: _restoreNow,
-                  ),
-                  _windowsNavRow(
-                    icon: Icons.delete_forever_outlined,
-                    title: 'مسح كل البيانات'.tr(),
-                    subtitle: 'حذف الفواتير والمصروفات وكل شيء نهائياً'.tr(),
-                    onTap: _clearAllNow,
-                    danger: true,
-                  ),
-                ]),
+                  // ==================== منتجات إضافية ====================
+                  _windowsSection('منتجات إضافية'.tr(), [
+                    _windowsSwitchRow(
+                      icon: Icons.smoking_rooms_outlined,
+                      iconColor: palette.warning,
+                      title: 'بيع السجائر'.tr(),
+                      subtitle:
+                          _cigarettesEnabled
+                              ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
+                                  .tr()
+                              : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
+                      value: _cigarettesEnabled,
+                      onChanged: _changeCigarettesEnabled,
+                    ),
+                    _windowsSwitchRow(
+                      icon: Icons.blur_on_rounded,
+                      iconColor: palette.info,
+                      title: 'بيع الشيشة'.tr(),
+                      subtitle:
+                          _shishaEnabled
+                              ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
+                                  .tr()
+                              : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
+                      value: _shishaEnabled,
+                      onChanged: _changeShishaEnabled,
+                    ),
+                  ]),
 
-                // ==================== النسخ عبر الانترنت ====================
-                _windowsSection('النسخ عبر الانترنت'.tr(), [
-                  // 🖥️ يظهر بس على جهاز الكاشير (Windows/Linux)
-                  if (Platform.isWindows || Platform.isLinux) ...[
-                    FutureBuilder<List<String>>(
-                      future: LanBackupServer.getLocalIps(),
-                      builder: (context, snapshot) {
-                        final ips = snapshot.data;
-                        if (ips == null || ips.isEmpty) {
+                  // ==================== شاشة إضافة المشروبات ====================
+                  _windowsSection('شاشة إضافة المشروبات'.tr(), [
+                    _windowsOptionRow(
+                      icon: Icons.view_list_rounded,
+                      title: 'قائمة'.tr(),
+                      subtitle: 'عرض المشروبات كقائمة عادية'.tr(),
+                      selected: !_posMode,
+                      onTap: () => _changeDrinksMode(false),
+                    ),
+                    _windowsOptionRow(
+                      icon: Icons.grid_view_rounded,
+                      title: 'كاشير'.tr(),
+                      subtitle: 'عرض المشروبات كشبكة أزرار سريعة'.tr(),
+                      selected: _posMode,
+                      onTap: () => _changeDrinksMode(true),
+                    ),
+                  ]),
+
+                  // ==================== شكل لوحة الأدمن ====================
+                  _windowsSection('شكل لوحة الأدمن'.tr(), [
+                    for (final d in DashStyle.values)
+                      _windowsOptionRow(
+                        icon: _dashStyleIcon(d),
+                        title: _dashStyleLabel(d),
+                        selected: _dashStyle == d,
+                        onTap: () => _changeDashStyle(d),
+                      ),
+                  ]),
+
+                  // ==================== شكل تقرير الشيفتات ====================
+                  _windowsSection('شكل تقرير الشيفتات'.tr(), [
+                    for (final d in ReportDesign.values)
+                      _windowsOptionRow(
+                        icon: _reportDesignIcon(d),
+                        title: _reportDesignLabel(d),
+                        selected: _reportDesign == d,
+                        onTap: () => _changeReportDesign(d),
+                      ),
+                  ]),
+
+                  // ==================== تخصيص النظام لنشاطك ====================
+                  _windowsSection('تخصيص النظام لنشاطك'.tr(), [
+                    _windowsNavRow(
+                      icon: Icons.currency_exchange,
+                      iconColor: palette.accent,
+                      title: 'العملة والطباعة'.tr(),
+                      subtitle:
+                          'رمز العملة، عرض ورق الفاتورة، اسم الطابعة'.tr(),
+                      onTap: _editMoneyAndPrint,
+                    ),
+                    _windowsNavRow(
+                      icon: Icons.receipt_long,
+                      iconColor: palette.info,
+                      title: 'نصوص الفاتورة'.tr(),
+                      subtitle:
+                          'جملة الشكر / تليفون / عنوان / الرقم الضريبي'.tr(),
+                      onTap: _editReceiptTexts,
+                    ),
+                    _windowsNavRow(
+                      icon: Icons.straighten,
+                      title: 'وحدات الخامات'.tr(),
+                      subtitle: 'عدّل قائمة الوحدات على مزاج نشاطك'.tr(),
+                      onTap: _editUnits,
+                    ),
+                  ]),
+
+                  // ==================== النسخ الاحتياطي والبيانات ====================
+                  _windowsSection('النسخ الاحتياطي والبيانات'.tr(), [
+                    _windowsNavRow(
+                      icon: Icons.backup_outlined,
+                      iconColor: palette.accent,
+                      title: 'نسخ احتياطي كامل'.tr(),
+                      subtitle: 'حفظ نسخة من كل بيانات البرنامج'.tr(),
+                      onTap: _backupNow,
+                    ),
+                    _windowsNavRow(
+                      icon: Icons.restore_outlined,
+                      iconColor: palette.info,
+                      title: 'استرجاع نسخة احتياطية'.tr(),
+                      subtitle: 'استبدال البيانات الحالية بنسخة محفوظة'.tr(),
+                      onTap: _restoreNow,
+                    ),
+                    _windowsNavRow(
+                      icon: Icons.delete_forever_outlined,
+                      title: 'مسح كل البيانات'.tr(),
+                      subtitle: 'حذف الفواتير والمصروفات وكل شيء نهائياً'.tr(),
+                      onTap: _clearAllNow,
+                      danger: true,
+                    ),
+                  ]),
+
+                  // ==================== النسخ عبر الانترنت ====================
+                  _windowsSection('النسخ عبر الانترنت'.tr(), [
+                    // 🖥️ يظهر بس على جهاز الكاشير (Windows/Linux)
+                    if (Platform.isWindows || Platform.isLinux) ...[
+                      FutureBuilder<List<String>>(
+                        future: LanBackupServer.getLocalIps(),
+                        builder: (context, snapshot) {
+                          final ips = snapshot.data;
+                          if (ips == null || ips.isEmpty) {
+                            return _windowsSettingRow(
+                              icon: Icons.wifi_off_rounded,
+                              iconColor: palette.textMuted,
+                              title: 'غير متصل بأي شبكة'.tr(),
+                              trailing: DesktopInfoChip(
+                                label: 'غير متصل'.tr(),
+                                icon: Icons.wifi_off,
+                                color: palette.warning,
+                              ),
+                            );
+                          }
                           return _windowsSettingRow(
-                            icon: Icons.wifi_off_rounded,
-                            iconColor: palette.textMuted,
-                            title: 'غير متصل بأي شبكة'.tr(),
+                            icon: Icons.wifi_tethering,
+                            iconColor: palette.info,
+                            title: 'عنوان جهاز الكاشير على الشبكة'.tr(),
+                            subtitle: ips.join(' , '),
                             trailing: DesktopInfoChip(
-                              label: 'غير متصل'.tr(),
-                              icon: Icons.wifi_off,
-                              color: palette.warning,
+                              label: 'متصل'.tr(),
+                              icon: Icons.check,
+                              color: palette.success,
                             ),
                           );
-                        }
-                        return _windowsSettingRow(
-                          icon: Icons.wifi_tethering,
-                          iconColor: palette.info,
-                          title: 'عنوان جهاز الكاشير على الشبكة'.tr(),
-                          subtitle: ips.join(' , '),
-                          trailing: DesktopInfoChip(
-                            label: 'متصل'.tr(),
-                            icon: Icons.check,
-                            color: palette.success,
+                        },
+                      ),
+                      _windowsNavRow(
+                        icon: Icons.cloud_upload_outlined,
+                        iconColor: palette.info,
+                        title: 'رفع نسخة على الشبكة الآن'.tr(),
+                        subtitle:
+                            'تحديث النسخة المتاحة للموبايل فوراً (نفس الواي فاي)'
+                                .tr(),
+                        onTap: _uploadNow,
+                      ),
+                      // 🆕 رفع على السيرفر (Supabase) — من أي مكان مش لازم نفس الواي فاي
+                      _windowsNavRow(
+                        icon: Icons.cloud_done_outlined,
+                        iconColor: palette.accent,
+                        title: 'رفع نسخة على السيرفر (كلاود)'.tr(),
+                        subtitle:
+                            'استخدمه عشان تقدر تسترجع من أي موبايل من أي مكان'
+                                .tr(),
+                        onTap: _uploadToSupabaseNow,
+                      ),
+                    ],
+
+                    // 📱 يظهر بس على الموبايل
+                    if (Platform.isAndroid || Platform.isIOS) ...[
+                      _windowsNavRow(
+                        icon: Icons.wifi,
+                        iconColor: palette.info,
+                        title: 'استيراد من جهاز الكاشير'.tr(),
+                        subtitle: 'لازم تكونوا على نفس شبكة الواي فاي'.tr(),
+                        onTap: _importFromNetwork,
+                      ),
+                      // 🆕 استرجاع من السيرفر (Supabase) — من غير الحاجة لنفس الشبكة
+                      _windowsNavRow(
+                        icon: Icons.cloud_download_outlined,
+                        iconColor: palette.accent,
+                        title: 'استرجاع من السيرفر (كلاود)'.tr(),
+                        subtitle:
+                            'يجيب آخر نسخة مرفوعة من أي مكان فيه إنترنت'.tr(),
+                        onTap: _restoreFromSupabaseNow,
+                      ),
+                    ],
+                  ]),
+
+                  // ==================== مواصفات الجهاز ====================
+                  DesktopCard(
+                    padding: EdgeInsets.zero,
+                    child: _windowsNavRow(
+                      icon: Icons.perm_device_information_outlined,
+                      iconColor: palette.info,
+                      title: 'مواصفات هذا الجهاز'.tr(),
+                      subtitle: 'عرض ونسخ كود التفعيل والمكونات'.tr(),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DeviceInfoScreen(),
                           ),
                         );
                       },
                     ),
-                    _windowsNavRow(
-                      icon: Icons.cloud_upload_outlined,
-                      iconColor: palette.info,
-                      title: 'رفع نسخة على الشبكة الآن'.tr(),
-                      subtitle:
-                          'تحديث النسخة المتاحة للموبايل فوراً (نفس الواي فاي)'.tr(),
-                      onTap: _uploadNow,
-                    ),
-                    // 🆕 رفع على السيرفر (Supabase) — من أي مكان مش لازم نفس الواي فاي
-                    _windowsNavRow(
-                      icon: Icons.cloud_done_outlined,
-                      iconColor: palette.accent,
-                      title: 'رفع نسخة على السيرفر (كلاود)'.tr(),
-                      subtitle: 'استخدمه عشان تقدر تسترجع من أي موبايل من أي مكان'.tr(),
-                      onTap: _uploadToSupabaseNow,
-                    ),
-                  ],
-
-                  // 📱 يظهر بس على الموبايل
-                  if (Platform.isAndroid || Platform.isIOS) ...[
-                    _windowsNavRow(
-                      icon: Icons.wifi,
-                      iconColor: palette.info,
-                      title: 'استيراد من جهاز الكاشير'.tr(),
-                      subtitle: 'لازم تكونوا على نفس شبكة الواي فاي'.tr(),
-                      onTap: _importFromNetwork,
-                    ),
-                    // 🆕 استرجاع من السيرفر (Supabase) — من غير الحاجة لنفس الشبكة
-                    _windowsNavRow(
-                      icon: Icons.cloud_download_outlined,
-                      iconColor: palette.accent,
-                      title: 'استرجاع من السيرفر (كلاود)'.tr(),
-                      subtitle: 'يجيب آخر نسخة مرفوعة من أي مكان فيه إنترنت'.tr(),
-                      onTap: _restoreFromSupabaseNow,
-                    ),
-                  ],
-                ]),
-
-                // ==================== مواصفات الجهاز ====================
-                DesktopCard(
-                  padding: EdgeInsets.zero,
-                  child: _windowsNavRow(
-                    icon: Icons.perm_device_information_outlined,
-                    iconColor: palette.info,
-                    title: 'مواصفات هذا الجهاز'.tr(),
-                    subtitle: 'عرض ونسخ كود التفعيل والمكونات'.tr(),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DeviceInfoScreen(),
-                        ),
-                      );
-                    },
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
     );
   }
 
@@ -365,23 +390,24 @@ extension _SettingsWindowsBody on _SettingsScreenState {
     }
 
     return HoverBuilder(
-      builder: (context, hovering) => GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: DesktopTokens.fast,
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          padding: const EdgeInsets.symmetric(
-            horizontal: DesktopTokens.gapMd,
-            vertical: 10,
+      builder:
+          (context, hovering) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: DesktopTokens.fast,
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesktopTokens.gapMd,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: hovering ? palette.surfaceSoft : Colors.transparent,
+                borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
+              ),
+              child: row,
+            ),
           ),
-          decoration: BoxDecoration(
-            color: hovering ? palette.surfaceSoft : Colors.transparent,
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
-          ),
-          child: row,
-        ),
-      ),
     );
   }
 
@@ -422,9 +448,10 @@ extension _SettingsWindowsBody on _SettingsScreenState {
       trailing: Icon(
         selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
         size: 20,
-        color: selected
-            ? palette.accent
-            : palette.textMuted.withValues(alpha: 0.7),
+        color:
+            selected
+                ? palette.accent
+                : palette.textMuted.withValues(alpha: 0.7),
       ),
     );
   }

@@ -16,9 +16,10 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
         DesktopToolbarIconButton(
           icon: Icons.refresh,
           tooltip: 'تحديث البيانات'.tr(),
-          onPressed: () => _refresh(() {
-            _loadExpenses();
-          }),
+          onPressed:
+              () => _refresh(() {
+                _loadExpenses();
+              }),
         ),
         DesktopButton.ghost(
           label: 'مسح كل المصروفات'.tr(),
@@ -27,21 +28,24 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
           onPressed: () async {
             final confirmed = await showDialog<bool>(
               context: context,
-              builder: (_) => AppDialog(
-                title: Text('تأكيد مسح كل المصروفات'.tr()),
-                content: Text(
-                    'هل أنت متأكد أنك تريد مسح كل المصروفات؟ هذا الإجراء لا يمكن التراجع عنه.'.tr()),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text('إلغاء'.tr()),
+              builder:
+                  (_) => AppDialog(
+                    title: Text('تأكيد مسح كل المصروفات'.tr()),
+                    content: Text(
+                      'هل أنت متأكد أنك تريد مسح كل المصروفات؟ هذا الإجراء لا يمكن التراجع عنه.'
+                          .tr(),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text('إلغاء'.tr()),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text('تأكيد'.tr()),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: Text('تأكيد'.tr()),
-                  ),
-                ],
-              ),
             );
 
             if (confirmed == true) {
@@ -61,9 +65,10 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
           Row(
             children: [
               DesktopButton.ghost(
-                label: _showAll
-                    ? 'اختيار يوم'.tr()
-                    : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                label:
+                    _showAll
+                        ? 'اختيار يوم'.tr()
+                        : DateFormat('yyyy-MM-dd').format(_selectedDate!),
                 icon: Icons.calendar_month_outlined,
                 onPressed: _pickDate,
               ),
@@ -81,17 +86,19 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
               ),
               const SizedBox(width: DesktopTokens.gapSm),
               DesktopInfoChip(
-                label: _showAll
-                    ? 'كل المصروفات'.tr()
-                    : 'مصروفات يوم ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}',
-                icon: _showAll
-                    ? Icons.all_inclusive_outlined
-                    : Icons.filter_alt_outlined,
+                label:
+                    _showAll
+                        ? 'كل المصروفات'.tr()
+                        : 'مصروفات يوم ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}',
+                icon:
+                    _showAll
+                        ? Icons.all_inclusive_outlined
+                        : Icons.filter_alt_outlined,
                 color: palette.info,
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg),
+          SizedBox(height: DesktopTokens.gapLg),
 
           // ==================== فورم الإضافة ====================
           DesktopSectionTitle(title: 'إضافة مصروف'.tr()),
@@ -106,8 +113,11 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
                     controller: _descCtrl,
                     label: 'وصف المصروف'.tr(),
                     icon: Icons.notes_outlined,
-                    validator: (value) =>
-                        value == null || value.isEmpty ? 'أدخل الوصف'.tr() : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'أدخل الوصف'.tr()
+                                : null,
                   ),
                   const SizedBox(height: DesktopTokens.gapMd),
                   _windowsFormField(
@@ -118,7 +128,8 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
                       decimal: true,
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'أدخل المبلغ'.tr();
+                      if (value == null || value.isEmpty)
+                        return 'أدخل المبلغ'.tr();
                       if (double.tryParse(value) == null) {
                         return 'أدخل رقم صحيح'.tr();
                       }
@@ -159,7 +170,7 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
             ),
           ),
 
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== قائمة المصروفات ====================
           DesktopSectionTitle(title: 'المصروفات المسجّلة'.tr()),
@@ -183,9 +194,10 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
                 return DesktopEmptyState(
                   icon: Icons.receipt_long_outlined,
                   title: 'لا توجد مصروفات'.tr(),
-                  message: _showAll
-                      ? 'لسه مفيش أي مصروفات مسجّلة.'.tr()
-                      : 'مفيش مصروفات في اليوم المختار.',
+                  message:
+                      _showAll
+                          ? 'لسه مفيش أي مصروفات مسجّلة.'.tr()
+                          : 'مفيش مصروفات في اليوم المختار.'.tr(),
                 );
               }
 
@@ -268,7 +280,10 @@ extension _AdminExpensesScreenWindowsBody on _AdminExpensesScreenState {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'تمت الإضافة بواسطة: {v1} • {v2}'.tr({'v1': exp['added_by'], 'v2': formatDate(exp['date'])}),
+                  'تمت الإضافة بواسطة: {v1} • {v2}'.tr({
+                    'v1': exp['added_by'],
+                    'v2': formatDate(exp['date']),
+                  }),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(

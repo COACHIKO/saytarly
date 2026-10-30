@@ -64,9 +64,10 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
                 value: '${filteredDebts.length}',
                 icon: Icons.people_outline,
                 color: palette.info,
-                hint: searchQuery.isEmpty
-                    ? 'كل العملاء المسجّلين'.tr()
-                    : 'نتيجة البحث الحالي',
+                hint:
+                    searchQuery.isEmpty
+                        ? 'كل العملاء المسجّلين'.tr()
+                        : 'نتيجة البحث الحالي'.tr(),
               ),
               DesktopStatCard(
                 label: 'عدد الفواتير'.tr(),
@@ -77,7 +78,7 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg + 4),
+          SizedBox(height: DesktopTokens.gapLg + 4),
 
           // ==================== البحث ====================
           DesktopSectionTitle(
@@ -100,9 +101,10 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
             DesktopEmptyState(
               icon: Icons.money_off_outlined,
               title: 'لا توجد ديون حالياً'.tr(),
-              message: searchQuery.isEmpty
-                  ? 'مفيش أي مبالغ آجلة مسجّلة على العملاء.'.tr()
-                  : 'مفيش نتائج للبحث "$searchQuery".',
+              message:
+                  searchQuery.isEmpty
+                      ? 'مفيش أي مبالغ آجلة مسجّلة على العملاء.'.tr()
+                      : 'مفيش نتائج للبحث "$searchQuery".',
             )
           else
             for (final d in filteredDebts) ...[
@@ -133,7 +135,7 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
     return DesktopCard(
       hover: true,
       onTap: openDetails,
-      padding:  EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: DesktopTokens.gapMd,
         vertical: DesktopTokens.gapSm + 2,
       ),
@@ -143,7 +145,7 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
             icon: Icons.person_outline,
             color: remaining > 0 ? palette.danger : palette.success,
           ),
-           SizedBox(width: DesktopTokens.gapMd),
+          SizedBox(width: DesktopTokens.gapMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,11 +161,13 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
                     fontSize: 14.5,
                   ),
                 ),
-                 SizedBox(height: 3),
+                SizedBox(height: 3),
                 Text(
                   date != null
-                      ? 'التاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd HH:mm').format(date)})
-                      : 'التاريخ: غير محدد',
+                      ? 'التاريخ: {v1}'.tr({
+                        'v1': DateFormat('yyyy-MM-dd HH:mm').format(date),
+                      })
+                      : 'التاريخ: غير محدد'.tr(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -192,7 +196,9 @@ extension _DebtsScreenWindowsBody on _DebtsScreenState {
           const SizedBox(width: DesktopTokens.gapSm),
           DesktopToolbarIconButton(
             icon: Icons.print_outlined,
-            tooltip: 'طباعة دين {customerName}'.tr({'customerName': customerName}),
+            tooltip: 'طباعة دين {customerName}'.tr({
+              'customerName': customerName,
+            }),
             onPressed: () => _printSingleDebt(customerName, d['ids']),
           ),
           DesktopToolbarIconButton(

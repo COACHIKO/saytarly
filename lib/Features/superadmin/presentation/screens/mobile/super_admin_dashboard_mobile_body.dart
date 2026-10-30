@@ -9,7 +9,7 @@ extension _SuperAdminMobileBody on _SuperAdminDashboardState {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               'لوحة السوبر ادمن'.tr(),
               style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
             ),
@@ -73,7 +73,7 @@ extension _SuperAdminMobileBody on _SuperAdminDashboardState {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  action['title'] as String,
+                                  (action['title'] as String).tr(),
                                   style: TextStyle(
                                     color: theme.onSurface,
                                     fontWeight: FontWeight.bold,
@@ -82,7 +82,7 @@ extension _SuperAdminMobileBody on _SuperAdminDashboardState {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  action['subtitle'] as String,
+                                  (action['subtitle'] as String).tr(),
                                   style: TextStyle(
                                     color: theme.onSurface.withOpacity(0.6),
                                     fontSize: 11.5,

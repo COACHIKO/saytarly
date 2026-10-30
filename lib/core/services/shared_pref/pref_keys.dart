@@ -5,7 +5,6 @@
 class PrefKeys {
   // ── Theme & language ────────────────────────────────────────────────────────
   static const String themeMode = 'themeMode';
-  static const String accentColorIndex = 'accentColorIndex';
   static const String language = 'language';
 
   // ── Auth (generic) ──────────────────────────────────────────────────────────

@@ -2,7 +2,6 @@ part of '../reports.dart';
 
 /// جسم شاشة التقارير المفصلة — نسخة الموبايل (زي ما كانت بالظبط).
 extension _ReportsScreenMobileBody on _ReportsScreenState {
-
   Widget _buildMobileBody(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < _ReportsScreenState._mobileBreakpoint;
@@ -59,7 +58,9 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'الفواتير بتاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!)}),
+                'الفواتير بتاريخ: {v1}'.tr({
+                  'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                }),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
@@ -72,7 +73,8 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
               _numbersVisible ? Icons.visibility : Icons.visibility_off,
             ),
             onPressed: _toggleNumbersVisibility,
-            tooltip: _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام',
+            tooltip:
+                _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام'.tr(),
           ),
           IconButton(
             icon: Icon(Icons.inventory_outlined),
@@ -96,7 +98,8 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
         // 🆕 أيقونة العين
         IconButton(
           icon: Icon(_numbersVisible ? Icons.visibility : Icons.visibility_off),
-          tooltip: _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام',
+          tooltip:
+              _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام'.tr(),
           onPressed: _toggleNumbersVisibility,
         ),
         IconButton(
@@ -118,31 +121,41 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
                 break;
             }
           },
-          itemBuilder: (_) => [
-             PopupMenuItem(value: 'all', child: Text('عرض كل الفواتير'.tr())),
-             PopupMenuItem(
-              value: 'stats',
-              child: Text('معلومات اكتر عن الدخل'.tr()),
-            ),
-             PopupMenuItem(
-              value: 'delete',
-              child: Text('مسح الكل'.tr(), style: TextStyle(color: Colors.red)),
-            ),
-          ],
+          itemBuilder:
+              (_) => [
+                PopupMenuItem(
+                  value: 'all',
+                  child: Text('عرض كل الفواتير'.tr()),
+                ),
+                PopupMenuItem(
+                  value: 'stats',
+                  child: Text('معلومات اكتر عن الدخل'.tr()),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text(
+                    'مسح الكل'.tr(),
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
         ),
       ],
-      bottom: _selectedDate != null
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(28),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  'بتاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!)}),
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+      bottom:
+          _selectedDate != null
+              ? PreferredSize(
+                preferredSize: const Size.fromHeight(28),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    'بتاريخ: {v1}'.tr({
+                      'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                    }),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
-            )
-          : null,
+              )
+              : null,
     );
   }
 
@@ -242,11 +255,18 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
         return Wrap(
           spacing: spacing,
           runSpacing: spacing,
-          children: cardsData
-              .map(
-                (d) => _buildCard(d.title, d.value, d.color, cardWidth, d.icon),
-              )
-              .toList(),
+          children:
+              cardsData
+                  .map(
+                    (d) => _buildCard(
+                      d.title,
+                      d.value,
+                      d.color,
+                      cardWidth,
+                      d.icon,
+                    ),
+                  )
+                  .toList(),
         );
       },
     );
@@ -254,19 +274,19 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
 
   Widget _buildInvoiceTile(Map<String, dynamic> inv) {
     final start = DateTime.parse(inv['start_time']);
-    final end = inv['end_time'] != null
-        ? DateTime.parse(inv['end_time'])
-        : null;
+    final end =
+        inv['end_time'] != null ? DateTime.parse(inv['end_time']) : null;
 
     final isDebt = inv['payment_type'] == 'علي الحساب';
     final isCancelled = inv['payment_type'] == 'ملغي';
-    final statusColor = isCancelled
-        ? Colors.grey
-        : (isDebt ? Colors.red : Colors.green);
-    final statusLabel = isCancelled ? 'ملغية'.tr() : (isDebt ? 'آجل'.tr() : 'مدفوعة');
-    final statusIcon = isCancelled
-        ? Icons.cancel
-        : (isDebt ? Icons.account_balance_wallet : Icons.check_circle);
+    final statusColor =
+        isCancelled ? Colors.grey : (isDebt ? Colors.red : Colors.green);
+    final statusLabel =
+        isCancelled ? 'ملغية'.tr() : (isDebt ? 'آجل'.tr() : 'مدفوعة');
+    final statusIcon =
+        isCancelled
+            ? Icons.cancel
+            : (isDebt ? Icons.account_balance_wallet : Icons.check_circle);
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -314,7 +334,11 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Text(
-            '{v1}   •   الإجمالي: {v2} {v3}'.tr({'v1': DateFormat('yyyy-MM-dd HH:mm').format(start), 'v2': _mask(formatter.format(inv['total_cost'] ?? 0)), 'v3': Money.txt}),
+            '{v1}   •   الإجمالي: {v2} {v3}'.tr({
+              'v1': DateFormat('yyyy-MM-dd HH:mm').format(start),
+              'v2': _mask(formatter.format(inv['total_cost'] ?? 0)),
+              'v3': Money.txt,
+            }),
             style: TextStyle(fontSize: 12, color: Colors.grey[700]),
           ),
         ),
@@ -350,12 +374,17 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
             'الجهاز'.tr(),
             (inv['console_name'] ?? inv['console_id']).toString(),
           ),
-          _infoRow('وقت البداية'.tr(), DateFormat('yyyy-MM-dd HH:mm').format(start)),
+          _infoRow(
+            'وقت البداية'.tr(),
+            DateFormat('yyyy-MM-dd HH:mm').format(start),
+          ),
         ] else
           _infoRow('النوع'.tr(), 'ترابيزة'.tr()),
         _infoRow(
           'وقت الدفع'.tr(),
-          end != null ? DateFormat('yyyy-MM-dd HH:mm').format(end) : 'جاري',
+          end != null
+              ? DateFormat('yyyy-MM-dd HH:mm').format(end)
+              : 'جاري'.tr(),
         ),
         const SizedBox(height: 10),
         Text(
@@ -367,7 +396,7 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
         ),
         const Divider(height: 12),
         if (items.isEmpty)
-           Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 6),
             child: Text('لا توجد أصناف'.tr()),
           )
@@ -384,7 +413,10 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
                 children: [
                   Expanded(
                     child: Text(
-                      '{v1}  x{v2}'.tr({'v1': item['drink_name'] ?? 'شحن رصيد'.tr(), 'v2': item['qty']}),
+                      '{v1}  x{v2}'.tr({
+                        'v1': item['drink_name'] ?? 'شحن رصيد'.tr(),
+                        'v2': item['qty'],
+                      }),
                     ),
                   ),
                   Text(
@@ -405,7 +437,8 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
         ),
         const Divider(height: 12),
         _financialRow('المشروبات'.tr(), drinksCost),
-        if (productsCost > 0) _financialRow('المنتجات / مأكولات'.tr(), productsCost),
+        if (productsCost > 0)
+          _financialRow('المنتجات / مأكولات'.tr(), productsCost),
         if (cigCost > 0) _financialRow('السجائر'.tr(), cigCost),
         if (shishaCost > 0) _financialRow('الشيشة'.tr(), shishaCost),
         if (deviceCost > 0) _financialRow('تكلفة الجهاز'.tr(), deviceCost),
@@ -534,4 +567,3 @@ extension _ReportsScreenMobileBody on _ReportsScreenState {
     );
   }
 }
-

@@ -7,15 +7,9 @@ class ModulesManagerState {
   final bool loading;
   final List<SectionModuleRow> rows;
 
-  const ModulesManagerState({
-    required this.loading,
-    required this.rows,
-  });
+  const ModulesManagerState({required this.loading, required this.rows});
 
-  ModulesManagerState copyWith({
-    bool? loading,
-    List<SectionModuleRow>? rows,
-  }) {
+  ModulesManagerState copyWith({bool? loading, List<SectionModuleRow>? rows}) {
     return ModulesManagerState(
       loading: loading ?? this.loading,
       rows: rows ?? this.rows,
@@ -26,8 +20,8 @@ class ModulesManagerState {
 /// Cubit شاشة إدارة الأقسام — كل منطق الأقسام هنا، والشاشة عرض بس.
 class ModulesManagerCubit extends Cubit<ModulesManagerState> {
   ModulesManagerCubit({SectionsRepository? repository})
-      : _repository = repository ?? SectionsRepository(),
-        super(const ModulesManagerState(loading: true, rows: []));
+    : _repository = repository ?? SectionsRepository(),
+      super(const ModulesManagerState(loading: true, rows: []));
 
   final SectionsRepository _repository;
 
@@ -41,24 +35,32 @@ class ModulesManagerCubit extends Cubit<ModulesManagerState> {
 
   /// إضافة قسم جديد.
   Future<void> addModule({
-    required String name,
+    required String nameAr,
+    required String nameEn,
     required String icon,
     required int color,
   }) async {
-    await _repository.addModule(name: name, icon: icon, color: color);
+    await _repository.addModule(
+      nameAr: nameAr,
+      nameEn: nameEn,
+      icon: icon,
+      color: color,
+    );
     await load();
   }
 
   /// تعديل بيانات قسم موجود.
   Future<void> editModule({
     required int id,
-    required String name,
+    required String nameAr,
+    required String nameEn,
     required String icon,
     required int color,
   }) async {
     await _repository.updateModule(
       id: id,
-      name: name,
+      nameAr: nameAr,
+      nameEn: nameEn,
       icon: icon,
       color: color,
     );

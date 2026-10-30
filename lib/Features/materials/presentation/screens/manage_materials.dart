@@ -106,32 +106,33 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
   Future<void> showImportMaterialsDialog() async {
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title:  Text('استيراد الخامات'.tr()),
-        content:  Text(
-          'هل تريد استبدال الخامات الحالية أم الإضافة عليها؟'.tr(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (_) => AppDialog(
+            title: Text('استيراد الخامات'.tr()),
+            content: Text(
+              'هل تريد استبدال الخامات الحالية أم الإضافة عليها؟'.tr(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  importMaterials(context, replace: false);
+                },
+                child: Text('إضافة'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  importMaterials(context, replace: true);
+                },
+                child: Text('استبدال'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              importMaterials(context, replace: false);
-            },
-            child:  Text('إضافة'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              importMaterials(context, replace: true);
-            },
-            child:  Text('استبدال'.tr()),
-          ),
-        ],
-      ),
     );
   }
 
@@ -180,140 +181,147 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
     final units = await BusinessProfile.getUnits();
     final unitNames = [for (final u in units) u.name];
     final savedUnit = material?['unit'] as String?;
-    String selectedUnit = (savedUnit != null && unitNames.contains(savedUnit))
-        ? savedUnit
-        : unitNames.first;
+    String selectedUnit =
+        (savedUnit != null && unitNames.contains(savedUnit))
+            ? savedUnit
+            : unitNames.first;
 
     await showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: EdgeInsets.zero,
-        title: Container(
-          padding:  EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius:  BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+      builder:
+          (_) => AppDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.secondary,
-              ],
-            ),
-          ),
-          child: Row(
-            children: [
-               Icon(Icons.inventory_2, color: Colors.white),
-               SizedBox(width: 10),
-              Text(
-                material == null ? 'إضافة خامة'.tr() : "تعديل خامة",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+            titlePadding: EdgeInsets.zero,
+            title: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
+                  ],
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.inventory_2, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text(
+                    material == null ? 'إضافة خامة'.tr() : "تعديل خامة".tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            content: SizedBox(
+              width: 450,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: name,
+                      decoration: InputDecoration(
+                        labelText: 'اسم الخامة'.tr(),
+                        prefixIcon: Icon(Icons.inventory_2_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: qty,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'الكمية الحالية'.tr(),
+                        prefixIcon: Icon(Icons.scale),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    DropdownButtonFormField<String>(
+                      value: selectedUnit,
+                      decoration: InputDecoration(
+                        labelText: 'الوحدة'.tr(),
+                        prefixIcon: Icon(Icons.straighten),
+                      ),
+                      items: [
+                        for (final u in unitNames)
+                          DropdownMenuItem(value: u, child: Text(u)),
+                      ],
+                      onChanged: (v) => selectedUnit = v!,
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: minQty,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'الحد الأدنى'.tr(),
+                        prefixIcon: Icon(Icons.warning_amber_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: cost,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'سعر الشراء'.tr(),
+                        prefixIcon: Icon(Icons.attach_money),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actionsPadding: const EdgeInsets.all(15),
+            actions: [
+              OutlinedButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                label: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.save),
+                label: Text('حفظ'.tr()),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
+                ),
+                onPressed: () async {
+                  final db = await DBHelper.database;
+
+                  final Map<String, dynamic> data = {
+                    'name': name.text,
+                    'qty': double.tryParse(qty.text) ?? 0,
+                    'unit': selectedUnit,
+                    'min_qty': double.tryParse(minQty.text) ?? 0,
+                    'cost': double.tryParse(cost.text) ?? 0,
+                  };
+
+                  if (material == null) {
+                    await db.insert('raw_materials', data);
+                  } else {
+                    await db.update(
+                      'raw_materials',
+                      data,
+                      where: 'id=?',
+                      whereArgs: [material['id']],
+                    );
+                  }
+
+                  Navigator.pop(context);
+                  load();
+                },
               ),
             ],
           ),
-        ),
-        content: SizedBox(
-          width: 450,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: name,
-                  decoration:  InputDecoration(
-                    labelText: 'اسم الخامة'.tr(),
-                    prefixIcon: Icon(Icons.inventory_2_outlined),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  controller: qty,
-                  keyboardType: TextInputType.number,
-                  decoration:  InputDecoration(
-                    labelText: 'الكمية الحالية'.tr(),
-                    prefixIcon: Icon(Icons.scale),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                DropdownButtonFormField<String>(
-                  value: selectedUnit,
-                  decoration:  InputDecoration(
-                    labelText: 'الوحدة'.tr(),
-                    prefixIcon: Icon(Icons.straighten),
-                  ),
-                  items: [
-                    for (final u in unitNames)
-                      DropdownMenuItem(value: u, child: Text(u)),
-                  ],
-                  onChanged: (v) => selectedUnit = v!,
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  controller: minQty,
-                  keyboardType: TextInputType.number,
-                  decoration:  InputDecoration(
-                    labelText: 'الحد الأدنى'.tr(),
-                    prefixIcon: Icon(Icons.warning_amber_rounded),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                TextField(
-                  controller: cost,
-                  keyboardType: TextInputType.number,
-                  decoration:  InputDecoration(
-                    labelText: 'سعر الشراء'.tr(),
-                    prefixIcon: Icon(Icons.attach_money),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actionsPadding: const EdgeInsets.all(15),
-        actions: [
-          OutlinedButton.icon(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close),
-            label:  Text('إلغاء'.tr()),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.save),
-            label:  Text('حفظ'.tr()),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            ),
-            onPressed: () async {
-              final db = await DBHelper.database;
-
-              final Map<String, dynamic> data = {
-                'name': name.text,
-                'qty': double.tryParse(qty.text) ?? 0,
-                'unit': selectedUnit,
-                'min_qty': double.tryParse(minQty.text) ?? 0,
-                'cost': double.tryParse(cost.text) ?? 0,
-              };
-
-              if (material == null) {
-                await db.insert('raw_materials', data);
-              } else {
-                await db.update(
-                  'raw_materials',
-                  data,
-                  where: 'id=?',
-                  whereArgs: [material['id']],
-                );
-              }
-
-              Navigator.pop(context);
-              load();
-            },
-          ),
-        ],
-      ),
     );
   }
 

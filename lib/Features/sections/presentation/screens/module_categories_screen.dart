@@ -58,49 +58,126 @@ class _ModuleCategoriesScreenState extends State<ModuleCategoriesScreen> {
   }
 
   Future<void> _openForm({_CategoryRow? edit}) async {
-    final nameCtl = TextEditingController(text: edit?.category.name ?? '');
+    final nameArCtl = TextEditingController(text: edit?.category.name ?? '');
+    final nameEnCtl = TextEditingController(text: edit?.category.nameEn ?? '');
+    String? validationError;
+
     final saved = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AppDialog(
-        title: Text(edit == null ? 'قائمة فرعية جديدة'.tr() : 'تعديل القائمة'),
-        content: TextField(
-          controller: nameCtl,
-          autofocus: true,
-          decoration:  InputDecoration(
-            labelText: 'اسم القائمة (زي: سخن)'.tr(),
-            border: OutlineInputBorder(),
+      builder:
+          (dialogContext) => StatefulBuilder(
+            builder:
+                (dialogContext, setDialogState) => AppDialog(
+                  title: Text(
+                    edit == null
+                        ? 'قائمة فرعية جديدة'.tr()
+                        : 'تعديل القائمة'.tr(),
+                  ),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: nameArCtl,
+                          autofocus: true,
+                          textDirection: TextDirection.rtl,
+                          onChanged: (_) {
+                            if (validationError != null) {
+                              setDialogState(() => validationError = null);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'الاسم بالعربي'.tr(),
+                            hintText: 'مثال: شاي'.tr(),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: nameEnCtl,
+                          textDirection: TextDirection.ltr,
+                          onChanged: (_) {
+                            if (validationError != null) {
+                              setDialogState(() => validationError = null);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'الاسم بالإنجليزي'.tr(),
+                            hintText: 'e.g. Tea',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'اسم واحد على الأقل مطلوب — العربي أو الإنجليزي.'
+                              .tr(),
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                        if (validationError != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            validationError!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final ar = nameArCtl.text.trim();
+                        final en = nameEnCtl.text.trim();
+                        if (ar.isEmpty && en.isEmpty) {
+                          setDialogState(
+                            () =>
+                                validationError =
+                                    'اكتب اسم القائمة بالعربي أو الإنجليزي'
+                                        .tr(),
+                          );
+                          return;
+                        }
+                        Navigator.pop(dialogContext, true);
+                      },
+                      child: Text('حفظ'.tr()),
+                    ),
+                  ],
+                ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child:  Text('إلغاء'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child:  Text('حفظ'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (saved != true) return;
-    final name = nameCtl.text.trim();
-    if (name.isEmpty) {
-      _snack('اكتب اسم القائمة'.tr(), error: true);
+    final nameAr = nameArCtl.text.trim();
+    final nameEn = nameEnCtl.text.trim();
+    if (nameAr.isEmpty && nameEn.isEmpty) {
+      _snack('اكتب اسم القائمة بالعربي أو الإنجليزي'.tr(), error: true);
       return;
     }
 
     if (edit == null) {
       await DBHelper.insertCategory(
         moduleId: widget.module.id!,
-        name: name,
+        name: nameAr,
+        nameEn: nameEn,
       );
       _snack('تم إضافة القائمة ✅'.tr());
     } else {
       await DBHelper.updateCategory({
         'id': edit.category.id,
-        'name': name,
+        'name': nameAr,
+        'name_en': nameEn,
       });
       _snack('تم التعديل ✅'.tr());
     }
@@ -118,27 +195,36 @@ class _ModuleCategoriesScreenState extends State<ModuleCategoriesScreen> {
   Future<void> _delete(_CategoryRow row) async {
     if (row.drinks > 0) {
       _snack(
-        ('مش هينفع تحذف «{v1}» — فيه {v2} منتج مسجل عليها. '.tr({'v1': row.category.name, 'v2': row.drinks}) + 'انقل المنتجات لقائمة تانية الأول، أو اقفلها من الزرار.'.tr()),
+        ('مش هينفع تحذف «{v1}» — فيه {v2} منتج مسجل عليها. '.tr({
+              'v1': row.category.displayName,
+              'v2': row.drinks,
+            }) +
+            'انقل المنتجات لقائمة تانية الأول، أو اقفلها من الزرار.'.tr()),
         error: true,
       );
       return;
     }
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AppDialog(
-        title:  Text('حذف القائمة؟'.tr()),
-        content: Text('هتتحذف قائمة «{v1}» نهائيًا.'.tr({'v1': row.category.name})),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (_) => AppDialog(
+            title: Text('حذف القائمة؟'.tr()),
+            content: Text(
+              'هتتحذف قائمة «{v1}» نهائيًا.'.tr({
+                'v1': row.category.displayName,
+              }),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('حذف'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child:  Text('حذف'.tr()),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
     await DBHelper.deleteCategory(row.category.id!);
@@ -153,9 +239,7 @@ class _ModuleCategoriesScreenState extends State<ModuleCategoriesScreen> {
     final tmp = list[index];
     list[index] = list[newIndex];
     list[newIndex] = tmp;
-    await DBHelper.reorderCategories(
-      list.map((r) => r.category.id!).toList(),
-    );
+    await DBHelper.reorderCategories(list.map((r) => r.category.id!).toList());
     _load();
   }
 

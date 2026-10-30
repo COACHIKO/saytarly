@@ -2,7 +2,6 @@ part of '../SaleReport.dart';
 
 /// جسم تقرير المبيعات — نسخة الموبايل (زي ما كانت بالظبط).
 extension _SalesReportScreenMobileBody on _SalesReportScreenState {
-
   Widget _buildMobileBody(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
@@ -17,15 +16,14 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
       cs.primary.withOpacity(0.06),
       surface,
     ); // فاتحة شوية عن السرفس
-    final Color border = cs.onSurface == Colors.white.withOpacity(0.01)
-        ? Colors.black
-        : cs.onSurface.withOpacity(0.1);
-    final Color textPrimary = cs.onSurface == Colors.white70
-        ? Colors.white
-        : cs.onSurface;
-    final Color textSecondary = cs.onSurface == Colors.white70
-        ? Colors.white
-        : cs.onSurface;
+    final Color border =
+        cs.onSurface == Colors.white.withOpacity(0.01)
+            ? Colors.black
+            : cs.onSurface.withOpacity(0.1);
+    final Color textPrimary =
+        cs.onSurface == Colors.white70 ? Colors.white : cs.onSurface;
+    final Color textSecondary =
+        cs.onSurface == Colors.white70 ? Colors.white : cs.onSurface;
 
     final totalRevenue = _report.fold<double>(
       0,
@@ -41,9 +39,8 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
     );
     final netCollected =
         totalRevenue - totalDiscount - totalDebt + _debtCollectedInPeriod;
-    final soldItemsCount = _report
-        .where((d) => (d['sold_qty'] as double) > 0)
-        .length;
+    final soldItemsCount =
+        _report.where((d) => (d['sold_qty'] as double) > 0).length;
     final totalDebtCollected = _report.fold<double>(
       0,
       (sum, item) => sum + (item['debt_collected_revenue'] as double),
@@ -54,7 +51,7 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
         title: Text(widget.customTitle ?? 'تقرير المبيعات'.tr()), // 🆕
         actions: [
           IconButton(
-            icon:  Icon(Icons.picture_as_pdf_outlined),
+            icon: Icon(Icons.picture_as_pdf_outlined),
             tooltip: 'طباعة PDF'.tr(),
             onPressed: _isLoading ? null : _printReportPdf,
           ),
@@ -62,16 +59,17 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
           // لأنه بيمسح الفاتورة كلها مش الصنف بس
           if (widget.categoryFilter == null && widget.moduleId == null)
             IconButton(
-              icon: _isClearing
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.red,
-                      ),
-                    )
-                  : const Icon(Icons.delete_forever, color: Colors.red),
+              icon:
+                  _isClearing
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.red,
+                        ),
+                      )
+                      : const Icon(Icons.delete_forever, color: Colors.red),
               tooltip: 'مسح مبيعات الفترة المعروضة'.tr(),
               onPressed: _isClearing ? null : _clearPeriodSales,
             ),
@@ -236,7 +234,9 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: Text(
-                        '{soldItemsCount} صنف'.tr({'soldItemsCount': soldItemsCount}),
+                        '{soldItemsCount} صنف'.tr({
+                          'soldItemsCount': soldItemsCount,
+                        }),
                         style: TextStyle(
                           color: accent,
                           fontWeight: FontWeight.bold,
@@ -354,7 +354,7 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
     Color textSecondary,
     Color bg,
   ) {
-    final options =  [
+    final options = [
       ('day', 'يومي'.tr()),
       ('month', 'شهري'.tr()),
       ('shift', 'شيفت'.tr()),
@@ -368,33 +368,35 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
         borderRadius: BorderRadius.circular(9),
       ),
       child: Row(
-        children: options.map((o) {
-          final selected = _periodType == o.$1;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                _refresh(() => _periodType = o.$1);
-                _loadReport();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: selected ? accent : Colors.transparent,
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: Text(
-                  o.$2,
-                  style: TextStyle(
-                    color: selected ? bg : textSecondary,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 12,
+        children:
+            options.map((o) {
+              final selected = _periodType == o.$1;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _refresh(() => _periodType = o.$1);
+                    _loadReport();
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: selected ? accent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: Text(
+                      o.$2,
+                      style: TextStyle(
+                        color: selected ? bg : textSecondary,
+                        fontWeight:
+                            selected ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }
@@ -484,18 +486,19 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
               value: _selectedShiftId,
               dropdownColor: surfaceAlt,
               icon: Icon(Icons.expand_more_rounded, color: accent, size: 18),
-              items: _shifts
-                  .map(
-                    (s) => DropdownMenuItem<int>(
-                      value: s['id'] as int,
-                      child: Text(
-                        _shiftLabel(s),
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12, color: textPrimary),
-                      ),
-                    ),
-                  )
-                  .toList(),
+              items:
+                  _shifts
+                      .map(
+                        (s) => DropdownMenuItem<int>(
+                          value: s['id'] as int,
+                          child: Text(
+                            _shiftLabel(s),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12, color: textPrimary),
+                          ),
+                        ),
+                      )
+                      .toList(),
               onChanged: (v) {
                 _refresh(() => _selectedShiftId = v);
                 _loadReport();
@@ -627,9 +630,10 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
     final discountAmount = item['discount_amount'] as double;
     final debtRevenue = item['debt_revenue'] as double;
     final debtCollected = item['debt_collected_revenue'] as double;
-    final unit = item['is_weighted'] as bool
-        ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم')
-        : '';
+    final unit =
+        item['is_weighted'] as bool
+            ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم'.tr())
+            : '';
     final lowStock = remaining <= 5;
     final hasExtra =
         discountAmount > 0 || debtRevenue > 0.01 || debtCollected > 0.01;
@@ -706,10 +710,15 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
                       _SalesReportScreenState.discountColor,
                     ),
                   if (debtRevenue > 0.01)
-                    _tag('آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}), debtColor),
+                    _tag(
+                      'آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}),
+                      debtColor,
+                    ),
                   if (debtCollected > 0.01)
                     _tag(
-                      'اتحصّل {v1}'.tr({'v1': debtCollected.toStringAsFixed(2)}),
+                      'اتحصّل {v1}'.tr({
+                        'v1': debtCollected.toStringAsFixed(2),
+                      }),
                       debtColor.withOpacity(0.7),
                     ),
                 ],
@@ -739,4 +748,3 @@ extension _SalesReportScreenMobileBody on _SalesReportScreenState {
     );
   }
 }
-

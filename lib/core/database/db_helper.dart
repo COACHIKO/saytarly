@@ -285,6 +285,7 @@ inventory_date TEXT
       CREATE TABLE drinks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        name_en TEXT DEFAULT '',
         price REAL NOT NULL,
          temperature TEXT,
         qty INTEGER DEFAULT 0
@@ -533,7 +534,6 @@ shift_id INTEGER
 
     // seed: إضافة كاش الإدمن
     await db.insert('customers', {'name': 'AdminCash', 'balance': 0});
-
   }
 
   static Future<int> addStaffDueSalary(Map<String, dynamic> data) async {
@@ -612,13 +612,19 @@ shift_id INTEGER
   ''');
 
     try {
-      await db.execute('ALTER TABLE remote_activation ADD COLUMN license_type TEXT DEFAULT \'lifetime\'');
+      await db.execute(
+        'ALTER TABLE remote_activation ADD COLUMN license_type TEXT DEFAULT \'lifetime\'',
+      );
     } catch (_) {}
     try {
-      await db.execute('ALTER TABLE remote_activation ADD COLUMN expires_at TEXT');
+      await db.execute(
+        'ALTER TABLE remote_activation ADD COLUMN expires_at TEXT',
+      );
     } catch (_) {}
     try {
-      await db.execute('ALTER TABLE remote_activation ADD COLUMN activation_code TEXT');
+      await db.execute(
+        'ALTER TABLE remote_activation ADD COLUMN activation_code TEXT',
+      );
     } catch (_) {}
   }
 
@@ -720,12 +726,14 @@ shift_id INTEGER
       whereArgs: [invoiceId],
       limit: 1,
     );
-    final deviceCost = invRow.isNotEmpty
-        ? ((invRow.first['device_cost'] as num?)?.toDouble() ?? 0.0)
-        : 0.0;
-    final discount = invRow.isNotEmpty
-        ? ((invRow.first['discount'] as num?)?.toDouble() ?? 0.0)
-        : 0.0;
+    final deviceCost =
+        invRow.isNotEmpty
+            ? ((invRow.first['device_cost'] as num?)?.toDouble() ?? 0.0)
+            : 0.0;
+    final discount =
+        invRow.isNotEmpty
+            ? ((invRow.first['discount'] as num?)?.toDouble() ?? 0.0)
+            : 0.0;
 
     final totalItems = drinksCost + cigaretteCost + shishaCost + productsCost;
     final computedTotal = (deviceCost + totalItems - discount).clamp(
@@ -811,8 +819,12 @@ shift_id INTEGER
         (tableInfo.isNotEmpty ? (tableInfo.first['sql'] as String? ?? '') : '')
             .toLowerCase();
 
-    final needsRebuild = !['superadmin', 'cashier', 'waiter']
-        .every((r) => createSql.contains("'$r'"));
+    final needsRebuild =
+        ![
+          'superadmin',
+          'cashier',
+          'waiter',
+        ].every((r) => createSql.contains("'$r'"));
 
     if (needsRebuild) {
       // إعادة بناء الجدول لأن SQLite مش بتسمح بتعديل الـ CHECK
@@ -830,11 +842,12 @@ shift_id INTEGER
           )
         ''');
         // staff من غير مشرف كان هو الكاشير، ومع مشرف بقى موظف طلبات
-        final staffElse = hasSupervisor
-            ? "CASE WHEN role = 'staff' THEN"
-                " CASE WHEN supervisor_id IS NOT NULL THEN 'waiter' ELSE 'cashier' END"
-                " ELSE 'cashier' END"
-            : "'cashier'";
+        final staffElse =
+            hasSupervisor
+                ? "CASE WHEN role = 'staff' THEN"
+                    " CASE WHEN supervisor_id IS NOT NULL THEN 'waiter' ELSE 'cashier' END"
+                    " ELSE 'cashier' END"
+                : "'cashier'";
         await txn.execute('''
           INSERT INTO users_new (id, username, password, role${hasSupervisor ? ', supervisor_id' : ''})
           SELECT id, username, password,
@@ -916,6 +929,15 @@ shift_id INTEGER
     'shisha': 'شيشة',
   };
 
+  static const Map<String, String> kLegacyTempLabelsEn = {
+    'hot': 'Hot',
+    'cold': 'Cold',
+    'normal': 'Soft drinks',
+    'prodect': 'Products',
+    'cigarette': 'Cigarettes',
+    'shisha': 'Hookah',
+  };
+
   /// ينشئ جداول الأقسام والقوائم الفرعية، ويربط البيانات القديمة بقسم «المشروبات»
   static Future<void> ensureAppModules() async {
     final db = await database;
@@ -924,6 +946,7 @@ shift_id INTEGER
       CREATE TABLE IF NOT EXISTS app_modules (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        name_en TEXT DEFAULT '',
         icon TEXT DEFAULT 'category',
         color INTEGER DEFAULT 4283215696,
         sort_order INTEGER DEFAULT 0,
@@ -932,16 +955,37 @@ shift_id INTEGER
       )
     ''');
 
+    // Upgrade existing databases created before bilingual section names.
+    final moduleCols = await db.rawQuery('PRAGMA table_info(app_modules)');
+    if (!moduleCols.any((c) => c['name'] == 'name_en')) {
+      await db.execute(
+        "ALTER TABLE app_modules ADD COLUMN name_en TEXT DEFAULT ''",
+      );
+      print('✅ Added column name_en to app_modules');
+    }
+
     await db.execute('''
       CREATE TABLE IF NOT EXISTS app_module_categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         module_id INTEGER NOT NULL,
         name TEXT NOT NULL,
+        name_en TEXT DEFAULT '',
         key TEXT NOT NULL,
         sort_order INTEGER DEFAULT 0,
         is_enabled INTEGER DEFAULT 1
       )
     ''');
+
+    // Upgrade existing databases created before bilingual submenu names.
+    final categoryCols = await db.rawQuery(
+      'PRAGMA table_info(app_module_categories)',
+    );
+    if (!categoryCols.any((c) => c['name'] == 'name_en')) {
+      await db.execute(
+        "ALTER TABLE app_module_categories ADD COLUMN name_en TEXT DEFAULT ''",
+      );
+      print('✅ Added column name_en to app_module_categories');
+    }
 
     await db.execute(
       'CREATE UNIQUE INDEX IF NOT EXISTS idx_module_categories_key ON app_module_categories(module_id, key)',
@@ -953,10 +997,16 @@ shift_id INTEGER
       await db.execute('ALTER TABLE drinks ADD COLUMN module_id INTEGER');
       print('✅ Added column module_id to drinks');
     }
+    if (!drinkCols.any((c) => c['name'] == 'name_en')) {
+      await db.execute("ALTER TABLE drinks ADD COLUMN name_en TEXT DEFAULT ''");
+      print('✅ Added column name_en to drinks');
+    }
 
     final matCols = await db.rawQuery('PRAGMA table_info(raw_materials)');
     if (!matCols.any((c) => c['name'] == 'module_id')) {
-      await db.execute('ALTER TABLE raw_materials ADD COLUMN module_id INTEGER');
+      await db.execute(
+        'ALTER TABLE raw_materials ADD COLUMN module_id INTEGER',
+      );
       print('✅ Added column module_id to raw_materials');
     }
 
@@ -969,9 +1019,7 @@ shift_id INTEGER
 
     if (modulesCount == 0) {
       final drinksCount =
-          _firstIntOrNull(
-            await db.rawQuery('SELECT COUNT(*) FROM drinks'),
-          ) ??
+          _firstIntOrNull(await db.rawQuery('SELECT COUNT(*) FROM drinks')) ??
           0;
       final materialsCount =
           _firstIntOrNull(
@@ -979,9 +1027,7 @@ shift_id INTEGER
           ) ??
           0;
       final consolesCount =
-          _firstIntOrNull(
-            await db.rawQuery('SELECT COUNT(*) FROM consoles'),
-          ) ??
+          _firstIntOrNull(await db.rawQuery('SELECT COUNT(*) FROM consoles')) ??
           0;
       final legacyUsers =
           _firstIntOrNull(
@@ -993,12 +1039,12 @@ shift_id INTEGER
 
       // قسم «المشروبات» بيتعمل بس لو فيه منتجات أو خامات فعلية تتلم عليه
       final hasProducts = drinksCount > 0 || materialsCount > 0;
-      final isLegacyUsage =
-          hasProducts || consolesCount > 0 || legacyUsers > 0;
+      final isLegacyUsage = hasProducts || consolesCount > 0 || legacyUsers > 0;
 
       if (hasProducts) {
         final moduleId = await db.insert('app_modules', {
           'name': 'المشروبات',
+          'name_en': 'Drinks',
           'icon': 'local_drink',
           'color': 0xFF14B8A6,
           'sort_order': 0,
@@ -1029,6 +1075,7 @@ shift_id INTEGER
           await db.insert('app_module_categories', {
             'module_id': moduleId,
             'name': kLegacyTempLabels[t] ?? t,
+            'name_en': kLegacyTempLabelsEn[t] ?? '',
             'key': t,
             'sort_order': order++,
             'is_enabled': 1,
@@ -1077,6 +1124,7 @@ shift_id INTEGER
           ) ??
           await db.insert('app_modules', {
             'name': 'المشروبات',
+            'name_en': 'Drinks',
             'icon': 'local_drink',
             'color': 0xFF14B8A6,
             'sort_order': 0,
@@ -1119,6 +1167,7 @@ shift_id INTEGER
         0;
     return db.insert('app_modules', {
       'name': module['name'],
+      'name_en': module['name_en'] ?? '',
       'icon': module['icon'] ?? 'category',
       'color': module['color'] ?? 0xFF14B8A6,
       'sort_order': module['sort_order'] ?? nextOrder,
@@ -1140,10 +1189,9 @@ shift_id INTEGER
   static Future<int> countModuleDrinks(int moduleId) async {
     final db = await database;
     return _firstIntOrNull(
-          await db.rawQuery(
-            'SELECT COUNT(*) FROM drinks WHERE module_id = ?',
-            [moduleId],
-          ),
+          await db.rawQuery('SELECT COUNT(*) FROM drinks WHERE module_id = ?', [
+            moduleId,
+          ]),
         ) ??
         0;
   }
@@ -1199,6 +1247,7 @@ shift_id INTEGER
   static Future<int> insertCategory({
     required int moduleId,
     required String name,
+    String nameEn = '',
     String? key,
   }) async {
     final db = await database;
@@ -1214,6 +1263,7 @@ shift_id INTEGER
     return db.insert('app_module_categories', {
       'module_id': moduleId,
       'name': name,
+      'name_en': nameEn,
       'key': k,
       'sort_order': nextOrder,
       'is_enabled': 1,
@@ -1243,11 +1293,7 @@ shift_id INTEGER
 
   static Future<void> deleteCategory(int id) async {
     final db = await database;
-    await db.delete(
-      'app_module_categories',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('app_module_categories', where: 'id = ?', whereArgs: [id]);
   }
 
   static Future<void> reorderCategories(List<int> orderedIds) async {
@@ -1414,11 +1460,8 @@ shift_id INTEGER
   static Future<int> checkOut(int shiftId, String checkOutTime) async {
     final db = await database;
     // احسب الساعات
-    final shift = (await db.query(
-      'shifts',
-      where: 'id=?',
-      whereArgs: [shiftId],
-    )).first;
+    final shift =
+        (await db.query('shifts', where: 'id=?', whereArgs: [shiftId])).first;
     final checkIn = DateTime.parse(shift['check_in'].toString());
     final checkOut = DateTime.parse(checkOutTime);
     final totalHours = checkOut.difference(checkIn).inMinutes / 60.0;
@@ -1709,9 +1752,10 @@ shift_id INTEGER
 
     // ✅ لو سعر ثابت → تجاهل حساب الوقت
     final bool isFixed = invoice['is_fixed_price'] == 1;
-    final double finalDeviceCost = isFixed
-        ? (invoice['fixed_price'] as num?)?.toDouble() ?? 0.0
-        : deviceCost;
+    final double finalDeviceCost =
+        isFixed
+            ? (invoice['fixed_price'] as num?)?.toDouble() ?? 0.0
+            : deviceCost;
 
     final total = (finalDeviceCost + drinksCost - discount).clamp(
       0,
@@ -2323,12 +2367,15 @@ shift_id INTEGER
 
     // 🆕 ربط تلقائي لأي فواتير في نطاق هذا الشيفت كان shift_id فيها فارغاً
     try {
-      final shiftRows = await db.rawQuery('''
+      final shiftRows = await db.rawQuery(
+        '''
         SELECT s.*, u.username AS staff_name
         FROM shifts s
         LEFT JOIN users u ON u.id = s.user_id
         WHERE s.id = ?
-      ''', [shiftId]);
+      ''',
+        [shiftId],
+      );
 
       if (shiftRows.isNotEmpty) {
         final staffName = shiftRows.first['staff_name'] as String?;
@@ -2337,22 +2384,28 @@ shift_id INTEGER
 
         if (staffName != null && checkIn != null) {
           if (checkOut != null) {
-            await db.rawUpdate('''
+            await db.rawUpdate(
+              '''
               UPDATE invoices
               SET shift_id = ?
               WHERE (shift_id IS NULL OR shift_id = 0)
                 AND staff_name = ?
                 AND start_time >= ?
                 AND start_time <= ?
-            ''', [shiftId, staffName, checkIn, checkOut]);
+            ''',
+              [shiftId, staffName, checkIn, checkOut],
+            );
           } else {
-            await db.rawUpdate('''
+            await db.rawUpdate(
+              '''
               UPDATE invoices
               SET shift_id = ?
               WHERE (shift_id IS NULL OR shift_id = 0)
                 AND staff_name = ?
                 AND start_time >= ?
-            ''', [shiftId, staffName, checkIn]);
+            ''',
+              [shiftId, staffName, checkIn],
+            );
           }
         }
       }
@@ -2571,7 +2624,8 @@ shift_id INTEGER
     final db = await database;
     return await db.query(
       'users',
-      where: "role = 'waiter' AND (supervisor_id IS NULL OR supervisor_id != ?)",
+      where:
+          "role = 'waiter' AND (supervisor_id IS NULL OR supervisor_id != ?)",
       whereArgs: [supervisorId],
       orderBy: 'username',
     );
@@ -2967,9 +3021,10 @@ shift_id INTEGER
       }
 
       // ✅ تحويل القيمة الرقمية لتفادي null أو نوع غير رقمي
-      final deviceCost = (invoice['device_cost'] is num)
-          ? invoice['device_cost'] as num
-          : num.tryParse(invoice['device_cost']?.toString() ?? '0') ?? 0;
+      final deviceCost =
+          (invoice['device_cost'] is num)
+              ? invoice['device_cost'] as num
+              : num.tryParse(invoice['device_cost']?.toString() ?? '0') ?? 0;
 
       mutableInvoice['session'] = {
         'console_name': invoice['console_name'] ?? 'غير معروف'.tr(),
@@ -3714,16 +3769,17 @@ FROM transactions
     await _recalculateDebtTotal(debtId);
     await _syncInvoiceFromDebt(debtId); // 🆕
     // 🆕 بعد نجاح التحديث، سجّل التغيير
-    final debtRow = (await db.query(
-      'debts',
-      where: 'id = ?',
-      whereArgs: [debtId],
-    )).first;
+    final debtRow =
+        (await db.query('debts', where: 'id = ?', whereArgs: [debtId])).first;
     await logInvoiceChange(
       invoiceId: debtRow['invoice_id'] as int?,
       customerName: (debtRow['customer_name'] ?? '').toString(),
       action: 'تعديل كمية'.tr(),
-      details: '{itemName}: من {oldQty} إلى {newQty}'.tr({'itemName': itemName, 'oldQty': oldQty, 'newQty': newQty}),
+      details: '{itemName}: من {oldQty} إلى {newQty}'.tr({
+        'itemName': itemName,
+        'oldQty': oldQty,
+        'newQty': newQty,
+      }),
       changedBy: changedBy,
     );
     return true;
@@ -3762,12 +3818,12 @@ FROM transactions
       where: 'id = ?',
       whereArgs: [debtId],
     );
-    final invoiceId = debtRows.isNotEmpty
-        ? debtRows.first['invoice_id'] as int?
-        : null;
-    final customerName = debtRows.isNotEmpty
-        ? (debtRows.first['customer_name'] ?? '').toString()
-        : '';
+    final invoiceId =
+        debtRows.isNotEmpty ? debtRows.first['invoice_id'] as int? : null;
+    final customerName =
+        debtRows.isNotEmpty
+            ? (debtRows.first['customer_name'] ?? '').toString()
+            : '';
 
     await logInvoiceChange(
       invoiceId: invoiceId,
@@ -3810,12 +3866,12 @@ FROM transactions
       where: 'id = ?',
       whereArgs: [debtId],
     );
-    final invoiceId = debtRows.isNotEmpty
-        ? debtRows.first['invoice_id'] as int?
-        : null;
-    final customerName = debtRows.isNotEmpty
-        ? (debtRows.first['customer_name'] ?? '').toString()
-        : '';
+    final invoiceId =
+        debtRows.isNotEmpty ? debtRows.first['invoice_id'] as int? : null;
+    final customerName =
+        debtRows.isNotEmpty
+            ? (debtRows.first['customer_name'] ?? '').toString()
+            : '';
 
     await logInvoiceChange(
       invoiceId: invoiceId,
@@ -4121,9 +4177,8 @@ FROM transactions
 
       // أي رقم قريب من الصفر (زي e-13) بيتحول لصفر بالظبط
       // أي رقم تاني بيتقرب لـ 4 خانات عشرية
-      final fixed = qty.abs() < 0.0001
-          ? 0.0
-          : double.parse(qty.toStringAsFixed(4));
+      final fixed =
+          qty.abs() < 0.0001 ? 0.0 : double.parse(qty.toStringAsFixed(4));
 
       if (fixed != qty) {
         await db.update(

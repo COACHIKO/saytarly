@@ -25,15 +25,18 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
     return DesktopShell(
       placeName: _placeName,
       roleLabel: 'السوبر ادمن'.tr(),
+      userName: CurrentUser.displayName,
+      userRole: 'السوبر ادمن'.tr(),
+      onLogout: _logoutToLogin,
       groups: [
         for (final entry in _groupedActions().entries)
           DesktopNavGroup(
-            title: entry.key,
+            title: entry.key.tr(),
             items: [
               for (final action in entry.value)
                 DesktopNavItem(
                   id: action['title'] as String,
-                  label: action['title'] as String,
+                  label: (action['title'] as String).tr(),
                   icon: action['icon'] as IconData,
                   onTap: action['onTap'] as VoidCallback,
                 ),
@@ -47,19 +50,14 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
         DesktopToolbarIconButton(
           icon: Icons.rocket_launch_outlined,
           tooltip: 'معالج التهيئة'.tr(),
-          onPressed: () => _push( SetupWizardScreen(fromDashboard: true)),
+          onPressed: () => _push(SetupWizardScreen(fromDashboard: true)),
         ),
         DesktopToolbarIconButton(
           icon: Icons.refresh,
           tooltip: 'تحديث البيانات'.tr(),
           onPressed: _load,
         ),
-        DesktopToolbarIconButton(
-          icon: Icons.logout,
-          tooltip: 'تسجيل خروج (تغيير دور)'.tr(),
-          onPressed: _logoutToLogin,
-        ),
-         DesktopThemeToggle(),
+        DesktopThemeToggle(),
       ],
       child: SingleChildScrollView(
         child: Column(
@@ -85,16 +83,18 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
                 ),
                 DesktopStatCard(
                   label: 'حالة التهيئة'.tr(),
-                  value: _setupCompleted ? 'مكتملة'.tr() : 'ناقصة',
-                  icon: _setupCompleted
-                      ? Icons.check_circle_outline
-                      : Icons.error_outline,
+                  value: _setupCompleted ? 'مكتملة'.tr() : 'ناقصة'.tr(),
+                  icon:
+                      _setupCompleted
+                          ? Icons.check_circle_outline
+                          : Icons.error_outline,
                   color: _setupCompleted ? palette.success : palette.warning,
-                  hint: _setupCompleted
-                      ? 'كل خطوات التهيئة خلصت'.tr()
-                      : 'لسه فيه خطوات محتاجة تكمل',
-                  onTap: () =>
-                      _push(const SetupWizardScreen(fromDashboard: true)),
+                  hint:
+                      _setupCompleted
+                          ? 'كل خطوات التهيئة خلصت'.tr()
+                          : 'لسه فيه خطوات محتاجة تكمل'.tr(),
+                  onTap:
+                      () => _push(const SetupWizardScreen(fromDashboard: true)),
                 ),
                 DesktopStatCard(
                   label: 'نوع النشاط'.tr(),
@@ -111,7 +111,7 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
             // ==================== أدوات التحكم ====================
             for (final entry in _groupedActions().entries) ...[
               DesktopSectionTitle(
-                title: entry.key,
+                title: entry.key.tr(),
                 count: entry.value.length,
               ),
               DesktopResponsiveGrid(
@@ -120,8 +120,8 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
                 children: [
                   for (final action in entry.value)
                     DesktopActionTile(
-                      title: action['title'] as String,
-                      subtitle: action['subtitle'] as String,
+                      title: (action['title'] as String).tr(),
+                      subtitle: (action['subtitle'] as String).tr(),
                       icon: action['icon'] as IconData,
                       color: action['color'] as Color,
                       onTap: action['onTap'] as VoidCallback,
@@ -132,19 +132,15 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
             ],
 
             const SizedBox(height: DesktopTokens.gapXs),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.phone, size: 14, color: palette.textMuted),
-                const SizedBox(width: DesktopTokens.gapXs),
-                Text(
-                  'Eng: Waled Mabrok — 01032548232',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: palette.textMuted,
-                    fontWeight: FontWeight.w600,
-                  ),
+            Center(
+              child: Text(
+                'SAYTARLY • Restaurant & Café Management',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: palette.textMuted.withValues(alpha: 0.7),
+                  fontSize: 9.5,
+                  letterSpacing: 0.3,
                 ),
-              ],
+              ),
             ),
           ],
         ),

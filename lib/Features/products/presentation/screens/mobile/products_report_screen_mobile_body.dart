@@ -2,7 +2,6 @@ part of '../ProductsReportScreen.dart';
 
 /// جسم تقرير المنتجات — نسخة الموبايل (زي ما كانت بالظبط).
 extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
-
   Widget _buildMobileBody(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
@@ -16,15 +15,14 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
       cs.primary.withOpacity(0.06),
       surface,
     );
-    final Color border = cs.onSurface == Colors.white.withOpacity(0.01)
-        ? Colors.black
-        : cs.onSurface.withOpacity(0.1);
-    final Color textPrimary = cs.onSurface == Colors.white70
-        ? Colors.white
-        : cs.onSurface;
-    final Color textSecondary = cs.onSurface == Colors.white70
-        ? Colors.white
-        : cs.onSurface;
+    final Color border =
+        cs.onSurface == Colors.white.withOpacity(0.01)
+            ? Colors.black
+            : cs.onSurface.withOpacity(0.1);
+    final Color textPrimary =
+        cs.onSurface == Colors.white70 ? Colors.white : cs.onSurface;
+    final Color textSecondary =
+        cs.onSurface == Colors.white70 ? Colors.white : cs.onSurface;
 
     final totalRevenue = _report.fold<double>(
       0,
@@ -40,9 +38,8 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
     );
     final netCollected =
         totalRevenue - totalDiscount - totalDebt + _debtCollectedInPeriod;
-    final soldItemsCount = _report
-        .where((d) => (d['sold_qty'] as double) > 0)
-        .length;
+    final soldItemsCount =
+        _report.where((d) => (d['sold_qty'] as double) > 0).length;
     final totalDebtCollected = _report.fold<double>(
       0,
       (sum, item) => sum + (item['debt_collected_revenue'] as double),
@@ -51,7 +48,7 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        title:  Text('تقرير المنتجات'.tr()),
+        title: Text('تقرير المنتجات'.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf_outlined),
@@ -59,16 +56,17 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
             onPressed: _isLoading ? null : _printReportPdf,
           ),
           IconButton(
-            icon: _isClearing
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.red,
-                    ),
-                  )
-                : const Icon(Icons.delete_forever, color: Colors.red),
+            icon:
+                _isClearing
+                    ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.red,
+                      ),
+                    )
+                    : const Icon(Icons.delete_forever, color: Colors.red),
             tooltip: 'مسح مبيعات الفترة المعروضة'.tr(),
             onPressed: _isClearing ? null : _clearPeriodSales,
           ),
@@ -81,21 +79,21 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
               children: [
                 const Icon(Icons.category_outlined, size: 20),
                 const SizedBox(width: 8),
-                 Text('القسم:'.tr()),
+                Text('القسم:'.tr()),
                 const SizedBox(width: 10),
                 Expanded(
                   child: DropdownButton<int?>(
                     isExpanded: true,
                     value: _selectedModuleId,
                     items: [
-                       DropdownMenuItem<int?>(
+                      DropdownMenuItem<int?>(
                         value: null,
                         child: Text('كل الأقسام'.tr()),
                       ),
                       for (final m in _modules)
                         DropdownMenuItem<int?>(
                           value: m['id'] as int,
-                          child: Text(m['name'] as String? ?? ''),
+                          child: Text(AppModule.displayNameFromMap(m)),
                         ),
                     ],
                     onChanged: (v) {
@@ -263,7 +261,9 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: Text(
-                        '{soldItemsCount} صنف'.tr({'soldItemsCount': soldItemsCount}),
+                        '{soldItemsCount} صنف'.tr({
+                          'soldItemsCount': soldItemsCount,
+                        }),
                         style: TextStyle(
                           color: accent,
                           fontWeight: FontWeight.bold,
@@ -375,7 +375,7 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
     Color textSecondary,
     Color bg,
   ) {
-    final options =  [
+    final options = [
       ('day', 'يومي'.tr()),
       ('month', 'شهري'.tr()),
       ('shift', 'شيفت'.tr()),
@@ -389,33 +389,35 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
         borderRadius: BorderRadius.circular(9),
       ),
       child: Row(
-        children: options.map((o) {
-          final selected = _periodType == o.$1;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                _refresh(() => _periodType = o.$1);
-                _loadReport();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: selected ? accent : Colors.transparent,
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: Text(
-                  o.$2,
-                  style: TextStyle(
-                    color: selected ? bg : textSecondary,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 12,
+        children:
+            options.map((o) {
+              final selected = _periodType == o.$1;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _refresh(() => _periodType = o.$1);
+                    _loadReport();
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: selected ? accent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: Text(
+                      o.$2,
+                      style: TextStyle(
+                        color: selected ? bg : textSecondary,
+                        fontWeight:
+                            selected ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }
@@ -505,18 +507,19 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
               value: _selectedShiftId,
               dropdownColor: surfaceAlt,
               icon: Icon(Icons.expand_more_rounded, color: accent, size: 18),
-              items: _shifts
-                  .map(
-                    (s) => DropdownMenuItem<int>(
-                      value: s['id'] as int,
-                      child: Text(
-                        _shiftLabel(s),
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12, color: textPrimary),
-                      ),
-                    ),
-                  )
-                  .toList(),
+              items:
+                  _shifts
+                      .map(
+                        (s) => DropdownMenuItem<int>(
+                          value: s['id'] as int,
+                          child: Text(
+                            _shiftLabel(s),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12, color: textPrimary),
+                          ),
+                        ),
+                      )
+                      .toList(),
               onChanged: (v) {
                 _refresh(() => _selectedShiftId = v);
                 _loadReport();
@@ -644,9 +647,10 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
     final discountAmount = item['discount_amount'] as double;
     final debtRevenue = item['debt_revenue'] as double;
     final debtCollected = item['debt_collected_revenue'] as double;
-    final unit = item['is_weighted'] as bool
-        ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم')
-        : '';
+    final unit =
+        item['is_weighted'] as bool
+            ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم'.tr())
+            : '';
     final lowStock = remaining <= 5;
     final hasExtra =
         discountAmount > 0 || debtRevenue > 0.01 || debtCollected > 0.01;
@@ -723,10 +727,15 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
                       _ProductsReportScreenState.discountColor,
                     ),
                   if (debtRevenue > 0.01)
-                    _tag('آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}), debtColor),
+                    _tag(
+                      'آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}),
+                      debtColor,
+                    ),
                   if (debtCollected > 0.01)
                     _tag(
-                      'اتحصّل {v1}'.tr({'v1': debtCollected.toStringAsFixed(2)}),
+                      'اتحصّل {v1}'.tr({
+                        'v1': debtCollected.toStringAsFixed(2),
+                      }),
                       debtColor.withOpacity(0.7),
                     ),
                 ],
@@ -756,4 +765,3 @@ extension _ProductsReportScreenMobileBody on _ProductsReportScreenState {
     );
   }
 }
-

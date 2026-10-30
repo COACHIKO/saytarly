@@ -12,7 +12,9 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
 
     return DesktopPageScaffold(
       title: 'أقسام المنتجات'.tr(),
-      subtitle: ('كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة + تقرير '.tr() + '• الخامات مخزون مشترك لكله'.tr()),
+      subtitle:
+          ('كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة + تقرير '.tr() +
+              '• الخامات مخزون مشترك لكله'.tr()),
       actions: [
         DesktopButton.primary(
           label: 'قسم جديد'.tr(),
@@ -21,68 +23,71 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
         ),
       ],
       scrollable: false,
-      child: viewModel.state.loading
-          ? const Center(child: CircularProgressIndicator())
-          : rows.isEmpty
+      child:
+          viewModel.state.loading
+              ? const Center(child: CircularProgressIndicator())
+              : rows.isEmpty
               ? DesktopEmptyState(
-                  icon: Icons.category_outlined,
-                  title: 'لسه مفيش أقسام'.tr(),
-                  message: ('ابدأ اعمل قسم زي «مشروبات» أو «ماكولات» — '.tr() + 'وهيطلع له تلقائي في لوحة الأدمن: إدارة + تقرير.'.tr()),
-                  action: DesktopButton.primary(
-                    label: 'قسم جديد'.tr(),
-                    icon: Icons.add,
-                    onPressed: () => _openForm(context),
-                  ),
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ==================== مؤشرات سريعة ====================
-                      DesktopResponsiveGrid(
-                        minTileWidth: 240,
-                        children: [
-                          DesktopStatCard(
-                            label: 'إجمالي الأقسام'.tr(),
-                            value: '${rows.length}',
-                            icon: Icons.category_outlined,
-                            color: palette.accent,
-                          ),
-                          DesktopStatCard(
-                            label: 'أقسام مفعّلة'.tr(),
-                            value:
-                                '${rows.where((r) => r.module.isEnabled).length}',
-                            icon: Icons.toggle_on_outlined,
-                            color: palette.success,
-                          ),
-                          DesktopStatCard(
-                            label: 'إجمالي المنتجات'.tr(),
-                            value:
-                                '${rows.fold<int>(0, (sum, r) => sum + r.drinks)}',
-                            icon: Icons.local_cafe_outlined,
-                            color: palette.info,
-                            hint: 'عبر كل الأقسام'.tr(),
-                          ),
-                        ],
-                      ),
-                       SizedBox(height: DesktopTokens.gapLg),
-
-                      // ==================== ملاحظة إرشادية ====================
-                      _windowsHintCard(context, palette),
-                       SizedBox(height: DesktopTokens.gapLg),
-
-                      DesktopSectionTitle(
-                        title: 'الأقسام'.tr(),
-                        count: rows.length,
-                      ),
-                      const SizedBox(height: DesktopTokens.gapXs),
-
-                      // ==================== قائمة الأقسام ====================
-                      for (var i = 0; i < rows.length; i++)
-                        _windowsModuleRow(context, viewModel, rows[i], i),
-                    ],
-                  ),
+                icon: Icons.category_outlined,
+                title: 'لسه مفيش أقسام'.tr(),
+                message:
+                    ('ابدأ اعمل قسم زي «مشروبات» أو «ماكولات» — '.tr() +
+                        'وهيطلع له تلقائي في لوحة الأدمن: إدارة + تقرير.'.tr()),
+                action: DesktopButton.primary(
+                  label: 'قسم جديد'.tr(),
+                  icon: Icons.add,
+                  onPressed: () => _openForm(context),
                 ),
+              )
+              : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ==================== مؤشرات سريعة ====================
+                    DesktopResponsiveGrid(
+                      minTileWidth: 240,
+                      children: [
+                        DesktopStatCard(
+                          label: 'إجمالي الأقسام'.tr(),
+                          value: '${rows.length}',
+                          icon: Icons.category_outlined,
+                          color: palette.accent,
+                        ),
+                        DesktopStatCard(
+                          label: 'أقسام مفعّلة'.tr(),
+                          value:
+                              '${rows.where((r) => r.module.isEnabled).length}',
+                          icon: Icons.toggle_on_outlined,
+                          color: palette.success,
+                        ),
+                        DesktopStatCard(
+                          label: 'إجمالي المنتجات'.tr(),
+                          value:
+                              '${rows.fold<int>(0, (sum, r) => sum + r.drinks)}',
+                          icon: Icons.local_cafe_outlined,
+                          color: palette.info,
+                          hint: 'عبر كل الأقسام'.tr(),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: DesktopTokens.gapLg),
+
+                    // ==================== ملاحظة إرشادية ====================
+                    _windowsHintCard(context, palette),
+                    SizedBox(height: DesktopTokens.gapLg),
+
+                    DesktopSectionTitle(
+                      title: 'الأقسام'.tr(),
+                      count: rows.length,
+                    ),
+                    const SizedBox(height: DesktopTokens.gapXs),
+
+                    // ==================== قائمة الأقسام ====================
+                    for (var i = 0; i < rows.length; i++)
+                      _windowsModuleRow(context, viewModel, rows[i], i),
+                  ],
+                ),
+              ),
     );
   }
 
@@ -104,12 +109,15 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
           const SizedBox(width: DesktopTokens.gapSm),
           Expanded(
             child: Text(
-              ('كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة القسم + تقرير القسم. '.tr() + 'اضغط على أي قسم عشان تضيف جواه قوائم فرعية (سخن / بارد / إلخ).'.tr()),
+              ('كل قسم بيظهر له تلقائي في لوحة الأدمن: إدارة القسم + تقرير القسم. '
+                      .tr() +
+                  'اضغط على أي قسم عشان تضيف جواه قوائم فرعية (سخن / بارد / إلخ).'
+                      .tr()),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: palette.accentText,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
+                color: palette.accentText,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
             ),
           ),
         ],
@@ -162,7 +170,7 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
                     children: [
                       Flexible(
                         child: Text(
-                          m.name,
+                          m.displayName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleSmall?.copyWith(
@@ -185,7 +193,10 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '{v1} منتج • {v2} قائمة فرعية'.tr({'v1': row.drinks, 'v2': row.categories}),
+                    '{v1} منتج • {v2} قائمة فرعية'.tr({
+                      'v1': row.drinks,
+                      'v2': row.categories,
+                    }),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: palette.textMuted,
                       fontSize: 12,
@@ -194,7 +205,7 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
                 ],
               ),
             ),
-             SizedBox(width: DesktopTokens.gapSm),
+            SizedBox(width: DesktopTokens.gapSm),
             DesktopToolbarIconButton(
               icon: Icons.arrow_upward_rounded,
               tooltip: 'تحريك لفوق'.tr(),
@@ -203,9 +214,10 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
             DesktopToolbarIconButton(
               icon: Icons.arrow_downward_rounded,
               tooltip: 'تحريك لتحت'.tr(),
-              onPressed: index == rowsIndexOf(viewModel)
-                  ? null
-                  : () => viewModel.move(index, 1),
+              onPressed:
+                  index == rowsIndexOf(viewModel)
+                      ? null
+                      : () => viewModel.move(index, 1),
             ),
             const SizedBox(width: DesktopTokens.gapSm),
             Switch(
@@ -214,11 +226,7 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
             ),
             PopupMenuButton<String>(
               tooltip: 'أوامر القسم'.tr(),
-              icon: Icon(
-                Icons.more_vert,
-                size: 20,
-                color: palette.textMuted,
-              ),
+              icon: Icon(Icons.more_vert, size: 20, color: palette.textMuted),
               onSelected: (v) {
                 switch (v) {
                   case 'edit':
@@ -235,13 +243,17 @@ extension _ModulesManagerWindowsBody on _ModulesManagerView {
                     break;
                 }
               },
-              itemBuilder: (_) =>  [
-                PopupMenuItem(value: 'edit', child: Text('تعديل'.tr())),
-                PopupMenuItem(value: 'up', child: Text('تحريك لفوق'.tr())),
-                PopupMenuItem(value: 'down', child: Text('تحريك لتحت'.tr())),
-                PopupMenuDivider(),
-                PopupMenuItem(value: 'delete', child: Text('حذف'.tr())),
-              ],
+              itemBuilder:
+                  (_) => [
+                    PopupMenuItem(value: 'edit', child: Text('تعديل'.tr())),
+                    PopupMenuItem(value: 'up', child: Text('تحريك لفوق'.tr())),
+                    PopupMenuItem(
+                      value: 'down',
+                      child: Text('تحريك لتحت'.tr()),
+                    ),
+                    PopupMenuDivider(),
+                    PopupMenuItem(value: 'delete', child: Text('حذف'.tr())),
+                  ],
             ),
           ],
         ),

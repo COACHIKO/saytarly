@@ -26,13 +26,14 @@ class _ManageConsolesScreenState extends State<ManageConsolesScreen> {
   Future<void> _load() async {
     final rows = await DBHelper.getAllConsoles();
     setState(
-        () => consoles = rows.map((r) => ConsoleModel.fromMap(r)).toList());
+      () => consoles = rows.map((r) => ConsoleModel.fromMap(r)).toList(),
+    );
   }
 
   /// إعادة بناء الشاشة من ملفات الجسم المنفصلة (mobile / windows).
   void _refresh(VoidCallback fn) => setState(fn);
 
-/*
+  /*
   void _showForm({ConsoleModel? edit}) {
     final nameCtl = TextEditingController(text: edit?.name ?? '');
     final priceCtl = TextEditingController(
@@ -78,179 +79,185 @@ class _ManageConsolesScreenState extends State<ManageConsolesScreen> {
   void _showForm({ConsoleModel? edit}) {
     final nameCtl = TextEditingController(text: edit?.name ?? '');
     final priceCtl = TextEditingController(
-        text: edit != null ? edit.pricePerHour.toString() : '');
+      text: edit != null ? edit.pricePerHour.toString() : '',
+    );
     bool isFixedPrice = edit?.isFixedPrice ?? false;
     final fixedPriceCtl = TextEditingController(
-        text: edit != null ? edit.fixedPrice.toString() : '');
+      text: edit != null ? edit.fixedPrice.toString() : '',
+    );
 
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-          builder: (context, setState) => AppDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                titlePadding: EdgeInsets.zero,
-                title: Container(
-                  padding:  EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    borderRadius:  BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AppDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  titlePadding: EdgeInsets.zero,
+                  title: Container(
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
+                      ),
                     ),
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.secondary,
+                    child: Row(
+                      children: [
+                        Icon(
+                          edit == null ? Icons.sports_esports : Icons.edit,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          edit == null ? 'إضافة جهاز'.tr() : "تعديل جهاز".tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        edit == null ? Icons.sports_esports : Icons.edit,
-                        color: Colors.white,
-                      ),
-                       SizedBox(width: 10),
-                      Text(
-                        edit == null ? 'إضافة جهاز'.tr() : "تعديل جهاز",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                content: SizedBox(
-                  width: 500,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: nameCtl,
-                          decoration:  InputDecoration(
-                            labelText: 'اسم الجهاز'.tr(),
-                            prefixIcon: Icon(Icons.videogame_asset),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Card(
-                          elevation: 0,
-                          color: Theme.of(context).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: priceCtl,
-                                    keyboardType: TextInputType.number,
-                                    enabled: !isFixedPrice,
-                                    decoration:  InputDecoration(
-                                      labelText: 'سعر الساعة'.tr(),
-                                      prefixIcon: Icon(Icons.timer),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Checkbox(
-                                  value: isFixedPrice,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      isFixedPrice = v!;
-
-                                      if (isFixedPrice) {
-                                        priceCtl.text = '0';
-                                      } else {
-                                        priceCtl.clear();
-                                      }
-                                    });
-                                  },
-                                ),
-                                 Text(
-                                  'سعر ثابت'.tr(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                  content: SizedBox(
+                    width: 500,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: nameCtl,
+                            decoration: InputDecoration(
+                              labelText: 'اسم الجهاز'.tr(),
+                              prefixIcon: Icon(Icons.videogame_asset),
                             ),
                           ),
-                        ),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: isFixedPrice
-                              ? Padding(
-                                  padding: const EdgeInsets.only(top: 15),
-                                  child: TextField(
-                                    controller: fixedPriceCtl,
-                                    keyboardType: TextInputType.number,
-                                    decoration:  InputDecoration(
-                                      labelText: 'السعر الثابت'.tr(),
-                                      prefixIcon: Icon(Icons.attach_money),
+                          const SizedBox(height: 15),
+                          Card(
+                            elevation: 0,
+                            color: Theme.of(context).colorScheme.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: priceCtl,
+                                      keyboardType: TextInputType.number,
+                                      enabled: !isFixedPrice,
+                                      decoration: InputDecoration(
+                                        labelText: 'سعر الساعة'.tr(),
+                                        prefixIcon: Icon(Icons.timer),
+                                      ),
                                     ),
                                   ),
-                                )
-                              : const SizedBox(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                actionsPadding: const EdgeInsets.all(15),
-                actions: [
-                  OutlinedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
-                    label:  Text('إلغاء'.tr()),
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.save),
-                    label:  Text('حفظ'.tr()),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(120, 45),
-                    ),
-                    onPressed: () async {
-                      final n = nameCtl.text.trim();
-                      final p = double.tryParse(priceCtl.text.trim()) ?? 0;
-                      final fixedP =
-                          double.tryParse(fixedPriceCtl.text.trim()) ?? 0;
+                                  const SizedBox(width: 10),
+                                  Checkbox(
+                                    value: isFixedPrice,
+                                    onChanged: (v) {
+                                      setState(() {
+                                        isFixedPrice = v!;
 
-                      if (edit == null) {
-                        await DBHelper.insertConsole(
-                          ConsoleModel(
-                            name: n,
-                            pricePerHour: p,
-                            isFixedPrice: isFixedPrice,
-                            fixedPrice: fixedP,
+                                        if (isFixedPrice) {
+                                          priceCtl.text = '0';
+                                        } else {
+                                          priceCtl.clear();
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    'سعر ثابت'.tr(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        );
-                      } else {
-                        edit.name = n;
-                        edit.pricePerHour = p;
-                        edit.isFixedPrice = isFixedPrice;
-                        edit.fixedPrice = fixedP;
-
-                        await DBHelper.updateConsole(edit);
-                      }
-
-                      Navigator.pop(context);
-                      _load();
-                    },
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child:
+                                isFixedPrice
+                                    ? Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: TextField(
+                                        controller: fixedPriceCtl,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          labelText: 'السعر الثابت'.tr(),
+                                          prefixIcon: Icon(Icons.attach_money),
+                                        ),
+                                      ),
+                                    )
+                                    : const SizedBox(),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              )),
+                  actionsPadding: const EdgeInsets.all(15),
+                  actions: [
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                      label: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.save),
+                      label: Text('حفظ'.tr()),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(120, 45),
+                      ),
+                      onPressed: () async {
+                        final n = nameCtl.text.trim();
+                        final p = double.tryParse(priceCtl.text.trim()) ?? 0;
+                        final fixedP =
+                            double.tryParse(fixedPriceCtl.text.trim()) ?? 0;
+
+                        if (edit == null) {
+                          await DBHelper.insertConsole(
+                            ConsoleModel(
+                              name: n,
+                              pricePerHour: p,
+                              isFixedPrice: isFixedPrice,
+                              fixedPrice: fixedP,
+                            ),
+                          );
+                        } else {
+                          edit.name = n;
+                          edit.pricePerHour = p;
+                          edit.isFixedPrice = isFixedPrice;
+                          edit.fixedPrice = fixedP;
+
+                          await DBHelper.updateConsole(edit);
+                        }
+
+                        Navigator.pop(context);
+                        _load();
+                      },
+                    ),
+                  ],
+                ),
+          ),
     );
   }
 
   @override
-// 1️⃣ متغير حالة في الـ StatefulWidget
+  // 1️⃣ متغير حالة في الـ StatefulWidget
   int? selectedConsoleId;
 
   @override

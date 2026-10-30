@@ -45,18 +45,18 @@ class _AdminScreenState extends State<Topup> {
   }
 
   String formatArabicDate(DateTime date) {
-     final days = [
+    final days = [
       "الاثنين",
       'الثلاثاء'.tr(),
       'الأربعاء'.tr(),
       'الخميس'.tr(),
       'الجمعة'.tr(),
       'السبت'.tr(),
-      'الأحد'.tr()
+      'الأحد'.tr(),
     ];
 
-     final months = [
-      "يناير",
+    final months = [
+      "يناير".tr(),
       'فبراير'.tr(),
       'مارس'.tr(),
       'أبريل'.tr(),
@@ -67,18 +67,26 @@ class _AdminScreenState extends State<Topup> {
       'سبتمبر'.tr(),
       'أكتوبر'.tr(),
       'نوفمبر'.tr(),
-      'ديسمبر'.tr()
+      'ديسمبر'.tr(),
     ];
 
     final dayName = days[date.weekday - 1];
     final monthName = months[date.month - 1];
 
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
-    final ampm = date.hour >= 12 ? 'م'.tr() : "ص";
+    final ampm = date.hour >= 12 ? 'م'.tr() : "ص".tr();
 
     final minute = date.minute.toString().padLeft(2, '0');
 
-    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({'dayName': dayName, 'v2': date.day, 'monthName': monthName, 'v4': date.year, 'hour': hour, 'minute': minute, 'ampm': ampm});
+    return '{dayName}، {v2} {monthName} {v4} - {hour}:{minute} {ampm}'.tr({
+      'dayName': dayName,
+      'v2': date.day,
+      'monthName': monthName,
+      'v4': date.year,
+      'hour': hour,
+      'minute': minute,
+      'ampm': ampm,
+    });
   }
 
   // لتأكد من تهيئة intl قبل التنسيق
@@ -151,22 +159,32 @@ class _AdminScreenState extends State<Topup> {
 
   // تطبق الفلتر على لائحة العمليات وتحسب المجاميع
   void _applyFilterOnList(List<Map<String, dynamic>> all) {
-    final filtered = all.where((t) {
-      final d = DateTime.tryParse(t['date'].toString()) ?? DateTime.now();
-      // إذا حدد من تاريخ -> d يجب أن يكون >= fromDate بداية اليوم
-      if (_fromDate != null) {
-        final startOfFrom =
-            DateTime(_fromDate!.year, _fromDate!.month, _fromDate!.day);
-        if (d.isBefore(startOfFrom)) return false;
-      }
-      // إذا حدد إلى تاريخ -> d يجب أن يكون <= endOfTo (نهاية اليوم)
-      if (_toDate != null) {
-        final endOfTo =
-            DateTime(_toDate!.year, _toDate!.month, _toDate!.day, 23, 59, 59);
-        if (d.isAfter(endOfTo)) return false;
-      }
-      return true;
-    }).toList();
+    final filtered =
+        all.where((t) {
+          final d = DateTime.tryParse(t['date'].toString()) ?? DateTime.now();
+          // إذا حدد من تاريخ -> d يجب أن يكون >= fromDate بداية اليوم
+          if (_fromDate != null) {
+            final startOfFrom = DateTime(
+              _fromDate!.year,
+              _fromDate!.month,
+              _fromDate!.day,
+            );
+            if (d.isBefore(startOfFrom)) return false;
+          }
+          // إذا حدد إلى تاريخ -> d يجب أن يكون <= endOfTo (نهاية اليوم)
+          if (_toDate != null) {
+            final endOfTo = DateTime(
+              _toDate!.year,
+              _toDate!.month,
+              _toDate!.day,
+              23,
+              59,
+              59,
+            );
+            if (d.isAfter(endOfTo)) return false;
+          }
+          return true;
+        }).toList();
 
     // حساب المجاميع
     double totalCost = 0.0;
@@ -212,102 +230,126 @@ class _AdminScreenState extends State<Topup> {
             bold: pw.Font.helveticaBold(),
           ),
         ),
-        build: (context) => [
-          pw.Center(
-            child: pw.Text(
-              'تقرير ماكينة الشحن'.tr(),
-              style: pw.TextStyle(
-                fontSize: 28,
-                fontWeight: pw.FontWeight.bold,
+        build:
+            (context) => [
+              pw.Center(
+                child: pw.Text(
+                  'تقرير ماكينة الشحن'.tr(),
+                  style: pw.TextStyle(
+                    fontSize: 28,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          pw.SizedBox(height: 20),
+              pw.SizedBox(height: 20),
 
-          // ملخص الفلتر
-          pw.Container(
-            padding: const pw.EdgeInsets.all(12),
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(),
-              borderRadius: pw.BorderRadius.circular(8),
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text('عدد العمليات: {v1}'.tr({'v1': _filteredTransactions.length}),
-                    style: pw.TextStyle()),
-                pw.Text(
-                    'إجمالي التكلفة: {v1}'.tr({'v1': _totalCostFiltered.toStringAsFixed(2)})),
-                pw.Text(
-                    'إجمالي المستلم: {v1}'.tr({'v1': _totalReceivedFiltered.toStringAsFixed(2)})),
-                pw.Text(
-                    'إجمالي الربح: {v1}'.tr({'v1': _totalProfitFiltered.toStringAsFixed(2)})),
-              ],
-            ),
-          ),
+              // ملخص الفلتر
+              pw.Container(
+                padding: const pw.EdgeInsets.all(12),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(),
+                  borderRadius: pw.BorderRadius.circular(8),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'عدد العمليات: {v1}'.tr({
+                        'v1': _filteredTransactions.length,
+                      }),
+                      style: pw.TextStyle(),
+                    ),
+                    pw.Text(
+                      'إجمالي التكلفة: {v1}'.tr({
+                        'v1': _totalCostFiltered.toStringAsFixed(2),
+                      }),
+                    ),
+                    pw.Text(
+                      'إجمالي المستلم: {v1}'.tr({
+                        'v1': _totalReceivedFiltered.toStringAsFixed(2),
+                      }),
+                    ),
+                    pw.Text(
+                      'إجمالي الربح: {v1}'.tr({
+                        'v1': _totalProfitFiltered.toStringAsFixed(2),
+                      }),
+                    ),
+                  ],
+                ),
+              ),
 
-          pw.SizedBox(height: 20),
-          pw.Text('تفاصيل العمليات:'.tr(), style: pw.TextStyle(fontSize: 20)),
-          pw.SizedBox(height: 8),
+              pw.SizedBox(height: 20),
+              pw.Text(
+                'تفاصيل العمليات:'.tr(),
+                style: pw.TextStyle(fontSize: 20),
+              ),
+              pw.SizedBox(height: 8),
 
-          // جدول العمليات
-          pw.Table(
-            border: pw.TableBorder.all(),
-            columnWidths: {
-              0: const pw.FlexColumnWidth(3),
-              1: const pw.FlexColumnWidth(2),
-              2: const pw.FlexColumnWidth(2),
-              3: const pw.FlexColumnWidth(2),
-            },
-            children: [
-              pw.TableRow(
-                decoration: pw.BoxDecoration(color: PdfColors.grey300),
+              // جدول العمليات
+              pw.Table(
+                border: pw.TableBorder.all(),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(3),
+                  1: const pw.FlexColumnWidth(2),
+                  2: const pw.FlexColumnWidth(2),
+                  3: const pw.FlexColumnWidth(2),
+                },
                 children: [
-                  pw.Padding(
-                      padding: const pw.EdgeInsets.all(8),
-                      child: pw.Text('التاريخ'.tr(), style: pw.TextStyle())),
-                  pw.Padding(
-                      padding: const pw.EdgeInsets.all(8),
-                      child: pw.Text('التكلفة'.tr(), style: pw.TextStyle())),
-                  pw.Padding(
-                      padding: const pw.EdgeInsets.all(8),
-                      child: pw.Text('المستلم'.tr(), style: pw.TextStyle())),
-                  pw.Padding(
-                      padding: const pw.EdgeInsets.all(8),
-                      child: pw.Text('الربح'.tr(), style: pw.TextStyle())),
+                  pw.TableRow(
+                    decoration: pw.BoxDecoration(color: PdfColors.grey300),
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text('التاريخ'.tr(), style: pw.TextStyle()),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text('التكلفة'.tr(), style: pw.TextStyle()),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text('المستلم'.tr(), style: pw.TextStyle()),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8),
+                        child: pw.Text('الربح'.tr(), style: pw.TextStyle()),
+                      ),
+                    ],
+                  ),
+                  ..._filteredTransactions.map((t) {
+                    final date =
+                        DateTime.tryParse(t['date'].toString()) ??
+                        DateTime.now();
+                    return pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Text(formatArabicDate(date)),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Text(t['received'].toString()),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Text(t['cost'].toString()),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Text(t['profit'].toString()),
+                        ),
+                      ],
+                    );
+                  }),
                 ],
               ),
-              ..._filteredTransactions.map((t) {
-                final date =
-                    DateTime.tryParse(t['date'].toString()) ?? DateTime.now();
-                return pw.TableRow(
-                  children: [
-                    pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Text(formatArabicDate(date))),
-                    pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Text(t['received'].toString())),
-                    pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Text(t['cost'].toString())),
-                    pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Text(t['profit'].toString())),
-                  ],
-                );
-              }),
             ],
-          ),
-        ],
       ),
     );
 
     // عرض نافذة الطباعة
-    await Printing.layoutPdf(
-      onLayout: (format) => pdf.save(),
-    );
+    await Printing.layoutPdf(onLayout: (format) => pdf.save());
   }
 
   @override
@@ -318,4 +360,3 @@ class _AdminScreenState extends State<Topup> {
         : _buildMobileBody(context);
   }
 }
-

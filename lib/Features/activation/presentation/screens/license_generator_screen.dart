@@ -21,14 +21,14 @@ class _LicenseGeneratorScreenState extends State<LicenseGeneratorScreen> {
   int _days = 30;
   String _generatedCode = '';
 
-  final List<Map<String, dynamic>> _durations = [
-    {'label': 'يوم واحد', 'days': 1},
-    {'label': '7 أيام', 'days': 7},
-    {'label': '30 يوم', 'days': 30},
-    {'label': '90 يوم', 'days': 90},
-    {'label': '6 شهور', 'days': 180},
-    {'label': 'سنة', 'days': 365},
-    {'label': 'دائم مدى الحياة', 'days': 36500},
+  List<Map<String, dynamic>> get _durations => [
+    {'label': 'يوم واحد'.tr(), 'days': 1},
+    {'label': '7 أيام'.tr(), 'days': 7},
+    {'label': '30 يوم'.tr(), 'days': 30},
+    {'label': '90 يوم'.tr(), 'days': 90},
+    {'label': '6 شهور'.tr(), 'days': 180},
+    {'label': 'سنة'.tr(), 'days': 365},
+    {'label': 'دائم مدى الحياة'.tr(), 'days': 36500},
   ];
 
   void _generate() {
@@ -73,4 +73,3 @@ class _LicenseGeneratorScreenState extends State<LicenseGeneratorScreen> {
     super.dispose();
   }
 }
-

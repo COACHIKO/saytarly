@@ -154,9 +154,8 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
       );
       final total = (debtMap['total_amount'] as num?)?.toDouble() ?? 0.0;
       debtMap['paid_partial'] = paid;
-      debtMap['remaining_amount'] = (total - paid)
-          .clamp(0, double.infinity)
-          .toDouble();
+      debtMap['remaining_amount'] =
+          (total - paid).clamp(0, double.infinity).toDouble();
       debts.add(debtMap);
     }
     final shiftRow = await db.query(
@@ -164,20 +163,16 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
       where: 'id = ?',
       whereArgs: [widget.shiftId],
     );
-    final checkIn = shiftRow.isNotEmpty
-        ? shiftRow.first['check_in'] as String?
-        : null;
-    final checkOut = shiftRow.isNotEmpty
-        ? shiftRow.first['check_out'] as String?
-        : null;
+    final checkIn =
+        shiftRow.isNotEmpty ? shiftRow.first['check_in'] as String? : null;
+    final checkOut =
+        shiftRow.isNotEmpty ? shiftRow.first['check_out'] as String? : null;
 
     final rangeStart = checkIn ?? DateTime.now().toIso8601String();
     final rangeEnd = checkOut ?? DateTime.now().toIso8601String();
 
-    final currentShiftInvoiceIds = invoices
-        .map((inv) => inv['id'])
-        .whereType<int>()
-        .toSet();
+    final currentShiftInvoiceIds =
+        invoices.map((inv) => inv['id']).whereType<int>().toSet();
 
     final debtPaymentsRowsRaw = await db.query(
       'debt_payments',
@@ -186,11 +181,12 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
       orderBy: 'paid_at ASC',
     );
 
-    debtPayments = debtPaymentsRowsRaw.where((p) {
-      final invId = p['invoice_id'];
-      if (invId == null) return true;
-      return !currentShiftInvoiceIds.contains(invId as int);
-    }).toList();
+    debtPayments =
+        debtPaymentsRowsRaw.where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !currentShiftInvoiceIds.contains(invId as int);
+        }).toList();
 
     totalDebtCollected = debtPayments.fold<double>(
       0.0,
@@ -239,14 +235,14 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
             children: [
               Icon(Icons.lock_outline, color: cs.primary),
               const SizedBox(width: 8),
-               Text('تأكيد كلمة المرور'.tr()),
+              Text('تأكيد كلمة المرور'.tr()),
             ],
           ),
           content: TextField(
             controller: passController,
             obscureText: true,
             autofocus: true,
-            decoration:  InputDecoration(
+            decoration: InputDecoration(
               labelText: 'أدخل كلمة المرور'.tr(),
               prefixIcon: Icon(Icons.key),
             ),
@@ -254,7 +250,7 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child:  Text('إلغاء'.tr()),
+              child: Text('إلغاء'.tr()),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -265,10 +261,13 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                   isValid = true;
                   Navigator.pop(ctx);
                 } else {
-                  AppToast.show('كلمة المرور غير صحيحة'.tr(), kind: FeedbackKind.error);
+                  AppToast.show(
+                    'كلمة المرور غير صحيحة'.tr(),
+                    kind: FeedbackKind.error,
+                  );
                 }
               },
-              child:  Text('تأكيد'.tr()),
+              child: Text('تأكيد'.tr()),
             ),
           ],
         );
@@ -296,12 +295,13 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _EditDebtSheet(
-        debtId: debtId,
-        initialCustomerName: (debt['customer_name'] ?? '').toString(),
-        initialItems: items,
-        invoiceId: invoiceId,
-      ),
+      builder:
+          (_) => _EditDebtSheet(
+            debtId: debtId,
+            initialCustomerName: (debt['customer_name'] ?? '').toString(),
+            initialItems: items,
+            invoiceId: invoiceId,
+          ),
     );
 
     if (changed == true) {
@@ -391,45 +391,59 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
     final cs = Theme.of(context).colorScheme;
     final result = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: cs.error),
-            const SizedBox(width: 8),
-            Expanded(child: Text(title)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (customerName.isNotEmpty) Text('العميل: {customerName}'.tr({'customerName': customerName})),
-            const SizedBox(height: 8),
-             Text(
-              'هيتم إرجاع كل الأصناف للمخزون والفاتورة هتتحوّل لـ "ملغي".'.tr(),
+      builder:
+          (ctx) => AppDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            if (alreadyCollected > 0) ...[
-              const SizedBox(height: 8),
-              Text(
-                '⚠️ فيه مبلغ اتحصّل سابقًا: {v1}  {v2} — الإلغاء ده هيرجّعه تلقائيًا.'.tr({'v1': alreadyCollected.toStringAsFixed(2), 'v2': Money.txt}),
-                style: TextStyle(color: cs.error, fontWeight: FontWeight.bold),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: cs.error),
+                const SizedBox(width: 8),
+                Expanded(child: Text(title)),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (customerName.isNotEmpty)
+                  Text(
+                    'العميل: {customerName}'.tr({'customerName': customerName}),
+                  ),
+                const SizedBox(height: 8),
+                Text(
+                  'هيتم إرجاع كل الأصناف للمخزون والفاتورة هتتحوّل لـ "ملغي".'
+                      .tr(),
+                ),
+                if (alreadyCollected > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '⚠️ فيه مبلغ اتحصّل سابقًا: {v1}  {v2} — الإلغاء ده هيرجّعه تلقائيًا.'
+                        .tr({
+                          'v1': alreadyCollected.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                    style: TextStyle(
+                      color: cs.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('تراجع'.tr()),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: cs.error),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('إلغاء الفاتورة'.tr()),
               ),
             ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('تراجع'.tr()),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: cs.error),
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('إلغاء الفاتورة'.tr()),
-          ),
-        ],
-      ),
     );
     return result == true;
   }
@@ -460,9 +474,10 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
     String fmt(dynamic v) => ((v as num?) ?? 0).toDouble().toStringAsFixed(2);
 
     final consoleId = inv['console_id'] as int?;
-    final consoleName = consoleId != null
-        ? (consoleNames[consoleId] ?? 'غير معروف'.tr())
-        : null;
+    final consoleName =
+        consoleId != null
+            ? (consoleNames[consoleId] ?? 'غير معروف'.tr())
+            : null;
 
     showModalBottomSheet(
       context: context,
@@ -478,7 +493,7 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
           expand: false,
           builder: (ctx, scrollController) {
             return Padding(
-              padding:  EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -486,7 +501,7 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                     child: Container(
                       width: 40,
                       height: 4,
-                      margin:  EdgeInsets.only(bottom: 14),
+                      margin: EdgeInsets.only(bottom: 14),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(4),
@@ -496,7 +511,7 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                   Row(
                     children: [
                       Icon(Icons.info_outline, color: cs.primary),
-                       SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Text(
                         'تفاصيل الفاتورة'.tr(),
                         style: TextStyle(
@@ -507,8 +522,11 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                       ),
                     ],
                   ),
-                   Divider(height: 24),
-                  _detailRow('العميل'.tr(), inv['customer_name'] ?? 'غير معروف'.tr()),
+                  Divider(height: 24),
+                  _detailRow(
+                    'العميل'.tr(),
+                    inv['customer_name'] ?? 'غير معروف'.tr(),
+                  ),
                   _detailRow('نوع الدفع'.tr(), inv['payment_type'] ?? '-'),
                   if (consoleName != null &&
                       ((inv['device_cost'] ?? 0) as num).toDouble() != 0)
@@ -543,9 +561,10 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                           return !(isPlaystation && total == 0);
                         })
                         .map((it) {
-                          final name = it['item_type'] == 'playstation'
-                              ? 'وقت بلايستيشن'.tr()
-                              : (it['drink_name'] ?? 'صنف'.tr());
+                          final name =
+                              it['item_type'] == 'playstation'
+                                  ? 'وقت بلايستيشن'.tr()
+                                  : (it['drink_name'] ?? 'صنف'.tr());
                           final qty = it['qty'] ?? 1;
                           final total = it['total'] ?? 0;
                           return Padding(
@@ -558,7 +577,7 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                             ),
                           );
                         }),
-                   Divider(height: 24),
+                  Divider(height: 24),
                   if (((inv['device_cost'] ?? 0) as num).toDouble() != 0)
                     _detailRow(
                       'تكلفة الجهاز'.tr(),
@@ -580,7 +599,10 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
                       '${fmt(inv['shisha_cost'])} ${Money.txt}',
                     ),
                   if ((inv['discount'] ?? 0) != 0)
-                    _detailRow('الخصم'.tr(), '${fmt(inv['discount'])} ${Money.txt}'),
+                    _detailRow(
+                      'الخصم'.tr(),
+                      '${fmt(inv['discount'])} ${Money.txt}',
+                    ),
                   _detailRow(
                     'الإجمالي'.tr(),
                     '${fmt(inv['total_cost'])} ${Money.txt}',
@@ -636,50 +658,52 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
 
     await showDialog(
       context: context,
-      builder: (ctx) => AppDialog(
-        title:  Text('إضافة ملحوظة فودافون كاش'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amountCtl,
-              keyboardType: TextInputType.number,
-              decoration:  InputDecoration(labelText: 'المبلغ'.tr()),
+      builder:
+          (ctx) => AppDialog(
+            title: Text('إضافة ملحوظة فودافون كاش'.tr()),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: amountCtl,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'المبلغ'.tr()),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: noteCtl,
+                  decoration: InputDecoration(
+                    labelText: 'ملحوظة (اختياري)'.tr(),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: noteCtl,
-              decoration:  InputDecoration(labelText: 'ملحوظة (اختياري)'.tr()),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child:  Text('إلغاء'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final amount = double.tryParse(amountCtl.text.trim()) ?? 0;
-              if (amount <= 0) return;
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final amount = double.tryParse(amountCtl.text.trim()) ?? 0;
+                  if (amount <= 0) return;
 
-              await DBHelper.addVodafoneCashNote(
-                shiftId: widget.shiftId,
-                amount: amount,
-                note: noteCtl.text.trim(),
-                addedBy: CurrentUser.displayName,
-              );
+                  await DBHelper.addVodafoneCashNote(
+                    shiftId: widget.shiftId,
+                    amount: amount,
+                    note: noteCtl.text.trim(),
+                    addedBy: CurrentUser.displayName,
+                  );
 
-              Navigator.pop(ctx);
-              await _reload();
-            },
-            child:  Text('حفظ'.tr()),
+                  Navigator.pop(ctx);
+                  await _reload();
+                },
+                child: Text('حفظ'.tr()),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
-
 }
 
 // ============================================================
@@ -733,17 +757,18 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialCustomerName);
-    _items = widget.initialItems.map((e) {
-      final qty = (e['qty'] as num?)?.toInt() ?? 0;
-      return _EditableDebtItem(
-        id: e['id'] as int?,
-        drinkId: e['drink_id'] as int?,
-        name: (e['drink_name'] ?? '').toString(),
-        qty: qty,
-        originalQty: qty,
-        price: (e['price'] as num?)?.toDouble() ?? 0.0,
-      );
-    }).toList();
+    _items =
+        widget.initialItems.map((e) {
+          final qty = (e['qty'] as num?)?.toInt() ?? 0;
+          return _EditableDebtItem(
+            id: e['id'] as int?,
+            drinkId: e['drink_id'] as int?,
+            name: (e['drink_name'] ?? '').toString(),
+            qty: qty,
+            originalQty: qty,
+            price: (e['price'] as num?)?.toDouble() ?? 0.0,
+          );
+        }).toList();
   }
 
   double get _total => _items.fold(0.0, (sum, i) => sum + i.total);
@@ -762,14 +787,10 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
-            final filtered = query.isEmpty
-                ? drinks
-                : drinks
-                      .where(
-                        (d) =>
-                            d.name.toLowerCase().contains(query.toLowerCase()),
-                      )
-                      .toList();
+            final filtered =
+                query.isEmpty
+                    ? drinks
+                    : drinks.where((d) => d.matchesQuery(query)).toList();
             return SizedBox(
               height: MediaQuery.of(ctx).size.height * 0.6,
               child: Column(
@@ -786,7 +807,7 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: TextField(
-                      decoration:  InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'ابحث عن صنف'.tr(),
                         prefixIcon: Icon(Icons.search),
                       ),
@@ -794,48 +815,54 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                     ),
                   ),
                   Expanded(
-                    child: filtered.isEmpty
-                        ?  Center(child: Text('لا توجد نتائج'.tr()))
-                        : ListView.builder(
-                            itemCount: filtered.length,
-                            itemBuilder: (_, i) {
-                              final d = filtered[i];
-                              final outOfStock = d.qty <= 0;
+                    child:
+                        filtered.isEmpty
+                            ? Center(child: Text('لا توجد نتائج'.tr()))
+                            : ListView.builder(
+                              itemCount: filtered.length,
+                              itemBuilder: (_, i) {
+                                final d = filtered[i];
+                                final outOfStock = d.qty <= 0;
 
-                              return ListTile(
-                                enabled: !outOfStock,
-                                title: Text(
-                                  d.name,
-                                  style: TextStyle(
-                                    color: outOfStock ? Colors.grey : null,
+                                return ListTile(
+                                  enabled: !outOfStock,
+                                  title: Text(
+                                    d.displayName,
+                                    style: TextStyle(
+                                      color: outOfStock ? Colors.grey : null,
+                                    ),
                                   ),
-                                ),
-                                subtitle: Text(
-                                  outOfStock
-                                      ? 'غير متوفر بالمخزون'.tr()
-                                      : 'المتاح: ${d.qty}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: outOfStock
-                                        ? Colors.redAccent
-                                        : Colors.grey.shade600,
-                                    fontWeight: outOfStock
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
+                                  subtitle: Text(
+                                    outOfStock
+                                        ? 'غير متوفر بالمخزون'.tr()
+                                        : 'المتاح: ${d.qty}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          outOfStock
+                                              ? Colors.redAccent
+                                              : Colors.grey.shade600,
+                                      fontWeight:
+                                          outOfStock
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                    ),
                                   ),
-                                ),
-                                trailing: Text(
-                                  '{v1} ج'.tr({'v1': d.price.toStringAsFixed(2)}),
-                                  style: TextStyle(
-                                    color: outOfStock ? Colors.grey : null,
+                                  trailing: Text(
+                                    '{v1} ج'.tr({
+                                      'v1': d.price.toStringAsFixed(2),
+                                    }),
+                                    style: TextStyle(
+                                      color: outOfStock ? Colors.grey : null,
+                                    ),
                                   ),
-                                ),
-                                onTap: outOfStock
-                                    ? null
-                                    : () => Navigator.pop(ctx, d),
-                              );
-                            },
-                          ),
+                                  onTap:
+                                      outOfStock
+                                          ? null
+                                          : () => Navigator.pop(ctx, d),
+                                );
+                              },
+                            ),
                   ),
                 ],
               ),
@@ -850,13 +877,15 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
       final existingIndex = _items.indexWhere(
         (i) => i.drinkId == selected.id && i.id == null,
       );
-      final currentQtyInList = existingIndex != -1
-          ? _items[existingIndex].qty
-          : 0;
+      final currentQtyInList =
+          existingIndex != -1 ? _items[existingIndex].qty : 0;
 
       if (currentQtyInList + 1 > selected.qty) {
         if (!mounted) return;
-        AppToast.show('الكمية المطلوبة أكبر من المتاح ({v1})'.tr({'v1': selected.qty}), kind: FeedbackKind.error);
+        AppToast.show(
+          'الكمية المطلوبة أكبر من المتاح ({v1})'.tr({'v1': selected.qty}),
+          kind: FeedbackKind.error,
+        );
         return;
       }
 
@@ -868,7 +897,7 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
             _EditableDebtItem(
               id: null,
               drinkId: selected.id,
-              name: selected.name,
+              name: selected.displayName,
               qty: 1,
               originalQty: 0,
               price: selected.price,
@@ -878,7 +907,7 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
       });
 
       if (!mounted) return;
-      AppToast.show('✅ تمت إضافة "{v1}"'.tr({'v1': selected.name}));
+      AppToast.show('✅ تمت إضافة "{v1}"'.tr({'v1': selected.displayName}));
     }
   }
 
@@ -917,7 +946,9 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
             changedBy: CurrentUser.displayName,
           );
           if (!ok) {
-            _showError('مخزون "{v1}" مش كفاية للكمية الجديدة'.tr({'v1': item.name}));
+            _showError(
+              'مخزون "{v1}" مش كفاية للكمية الجديدة'.tr({'v1': item.name}),
+            );
             setState(() => _isSaving = false);
             return;
           }
@@ -981,7 +1012,7 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                     Expanded(
+                    Expanded(
                       child: Text(
                         'تعديل الدين'.tr(),
                         style: TextStyle(
@@ -1014,89 +1045,99 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                 ),
               ),
               Expanded(
-                child: _items.isEmpty
-                    ?  Center(child: Text('مفيش أصناف'.tr()))
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: _items.length,
-                        itemBuilder: (_, i) {
-                          final item = _items[i];
-                          // 🆕 سطور التسوية (خصم / دفعة مقدمة) للعرض فقط، بدون تعديل أو حذف
-                          final isLocked =
-                              item.name == 'خصم' || item.name == 'دفعة مقدمة';
+                child:
+                    _items.isEmpty
+                        ? Center(child: Text('مفيش أصناف'.tr()))
+                        : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: _items.length,
+                          itemBuilder: (_, i) {
+                            final item = _items[i];
+                            // 🆕 سطور التسوية (خصم / دفعة مقدمة) للعرض فقط، بدون تعديل أو حذف
+                            final isLocked =
+                                item.name == 'خصم' || item.name == 'دفعة مقدمة';
 
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            color: isLocked ? Colors.grey.shade100 : null,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Row(
-                                children: [
-                                  if (isLocked)
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 8),
-                                      child: Icon(
-                                        Icons.lock_outline,
-                                        size: 18,
-                                        color: Colors.grey,
-                                      ),
-                                    )
-                                  else
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.redAccent,
-                                        size: 20,
-                                      ),
-                                      onPressed: () => _removeItem(item),
-                                    ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              color: isLocked ? Colors.grey.shade100 : null,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    if (isLocked)
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 8),
+                                        child: Icon(
+                                          Icons.lock_outline,
+                                          size: 18,
+                                          color: Colors.grey,
                                         ),
-                                        Text(
-                                          '{v1} ج × {v2} = {v3} ج'.tr({'v1': item.price.toStringAsFixed(2), 'v2': item.qty, 'v3': item.total.toStringAsFixed(2)}),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade600,
-                                          ),
+                                      )
+                                    else
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.redAccent,
+                                          size: 20,
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  if (!isLocked) ...[
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                        size: 20,
+                                        onPressed: () => _removeItem(item),
                                       ),
-                                      onPressed: () => setState(() {
-                                        if (item.qty > 1) item.qty--;
-                                      }),
-                                    ),
-                                    Text('${item.qty}'),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
-                                        size: 20,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          Text(
+                                            '{v1} ج × {v2} = {v3} ج'.tr({
+                                              'v1': item.price.toStringAsFixed(
+                                                2,
+                                              ),
+                                              'v2': item.qty,
+                                              'v3': item.total.toStringAsFixed(
+                                                2,
+                                              ),
+                                            }),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      onPressed: () =>
-                                          setState(() => item.qty++),
                                     ),
+                                    if (!isLocked) ...[
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.remove_circle_outline,
+                                          size: 20,
+                                        ),
+                                        onPressed:
+                                            () => setState(() {
+                                              if (item.qty > 1) item.qty--;
+                                            }),
+                                      ),
+                                      Text('${item.qty}'),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.add_circle_outline,
+                                          size: 20,
+                                        ),
+                                        onPressed:
+                                            () => setState(() => item.qty++),
+                                      ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
               ),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -1115,7 +1156,7 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                         Text(
+                        Text(
                           'الإجمالي الجديد'.tr(),
                           style: TextStyle(
                             fontSize: 15,
@@ -1130,16 +1171,17 @@ class _EditDebtSheetState extends State<_EditDebtSheet> {
                       height: 46,
                       child: ElevatedButton(
                         onPressed: _isSaving ? null : _save,
-                        child: _isSaving
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            :  Text('حفظ التعديلات'.tr()),
+                        child:
+                            _isSaving
+                                ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : Text('حفظ التعديلات'.tr()),
                       ),
                     ),
                   ],

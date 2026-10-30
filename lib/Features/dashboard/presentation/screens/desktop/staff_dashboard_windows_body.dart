@@ -11,7 +11,12 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     return LogoutHelper.confirmAndLogout(
       context,
       openShiftNote:
-          ('الشيفت رقم {v1} يفضل مفتوح باسمك: تقدر ترجع بنفس '.tr({'v1': widget.shiftId}) + 'الحساب وتكمّل، وكاشير تاني مش هيقدر يفتح شيفت غير لما تقفل '.tr() + 'أو تسلّم شيفتك — أما الأدمن والسوبر أدمن بيدخلوا براحتهم.'.tr()),
+          ('الشيفت رقم {v1} يفضل مفتوح باسمك: تقدر ترجع بنفس '.tr({
+                'v1': widget.shiftId,
+              }) +
+              'الحساب وتكمّل، وكاشير تاني مش هيقدر يفتح شيفت غير لما تقفل '
+                  .tr() +
+              'أو تسلّم شيفتك — أما الأدمن والسوبر أدمن بيدخلوا براحتهم.'.tr()),
     );
   }
 
@@ -19,10 +24,9 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => PsScreen(
-          staffName: widget.staffName,
-          shiftId: widget.shiftId,
-        ),
+        builder:
+            (_) =>
+                PsScreen(staffName: widget.staffName, shiftId: widget.shiftId),
       ),
     );
   }
@@ -31,10 +35,11 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DrinksscreenDashboard(
-          staffName: widget.staffName,
-          shiftId: widget.shiftId,
-        ),
+        builder:
+            (_) => DrinksscreenDashboard(
+              staffName: widget.staffName,
+              shiftId: widget.shiftId,
+            ),
       ),
     );
   }
@@ -43,10 +48,11 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CashierExpensesScreen(
-          shiftId: widget.shiftId,
-          cashierName: widget.staffName,
-        ),
+        builder:
+            (_) => CashierExpensesScreen(
+              shiftId: widget.shiftId,
+              cashierName: widget.staffName,
+            ),
       ),
     );
   }
@@ -55,11 +61,12 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SubStaffPage(
-          staffId: widget.staffId,
-          shiftId: widget.shiftId,
-          cashierName: widget.staffName,
-        ),
+        builder:
+            (_) => SubStaffPage(
+              staffId: widget.staffId,
+              shiftId: widget.shiftId,
+              cashierName: widget.staffName,
+            ),
       ),
     );
   }
@@ -68,11 +75,12 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ShiftDetailsPage(
-          shiftId: widget.shiftId,
-          staffName: widget.staffName,
-          staffId: widget.staffId,
-        ),
+        builder:
+            (_) => ShiftDetailsPage(
+              shiftId: widget.shiftId,
+              staffName: widget.staffName,
+              staffId: widget.staffId,
+            ),
       ),
     );
   }
@@ -83,11 +91,14 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     return DesktopShell(
       placeName: _placeName,
       roleLabel: 'نقطة الكاشير'.tr(),
+      userName: widget.staffName,
+      userRole: 'كاشير'.tr(),
+      onLogout: _logoutToLogin,
       groups: [
         DesktopNavGroup(
           title: 'الكاشير'.tr(),
           items: [
-             DesktopNavItem(
+            DesktopNavItem(
               id: 'staff-home',
               label: 'الرئيسية'.tr(),
               icon: Icons.home_outlined,
@@ -157,7 +168,10 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
       activeId: 'staff-home',
       onSelect: (item) => item.onTap?.call(),
       title: 'الكاشير — {v1}'.tr({'v1': widget.staffName}),
-      subtitle: 'شيفت رقم {v1} • {_placeName}'.tr({'v1': widget.shiftId, '_placeName': _placeName}),
+      subtitle: 'شيفت رقم {v1} • {_placeName}'.tr({
+        'v1': widget.shiftId,
+        '_placeName': _placeName,
+      }),
       actions: [
         const CardQueueIconButton(),
         DesktopToolbarIconButton(
@@ -166,19 +180,9 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
           onPressed: _showDebtorsSheet,
         ),
         DesktopToolbarIconButton(
-          icon: Icons.query_stats_outlined,
-          tooltip: 'كل المبيعات'.tr(),
-          onPressed: _openAllSales,
-        ),
-        DesktopToolbarIconButton(
           icon: Icons.lock_outline,
           tooltip: 'قفل الشيفت'.tr(),
           onPressed: _confirmCloseShift,
-        ),
-        DesktopToolbarIconButton(
-          icon: Icons.logout,
-          tooltip: 'تسجيل خروج (تغيير دور)'.tr(),
-          onPressed: _logoutToLogin,
         ),
         const DesktopThemeToggle(),
       ],
@@ -263,19 +267,15 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               ],
             ),
             const SizedBox(height: DesktopTokens.gapLg + 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.phone, size: 14, color: palette.textMuted),
-                const SizedBox(width: DesktopTokens.gapXs),
-                Text(
-                  'Eng: Waled Mabrok — 01032548232',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: palette.textMuted,
-                        fontWeight: FontWeight.w600,
-                      ),
+            Center(
+              child: Text(
+                'SAYTARLY • Restaurant & Café Management',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: palette.textMuted.withValues(alpha: 0.7),
+                  fontSize: 9.5,
+                  letterSpacing: 0.3,
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -325,7 +325,9 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'شيفت رقم {v1} — كل حاجة تحت إيدك من هنا.'.tr({'v1': widget.shiftId}),
+                  'شيفت رقم {v1} — كل حاجة تحت إيدك من هنا.'.tr({
+                    'v1': widget.shiftId,
+                  }),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.82),
                     fontSize: 14,
@@ -335,17 +337,9 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
             ),
           ),
           const SizedBox(width: DesktopTokens.gapLg),
-          _heroStat(
-            context,
-            'جلسات مفتوحة'.tr(),
-            '${activeInvoices.length}',
-          ),
+          _heroStat(context, 'جلسات مفتوحة'.tr(), '${activeInvoices.length}'),
           const SizedBox(width: DesktopTokens.gapSm + 2),
-          _heroStat(
-            context,
-            'إجمالي الأجهزة'.tr(),
-            '${consoles.length}',
-          ),
+          _heroStat(context, 'إجمالي الأجهزة'.tr(), '${consoles.length}'),
         ],
       ),
     );
@@ -366,18 +360,18 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 24,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 24,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.78),
-                  fontWeight: FontWeight.w600,
-                ),
+              color: Colors.white.withValues(alpha: 0.78),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

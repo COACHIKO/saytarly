@@ -2,7 +2,6 @@ part of '../staff_dashboard.dart';
 
 /// جسم لوحة الكاشير — نسخة الموبايل (زي ما كانت بالظبط).
 extension _StaffDashboardMobileBody on _StaffDashboardState {
-
   Widget _buildMobileBody(BuildContext context) {
     final List<Map<String, dynamic>> cards = [
       {
@@ -12,10 +11,11 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => PsScreen(
-                staffName: widget.staffName,
-                shiftId: widget.shiftId,
-              ),
+              builder:
+                  (_) => PsScreen(
+                    staffName: widget.staffName,
+                    shiftId: widget.shiftId,
+                  ),
             ),
           );
         },
@@ -32,10 +32,11 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DrinksscreenDashboard(
-                staffName: widget.staffName,
-                shiftId: widget.shiftId,
-              ),
+              builder:
+                  (_) => DrinksscreenDashboard(
+                    staffName: widget.staffName,
+                    shiftId: widget.shiftId,
+                  ),
             ),
           );
         },
@@ -61,10 +62,11 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => CashierExpensesScreen(
-                shiftId: widget.shiftId,
-                cashierName: widget.staffName,
-              ),
+              builder:
+                  (_) => CashierExpensesScreen(
+                    shiftId: widget.shiftId,
+                    cashierName: widget.staffName,
+                  ),
             ),
           );
         },
@@ -76,11 +78,12 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SubStaffPage(
-                staffId: widget.staffId,
-                shiftId: widget.shiftId,
-                cashierName: widget.staffName,
-              ),
+              builder:
+                  (_) => SubStaffPage(
+                    staffId: widget.staffId,
+                    shiftId: widget.shiftId,
+                    cashierName: widget.staffName,
+                  ),
             ),
           );
         },
@@ -117,9 +120,10 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
               width: 40,
               height: 40,
 
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.tertiaryContainer,
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.tertiaryContainer,
 
               // لو عايز تغير اللون
             ),
@@ -130,9 +134,10 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
               'assets/images/lock-protect-security-20-svgrepo-com.svg',
               width: 40,
               height: 40,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.tertiaryContainer,
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.tertiaryContainer,
               // لو عايز تغير اللون
             ),
             tooltip: 'قفل الشيفت'.tr(),
@@ -143,25 +148,28 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
               'assets/images/sales-performance-svgrepo-com.svg',
               width: 40,
               height: 40,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.tertiaryContainer,
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.tertiaryContainer,
               // لو عايز تغير اللون
             ),
             splashRadius: 24,
             padding: EdgeInsets.all(12),
-            color: Colors
-                .red, // ده بيأثر على Icon مش Svg، فممكن تستخدم Container بدل
+            color:
+                Colors
+                    .red, // ده بيأثر على Icon مش Svg، فممكن تستخدم Container بدل
             tooltip: 'عرض كل مبيعات'.tr(),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ShiftDetailsPage(
-                    shiftId: widget.shiftId,
-                    staffName: widget.staffName,
-                    staffId: widget.staffId,
-                  ),
+                  builder:
+                      (_) => ShiftDetailsPage(
+                        shiftId: widget.shiftId,
+                        staffName: widget.staffName,
+                        staffId: widget.staffId,
+                      ),
                 ),
               );
             },
@@ -321,46 +329,6 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
               },
             ),
           ),
-          Positioned(
-            right: 15,
-            bottom: 10,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    "Eng: Waled Mabrok",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        "01032548232",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      SizedBox(width: 6),
-                      Icon(Icons.phone, size: 26, color: Colors.red),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -423,4 +391,3 @@ extension _StaffDashboardMobileBody on _StaffDashboardState {
     );
   }
 }
-

@@ -10,7 +10,9 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
 
     return DesktopPageScaffold(
       title: 'الموظفين الفرعيين'.tr(),
-      subtitle: '{v1} موظف تابع — إدارة الراتب والشيفتات'.tr({'v1': subStaff.length}),
+      subtitle: '{v1} موظف تابع — إدارة الراتب والشيفتات'.tr({
+        'v1': subStaff.length,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -23,34 +25,34 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
           onPressed: () => _showForm(),
         ),
       ],
-      child: subStaff.isEmpty
-          ? DesktopEmptyState(
-              icon: Icons.people_outline,
-              title: 'مفيش موظفين فرعيين'.tr(),
-              message: ('ضيف موظفين تابعين للمشرف ده وحدد راتب الساعة '.tr() + 'وساعات العمل اليومية.'.tr()),
-              action: DesktopButton.primary(
-                label: 'إضافة موظف فرعي'.tr(),
-                icon: Icons.person_add_alt,
-                onPressed: () => _showForm(),
+      child:
+          subStaff.isEmpty
+              ? DesktopEmptyState(
+                icon: Icons.people_outline,
+                title: 'مفيش موظفين فرعيين'.tr(),
+                message:
+                    ('ضيف موظفين تابعين للمشرف ده وحدد راتب الساعة '.tr() +
+                        'وساعات العمل اليومية.'.tr()),
+                action: DesktopButton.primary(
+                  label: 'إضافة موظف فرعي'.tr(),
+                  icon: Icons.person_add_alt,
+                  onPressed: () => _showForm(),
+                ),
+              )
+              : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DesktopSectionTitle(
+                      title: 'الموظفين الفرعيين'.tr(),
+                      count: subStaff.length,
+                    ),
+                    const SizedBox(height: DesktopTokens.gapXs),
+                    for (final u in subStaff)
+                      _winSubStaffManagementRow(context, palette, u),
+                  ],
+                ),
               ),
-            )
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DesktopSectionTitle(
-                    title: 'الموظفين الفرعيين'.tr(),
-                    count: subStaff.length,
-                  ),
-                  const SizedBox(height: DesktopTokens.gapXs),
-                  for (final u in subStaff) _winSubStaffManagementRow(
-                    context,
-                    palette,
-                    u,
-                  ),
-                ],
-              ),
-            ),
     );
   }
 
@@ -102,7 +104,10 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
-                        ('الراتب بالساعة: '.tr() + '{v1}'.tr({'v1': u['salary_per_hour'] ?? 'غير محدد'.tr()})),
+                        ('الراتب بالساعة: '.tr() +
+                            '{v1}'.tr({
+                              'v1': u['salary_per_hour'] ?? 'غير محدد'.tr(),
+                            })),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: palette.textMuted,
                           fontSize: 12,
@@ -110,14 +115,18 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
                       ),
                       if (u['shift_start'] != null)
                         DesktopInfoChip(
-                          label: ('بدأت العمل: '.tr() + '${DateFormat('HH:mm').format(DateTime.parse(u['shift_start']))}'),
+                          label:
+                              ('بدأت العمل: '.tr() +
+                                  '${DateFormat('HH:mm').format(DateTime.parse(u['shift_start']))}'),
                           icon: Icons.play_arrow_rounded,
                           color: palette.success,
                           dense: true,
                         ),
                       if (u['shift_end'] != null)
                         DesktopInfoChip(
-                          label: ('انتهت: '.tr() + '${DateFormat('HH:mm').format(DateTime.parse(u['shift_end']))}'),
+                          label:
+                              ('انتهت: '.tr() +
+                                  '${DateFormat('HH:mm').format(DateTime.parse(u['shift_end']))}'),
                           icon: Icons.stop_rounded,
                           color: palette.textMuted,
                           dense: true,
@@ -141,10 +150,11 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
             ),
             const SizedBox(width: DesktopTokens.gapXs),
             DesktopButton.primary(
-              label: isWorking ? 'إنهاء'.tr() : 'بدء',
-              icon: isWorking
-                  ? Icons.stop_circle_outlined
-                  : Icons.play_circle_fill,
+              label: isWorking ? 'إنهاء'.tr() : 'بدء'.tr(),
+              icon:
+                  isWorking
+                      ? Icons.stop_circle_outlined
+                      : Icons.play_circle_fill,
               color: isWorking ? palette.danger : palette.success,
               onPressed: () async {
                 final now = DateTime.now();

@@ -30,14 +30,16 @@ class SectionsRepository {
     return rows;
   }
 
-  /// إضافة قسم جديد.
+  /// إضافة قسم جديد — العربي والإنجليزي اختياريان بشرط واحد على الأقل.
   Future<void> addModule({
-    required String name,
+    required String nameAr,
+    required String nameEn,
     required String icon,
     required int color,
   }) async {
     await DBHelper.insertModule({
-      'name': name,
+      'name': nameAr,
+      'name_en': nameEn,
       'icon': icon,
       'color': color,
     });
@@ -46,14 +48,16 @@ class SectionsRepository {
   /// تعديل قسم — بيبعت الحقول المطلوب تعديلها بس.
   Future<void> updateModule({
     required int id,
-    String? name,
+    String? nameAr,
+    String? nameEn,
     String? icon,
     int? color,
     bool? isEnabled,
   }) async {
     await DBHelper.updateModule({
       'id': id,
-      if (name != null) 'name': name,
+      if (nameAr != null) 'name': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
       if (icon != null) 'icon': icon,
       if (color != null) 'color': color,
       if (isEnabled != null) 'is_enabled': isEnabled ? 1 : 0,

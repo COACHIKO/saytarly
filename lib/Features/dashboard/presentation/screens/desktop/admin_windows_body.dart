@@ -1,15 +1,23 @@
 part of '../admin.dart';
 
-/// جسم لوحة الأدمن — نسخة الويندوز (Windows UI).
+/// Admin dashboard — Windows body.
 ///
-/// سايد بار كامل بكل أدوات النظام مجمّعة في مجموعات + صف مؤشرات (KPI)
-/// + شبكة أدوات قابلة للبحث بالهوفر.
+/// Premium SaaS composition: live KPIs, sales performance, daily summary,
+/// recent orders, stock alerts, quick access, and the searchable module
+/// directory. All figures come from the same local SQLite database as before.
 extension _AdminWindowsBody on _AdminDashboardState {
-  /// 🚪 تسجيل خروج لتغيير الدور — من شاشة اللوجين بيدخل بأي دور تاني.
-  /// (الأدمن مالوش شيفت فمفيش أي قيود دخول بعده).
   Future<void> _logoutToLogin() => LogoutHelper.confirmAndLogout(context);
 
-  /// بنجمّع كل الأدوات حسب المفتاح 'group' — نفس مصدر بيانات الموبايل.
+  void _pushPage(Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  }
+
+  void _openReports() => _pushPage(ReportsScreen());
+
+  void _openInventory() => _pushPage(const ManageMaterialsScreen());
+
+  void _openSettings() => _pushPage(const SettingsScreen());
+
   Map<String, List<Map<String, dynamic>>> _groupedActions({
     bool filtered = false,
   }) {
@@ -19,9 +27,9 @@ extension _AdminWindowsBody on _AdminDashboardState {
     for (final action in _actions) {
       if (filtered &&
           query.isNotEmpty &&
-          !(action['title'] as String)
-              .toLowerCase()
-              .contains(query.toLowerCase())) {
+          !(action['title'] as String).toLowerCase().contains(
+            query.toLowerCase(),
+          )) {
         continue;
       }
       final group = action['group'] as String? ?? 'عام'.tr();
@@ -34,15 +42,30 @@ extension _AdminWindowsBody on _AdminDashboardState {
     final grouped = _groupedActions();
 
     return [
+      DesktopNavGroup(
+        title: 'نظرة عامة'.tr(),
+        items: [
+          DesktopNavItem(
+            id: 'admin-home',
+            label: 'لوحة التحكم'.tr(),
+            icon: Icons.space_dashboard_outlined,
+          ),
+        ],
+      ),
       for (final entry in grouped.entries)
         DesktopNavGroup(
-          title: entry.key,
+          title: entry.key.tr(),
           items: [
             for (final action in entry.value)
               DesktopNavItem(
-                id: action['title'] as String,
-                label: action['title'] as String,
+                id: action['id'] as String,
+                label: (action['title'] as String).tr(),
                 icon: action['icon'] as IconData,
+                badge:
+                    (action['id'] as String) == 'materials_low'
+                        ? _dashboardStats.lowStockCount
+                        : null,
+                badgeColor: SaytarlyColors.warning,
                 onTap: action['onTap'] as VoidCallback,
               ),
           ],
@@ -50,52 +73,98 @@ extension _AdminWindowsBody on _AdminDashboardState {
     ];
   }
 
+  List<DashboardQuickAction> _dashboardQuickActions() {
+    final palette = DesktopPalette.of(context);
+    return [
+      DashboardQuickAction(
+        label: 'التقارير'.tr(),
+        subtitle: 'مبيعات، أرباح وتقارير تشغيلية'.tr(),
+        icon: Icons.bar_chart_rounded,
+        color: palette.accent,
+        onTap: _openReports,
+      ),
+      DashboardQuickAction(
+        label: 'إدارة المخزون'.tr(),
+        subtitle: 'الخامات، الحدود والحركات'.tr(),
+        icon: Icons.inventory_2_outlined,
+        color: palette.warning,
+        onTap: _openInventory,
+      ),
+      DashboardQuickAction(
+        label: 'إضافة مصروف'.tr(),
+        subtitle: 'تسجيل مصروف تشغيلي جديد'.tr(),
+        icon: Icons.receipt_long_outlined,
+        color: palette.info,
+        onTap: () => _pushPage(AdminExpensesScreen()),
+      ),
+      DashboardQuickAction(
+        label: 'تقرير المنتجات'.tr(),
+        subtitle: 'الأكثر مبيعًا وأداء الأصناف'.tr(),
+        icon: Icons.shopping_bag_outlined,
+        color: palette.profit,
+        onTap: () => _pushPage(const ProductsReportScreen()),
+      ),
+      DashboardQuickAction(
+        label: 'رواتب الموظفين'.tr(),
+        subtitle: 'المستحقات والرواتب المعلقة'.tr(),
+        icon: Icons.account_balance_wallet_outlined,
+        color: palette.profit,
+        onTap: () => _pushPage(PendingSalariesScreen()),
+      ),
+      DashboardQuickAction(
+        label: 'إدارة المستخدمين'.tr(),
+        subtitle: 'الصلاحيات وحسابات الفريق'.tr(),
+        icon: Icons.people_alt_outlined,
+        color: palette.info,
+        onTap: () => _pushPage(ManageUsersScreen()),
+      ),
+    ];
+  }
+
   Widget _buildWindowsBody(BuildContext context) {
     final palette = DesktopPalette.of(context);
+    final theme = Theme.of(context);
 
     return DesktopShell(
       placeName: _placeName,
-      roleLabel: 'لوحة التحكم'.tr(),
+      roleLabel: 'مدير النظام'.tr(),
       groups: _windowsNavGroups(),
+      activeId: 'admin-home',
       onSelect: (item) => item.onTap?.call(),
+      userName: CurrentUser.displayName,
+      userRole: 'مدير النظام'.tr(),
+      onSettings: _openSettings,
+      onLogout: _logoutToLogin,
       title: 'لوحة التحكم'.tr(),
-      subtitle: '{_placeName} • نظرة شاملة على النظام'.tr({'_placeName': _placeName}),
+      subtitle: 'نظرة شاملة على أداء {v1}'.tr({'v1': _placeName}),
       actions: [
         DesktopToolbarIconButton(
-          icon: _showStats
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
-          tooltip: _showStats ? 'إخفاء الملخص'.tr() : 'إظهار الملخص',
-          onPressed: () => _refresh(() => _showStats = !_showStats),
+          icon: Icons.refresh_rounded,
+          tooltip: 'تحديث البيانات'.tr(),
+          onPressed: _loadStats,
         ),
-        DesktopToolbarIconButton(
-          icon: Icons.delete_outline,
-          tooltip: 'مسح كل البيانات'.tr(),
-          onPressed: _clearAllData,
-        ),
-        DesktopToolbarIconButton(
-          icon: Icons.logout,
-          tooltip: 'تسجيل خروج (تغيير دور)'.tr(),
-          onPressed: _logoutToLogin,
-        ),
-         DesktopThemeToggle(),
+        const DesktopThemeToggle(),
       ],
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ==================== مؤشرات سريعة ====================
-            if (_showStats) ...[
-              _windowsStatsGrid(context),
-               SizedBox(height: DesktopTokens.gapLg + 4),
-            ],
-
-            // ==================== كل الأدوات ====================
+            DashboardOverview(
+              stats: _dashboardStats,
+              range: _dashboardRange,
+              onRangeChanged: _setDashboardRange,
+              quickActions: _dashboardQuickActions(),
+              onViewOrders: _openReports,
+              onManageStock: _openInventory,
+              onOpenReports: _openReports,
+            ),
+            const SizedBox(height: DesktopTokens.gapXl + 6),
             DesktopSectionTitle(
               title: 'كل الأدوات'.tr(),
-              count: _groupedActions(filtered: true)
-                  .values
-                  .fold<int>(0, (sum, list) => sum + list.length),
+              subtitle: 'كل شاشات وإجراءات النظام في مكان واحد'.tr(),
+              count: _groupedActions(
+                filtered: true,
+              ).values.fold<int>(0, (sum, list) => sum + list.length),
               trailing: DesktopSearchField(
                 hint: 'ابحث عن أداة...'.tr(),
                 onChanged: _setSearchQuery,
@@ -103,65 +172,11 @@ extension _AdminWindowsBody on _AdminDashboardState {
             ),
             const SizedBox(height: DesktopTokens.gapXs),
             ..._windowsActionSections(context),
-
-            const SizedBox(height: DesktopTokens.gapMd),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.phone, size: 14, color: palette.textMuted),
-                const SizedBox(width: DesktopTokens.gapXs),
-                Text(
-                  'Eng: Waled Mabrok — 01032548232',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: palette.textMuted,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ],
-            ),
+            const SizedBox(height: DesktopTokens.gapLg),
+            _buildDangerFooter(context, palette, theme),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _windowsStatsGrid(BuildContext context) {
-    final palette = DesktopPalette.of(context);
-
-    return DesktopResponsiveGrid(
-      minTileWidth: 230,
-      children: [
-        DesktopStatCard(
-          label: 'عدد الفواتير'.tr(),
-          value: '$sessionsCount',
-          icon: Icons.receipt_long_outlined,
-          color: palette.info,
-        ),
-        DesktopStatCard(
-          label: 'إجمالي الدخل'.tr(),
-          value: _money(incomeToday),
-          icon: Icons.payments_outlined,
-          color: palette.success,
-        ),
-        DesktopStatCard(
-          label: 'إجمالي المصروفات'.tr(),
-          value: _money(expensesTotal),
-          icon: Icons.receipt_outlined,
-          color: palette.danger,
-        ),
-        DesktopStatCard(
-          label: 'شحن الرصيد'.tr(),
-          value: _money(topupsTotal),
-          icon: Icons.wallet_outlined,
-          color: palette.warning,
-        ),
-        DesktopStatCard(
-          label: 'تحصيل الآجل'.tr(),
-          value: _money(debtsCollected),
-          icon: Icons.handshake_outlined,
-          color: palette.accent,
-        ),
-      ],
     );
   }
 
@@ -171,7 +186,7 @@ extension _AdminWindowsBody on _AdminDashboardState {
     if (grouped.isEmpty) {
       return [
         DesktopEmptyState(
-          icon: Icons.search_off,
+          icon: Icons.search_off_rounded,
           title: 'مفيش نتائج'.tr(),
           message: 'جرّب كلمة بحث تانية — أو امسح البحث.'.tr(),
         ),
@@ -180,17 +195,14 @@ extension _AdminWindowsBody on _AdminDashboardState {
 
     return [
       for (final entry in grouped.entries) ...[
-        DesktopSectionTitle(
-          title: entry.key,
-          count: entry.value.length,
-        ),
+        DesktopSectionTitle(title: entry.key.tr(), count: entry.value.length),
         DesktopResponsiveGrid(
           minTileWidth: 270,
           maxColumns: 4,
           children: [
             for (final action in entry.value)
               DesktopActionTile(
-                title: action['title'] as String,
+                title: (action['title'] as String).tr(),
                 icon: action['icon'] as IconData,
                 color: action['color'] as Color,
                 onTap: action['onTap'] as VoidCallback,
@@ -202,5 +214,75 @@ extension _AdminWindowsBody on _AdminDashboardState {
     ];
   }
 
-  static String _money(double value) => '${value.toStringAsFixed(2)} ${Money.txt}';
+  Widget _buildDangerFooter(
+    BuildContext context,
+    DesktopPalette palette,
+    ThemeData theme,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
+            border: Border.all(color: palette.danger.withValues(alpha: 0.18)),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.shield_outlined,
+                size: 18,
+                color: palette.danger.withValues(alpha: 0.8),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'منطقة حساسة'.tr(),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: palette.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      'مسح البيانات نهائي — بيتأكد قبل التنفيذ.'.tr(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: palette.textMuted,
+                        fontSize: 10.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _clearAllData,
+                style: TextButton.styleFrom(
+                  foregroundColor: palette.danger,
+                  backgroundColor: palette.soft(palette.danger),
+                ),
+                icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                label: Text('مسح كل البيانات'.tr()),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: DesktopTokens.gapMd),
+        Text(
+          'SAYTARLY • Restaurant & Café Management',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: palette.textMuted.withValues(alpha: 0.7),
+            fontSize: 9.5,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
 }

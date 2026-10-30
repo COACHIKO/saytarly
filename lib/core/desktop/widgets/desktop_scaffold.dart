@@ -96,15 +96,13 @@ class _DesktopPageScaffoldState extends State<DesktopPageScaffold> {
             Container(
               padding: const EdgeInsets.fromLTRB(
                 DesktopTokens.pagePadding,
-                12,
+                14,
                 DesktopTokens.pagePadding,
-                12,
+                14,
               ),
               decoration: BoxDecoration(
                 color: palette.surface,
-                border: Border(
-                  bottom: BorderSide(color: palette.border),
-                ),
+                border: Border(bottom: BorderSide(color: palette.border)),
               ),
               child: Column(
                 children: [
@@ -133,9 +131,10 @@ class _DesktopPageScaffoldState extends State<DesktopPageScaffold> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w900,
+                                fontWeight: FontWeight.w800,
                                 color: palette.textPrimary,
                                 fontSize: 20,
+                                letterSpacing: -0.2,
                               ),
                             ),
                             if (widget.subtitle != null)
@@ -167,18 +166,17 @@ class _DesktopPageScaffoldState extends State<DesktopPageScaffold> {
 
             // ==================== المحتوى ====================
             Expanded(
-              child: widget.scrollable
-                  ? DesktopScrollbar(
-                      builder: (c) => SingleChildScrollView(
-                        controller: c,
-                        padding: widget.padding,
-                        child: content,
-                      ),
-                    )
-                  : Padding(
-                      padding: widget.padding,
-                      child: content,
-                    ),
+              child:
+                  widget.scrollable
+                      ? DesktopScrollbar(
+                        builder:
+                            (c) => SingleChildScrollView(
+                              controller: c,
+                              padding: widget.padding,
+                              child: content,
+                            ),
+                      )
+                      : Padding(padding: widget.padding, child: content),
             ),
           ],
         ),
@@ -273,18 +271,20 @@ class _HeaderBackButtonState extends State<_HeaderBackButton> {
           onTap: widget.onPressed,
           child: AnimatedContainer(
             duration: DesktopTokens.fast,
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: _hovering ? palette.accentSoft : palette.surfaceSoft,
-              borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
+              borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
               border: Border.all(
                 color: _hovering ? palette.accent : palette.border,
               ),
             ),
             child: Icon(
-              Icons.chevron_right,
-              size: 22,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_forward_rounded
+                  : Icons.arrow_back_rounded,
+              size: 20,
               color: _hovering ? palette.accentText : palette.textSecondary,
             ),
           ),

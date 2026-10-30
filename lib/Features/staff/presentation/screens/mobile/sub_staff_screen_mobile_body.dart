@@ -2,7 +2,6 @@ part of '../SubStaffScreen.dart';
 
 /// جسم الموظفين الفرعيين — نسخة الموبايل (زي ما كانت بالظبط).
 extension _SubStaffScreenMobileBody on _SubStaffScreenState {
-
   Widget _buildShiftButton(Map<String, dynamic> u) {
     final isWorking = u['shift_start'] != null && u['shift_end'] == null;
 
@@ -16,7 +15,7 @@ extension _SubStaffScreenMobileBody on _SubStaffScreenState {
         }
         _loadSubStaff();
       },
-      child: Text(isWorking ? 'إنهاء'.tr() : 'بدء'),
+      child: Text(isWorking ? 'إنهاء'.tr() : 'بدء'.tr()),
       style: ElevatedButton.styleFrom(
         backgroundColor: isWorking ? Colors.red : Colors.green,
       ),
@@ -43,13 +42,27 @@ extension _SubStaffScreenMobileBody on _SubStaffScreenState {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('الراتب بالساعة: {v1}'.tr({'v1': u['salary_per_hour'] ?? 'غير محدد'.tr()})),
+                          Text(
+                            'الراتب بالساعة: {v1}'.tr({
+                              'v1': u['salary_per_hour'] ?? 'غير محدد'.tr(),
+                            }),
+                          ),
                           if (u['shift_start'] != null)
                             Text(
-                                'بدأت العمل: {v1}'.tr({'v1': DateFormat('HH:mm').format(DateTime.parse(u['shift_start']))})),
+                              'بدأت العمل: {v1}'.tr({
+                                'v1': DateFormat(
+                                  'HH:mm',
+                                ).format(DateTime.parse(u['shift_start'])),
+                              }),
+                            ),
                           if (u['shift_end'] != null)
                             Text(
-                                'انتهت: {v1}'.tr({'v1': DateFormat('HH:mm').format(DateTime.parse(u['shift_end']))})),
+                              'انتهت: {v1}'.tr({
+                                'v1': DateFormat(
+                                  'HH:mm',
+                                ).format(DateTime.parse(u['shift_end'])),
+                              }),
+                            ),
                         ],
                       ),
                       trailing: Row(

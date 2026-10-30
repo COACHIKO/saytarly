@@ -15,7 +15,8 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(28),
                 child: Column(
@@ -23,7 +24,9 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                   children: [
                     // ── أيقونة ──
                     Icon(
-                      isExpired ? Icons.timer_off_rounded : Icons.lock_open_rounded,
+                      isExpired
+                          ? Icons.timer_off_rounded
+                          : Icons.lock_open_rounded,
                       size: 72,
                       color: isExpired ? Colors.orange : Colors.blueAccent,
                     ),
@@ -31,7 +34,9 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
 
                     // ── عنوان ──
                     Text(
-                      isExpired ? 'انتهت مدة الترخيص'.tr() : 'تفعيل البرنامج',
+                      isExpired
+                          ? 'انتهت مدة الترخيص'.tr()
+                          : 'تفعيل البرنامج'.tr(),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -41,69 +46,82 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                     const SizedBox(height: 8),
                     Text(
                       isExpired
-                          ? 'تواصل مع المهندس للتجديد وأرسله كود الجهاز أدناه'.tr()
-                          : 'أرسل كود الجهاز للمهندس وادخل كود التفعيل الذي سيرسله لك',
+                          ? 'تواصل مع المهندس للتجديد وأرسله كود الجهاز أدناه'
+                              .tr()
+                          : 'أرسل كود الجهاز للمهندس وادخل كود التفعيل الذي سيرسله لك'
+                              .tr(),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 24),
 
                     // ── كود الجهاز ──
-                     Align(
+                    Align(
                       alignment: Alignment.centerRight,
                       child: Text(
                         'كود هذا الجهاز:'.tr(),
                         style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 13),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 12),
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.grey[300]!),
                       ),
-                      child: _loadingId
-                          ? const Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                      child:
+                          _loadingId
+                              ? const Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                              : SelectableText(
+                                _deviceId,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                  letterSpacing: 1.2,
+                                ),
                               ),
-                            )
-                          : SelectableText(
-                              _deviceId,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 12,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
                     ),
                     const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () =>
-                            Clipboard.setData(ClipboardData(text: _deviceId)),
+                        onPressed:
+                            () => Clipboard.setData(
+                              ClipboardData(text: _deviceId),
+                            ),
                         icon: const Icon(Icons.copy, size: 16),
-                        label:  Text('نسخ كود الجهاز'.tr()),
+                        label: Text('نسخ كود الجهاز'.tr()),
                       ),
                     ),
                     const SizedBox(height: 24),
 
                     // ── حقل كود التفعيل ──
-                     Align(
+                    Align(
                       alignment: Alignment.centerRight,
                       child: Text(
                         'كود التفعيل (من المهندس):'.tr(),
                         style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 13),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -129,8 +147,9 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                           icon: const Icon(Icons.paste_rounded),
                           tooltip: 'لصق'.tr(),
                           onPressed: () async {
-                            final data =
-                                await Clipboard.getData(Clipboard.kTextPlain);
+                            final data = await Clipboard.getData(
+                              Clipboard.kTextPlain,
+                            );
                             if (data?.text != null) {
                               _codeCtrl.text = data!.text!.trim();
                             }
@@ -138,7 +157,7 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                         ),
                       ),
                     ),
-                     SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // ── رسالة نجاح ──
                     if (_successMsg != null)
@@ -151,13 +170,17 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.check_circle,
-                                color: Colors.green, size: 18),
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 18,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(_successMsg!,
-                                  style:
-                                      const TextStyle(color: Colors.green)),
+                              child: Text(
+                                _successMsg!,
+                                style: const TextStyle(color: Colors.green),
+                              ),
                             ),
                           ],
                         ),
@@ -171,16 +194,20 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                       height: 48,
                       child: ElevatedButton.icon(
                         onPressed: _activating ? null : _activate,
-                        icon: _activating
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.verified_rounded),
+                        icon:
+                            _activating
+                                ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Icon(Icons.verified_rounded),
                         label: Text(
-                          _activating ? 'جاري التفعيل...'.tr() : 'تفعيل البرنامج',
+                          _activating
+                              ? 'جاري التفعيل...'.tr()
+                              : 'تفعيل البرنامج'.tr(),
                           style: const TextStyle(fontSize: 15),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -191,27 +218,6 @@ extension _ActivationScreenMobileBody on _ActivationScreenState {
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ── معلومات الاتصال ──
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Eng: Waled Mabrok',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.phone, size: 16, color: Colors.green),
-                        SizedBox(width: 6),
-                        Text('01032548232',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600)),
-                      ],
                     ),
                   ],
                 ),

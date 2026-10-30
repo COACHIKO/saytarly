@@ -4,8 +4,6 @@ part of '../login.dart';
 extension _LoginMobileBody on _LoginViewState {
   Widget _buildMobileBody(BuildContext context) {
     final viewModel = context.watch<LoginCubit>().state;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 500; // حدّد الموبايل
 
     return Scaffold(
       appBar: AppBar(
@@ -140,26 +138,22 @@ extension _LoginMobileBody on _LoginViewState {
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide:  BorderSide(
-                                    color: Colors.white,
-                                  ),
+                                  borderSide: BorderSide(color: Colors.white),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: Colors.white,
                                     width: 2,
                                   ),
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide:  BorderSide(
-                                    color: Colors.red,
-                                  ),
+                                  borderSide: BorderSide(color: Colors.red),
                                 ),
                                 focusedErrorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide:  BorderSide(
+                                  borderSide: BorderSide(
                                     color: Colors.red,
                                     width: 2,
                                   ),
@@ -170,30 +164,28 @@ extension _LoginMobileBody on _LoginViewState {
                             viewModel.loading
                                 ? CircularProgressIndicator()
                                 : SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: _login,
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 16,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        textStyle: TextStyle(fontSize: 18),
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _login,
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 16,
                                       ),
-                                      child: Text(
-                                        'دخول'.tr(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      textStyle: TextStyle(fontSize: 18),
+                                    ),
+                                    child: Text(
+                                      'دخول'.tr(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
+                                ),
                             if (viewModel.error != null) ...[
                               SizedBox(height: 16),
                               Text(
@@ -201,43 +193,6 @@ extension _LoginMobileBody on _LoginViewState {
                                 style: TextStyle(color: Colors.red),
                               ),
                             ],
-                            SizedBox(height: 24),
-                            Divider(color: Colors.white24),
-                            SizedBox(height: 12),
-                            Column(
-                              children: [
-                                Text(
-                                  "Eng: Waled Mabrok",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: isSmallScreen
-                                        ? 16
-                                        : 20, // حجم متجاوب
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "01032548232",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: isSmallScreen ? 16 : 20,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Icon(
-                                      Icons.phone,
-                                      size: isSmallScreen ? 18 : 22,
-                                      color: Colors.red,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),

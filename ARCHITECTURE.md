@@ -44,7 +44,22 @@ bootstrap hooks. Feature apps should keep the same seams.
 `lib/saytarly.dart` is the single `MaterialApp` wiring point: injects
 `GlobalMaterialLocalizations`/`Widgets`/`Cupertino` delegates,
 `Str.supportedLocales`, `Str.localeResolutionCallback`, the theme+Bloc
-providers, and the desktop shell.
+providers, and the desktop shell. The product identity is fixed (deep navy +
+Control Blue); users switch light/dark and Arabic/English only.
+
+### Design system
+
+- `lib/core/design/saytarly_brand.dart` — brand palette, semantics, gradients,
+  shadows and the `SaytarlyThemeTokens` extension (`context.saytarly`).
+- `lib/core/design/saytarly_theme.dart` — the single Material 3 theme builder
+  (light/dark, Inter + Alexandria, component themes).
+- `lib/core/design/widgets/` — brand mark, KPI cards, area chart, sparkline and
+  status pills.
+- `lib/core/desktop/` — desktop chrome (`DesktopShell`, sidebar, command
+  palette, panels, tables/controls) built on the design tokens.
+
+Do not hard-code colours in screens: read `context.saytarly` or
+`DesktopPalette.of(context)`.
 
 ## Localization runtime
 

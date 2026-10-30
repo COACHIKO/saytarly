@@ -1,48 +1,50 @@
 import 'package:flutter/material.dart';
 
-/// قِيَم التصميم الموحّدة لواجهة سطح المكتب (مسافات، انحناءات، مقاسات).
+import 'package:saytarly/core/design/saytarly_brand.dart';
+
+/// Shared desktop layout values.
 ///
-/// أي شاشة ويندوز جديدة تستخدم القِيَم دي عشان الشكل يفضل متسق في كل الصفحات.
+/// New Windows screens should use these values so spacing, radii and motion
+/// stay consistent across every page.
 class DesktopTokens {
   DesktopTokens._();
 
-  // ------- مقاسات أساسية -------
-  static const double sidebarWidth = 264;
+  // Base dimensions.
+  static const double sidebarWidth = 276;
   static const double sidebarCollapsedWidth = 84;
-  static const double topBarHeight = 64;
-  static const double contentMaxWidth = 1560;
-  static const double pagePadding = 24;
-  static const double pageHeaderHeight = 74;
+  static const double topBarHeight = 68;
+  static const double contentMaxWidth = 1600;
+  static const double pagePadding = 28;
+  static const double pageHeaderHeight = 76;
 
-  // ------- مسافات -------
+  // 8px rhythm (with a 6px micro-step for dense controls).
   static const double gapXs = 6;
   static const double gapSm = 10;
   static const double gapMd = 16;
   static const double gapLg = 24;
   static const double gapXl = 32;
 
-  // ------- انحناءات -------
-  static const double radiusSm = 10;
-  static const double radiusMd = 14;
-  static const double radiusLg = 18;
-  static const double radiusXl = 22;
+  // Radii.
+  static const double radiusSm = 8;
+  static const double radiusMd = 12;
+  static const double radiusLg = 16;
+  static const double radiusXl = 20;
 
-  // ------- حركة -------
-  static const Duration fast = Duration(milliseconds: 130);
-  static const Duration medium = Duration(milliseconds: 220);
+  // Motion.
+  static const Duration fast = Duration(milliseconds: 140);
+  static const Duration medium = Duration(milliseconds: 240);
 }
 
-/// ألوان واجهة سطح المكتب — مشتقة من ثيم التطبيق (لايت/دارك) عند الطلب.
-///
-/// الفكرة: نفس هوية اللون الأساسي (accent) بتاعة الثيم بتاع المستخدم،
-/// لكن بمستويات أدق (حواف ناعمة، أسطح متعددة، سايد بار غامق ثابت) عشان
-/// شكل الويندوز يبقى عالي المستوى في الوضعين.
+/// Desktop-facing colour palette derived from [SaytarlyThemeTokens] and the
+/// user-selected accent. Widgets in the desktop kit keep using this class, so
+/// the whole Windows surface follows one source of truth.
 class DesktopPalette {
   const DesktopPalette({
     required this.isDark,
     required this.background,
     required this.surface,
     required this.surfaceSoft,
+    required this.surfaceSunken,
     required this.border,
     required this.borderStrong,
     required this.textPrimary,
@@ -55,6 +57,7 @@ class DesktopPalette {
     required this.warning,
     required this.danger,
     required this.info,
+    required this.profit,
     required this.shadow,
     required this.sidebarBg,
     required this.sidebarBgDeep,
@@ -67,16 +70,19 @@ class DesktopPalette {
 
   final bool isDark;
 
-  /// خلفية الصفحة.
+  /// Page background.
   final Color background;
 
-  /// خلفية الكروت.
+  /// Card surface.
   final Color surface;
 
-  /// سطح أخف (صفوف الجداول، الخانات الداخلية).
+  /// Soft inner surface (table rows, nested fields).
   final Color surfaceSoft;
 
-  /// الحدود الناعمة الافتراضية.
+  /// Recessed surface.
+  final Color surfaceSunken;
+
+  /// Default hairline border.
   final Color border;
   final Color borderStrong;
 
@@ -84,7 +90,7 @@ class DesktopPalette {
   final Color textSecondary;
   final Color textMuted;
 
-  /// اللون الرئيسي — جاي من ثيم التطبيق نفسه.
+  /// Accent from the app theme (Control Blue by default).
   final Color accent;
   final Color accentText;
   final Color accentSoft;
@@ -93,10 +99,11 @@ class DesktopPalette {
   final Color warning;
   final Color danger;
   final Color info;
+  final Color profit;
 
   final Color shadow;
 
-  // ------- السايد بار (غامق في الوضعين — كشكل "أدوات" احترافي) -------
+  // Sidebar — always deep navy in both modes.
   final Color sidebarBg;
   final Color sidebarBgDeep;
   final Color sidebarFg;
@@ -105,87 +112,77 @@ class DesktopPalette {
   final Color sidebarActiveBg;
   final Color sidebarBorder;
 
-  /// نسخة شفافة من أي لون — للخلفيات الملونة (chips / badges).
-  Color soft(Color color) => color.withValues(alpha: isDark ? 0.18 : 0.12);
+  /// A translucent version of any colour, for chips and badges.
+  Color soft(Color color) => color.withValues(alpha: isDark ? 0.18 : 0.10);
 
-  static const DesktopPalette dark = DesktopPalette(
-    isDark: true,
-    background: Color(0xFF0B0F1A),
-    surface: Color(0xFF141B2C),
-    surfaceSoft: Color(0xFF1B2335),
-    border: Color(0x1F94A3C8),
-    borderStrong: Color(0x3D94A3C8),
-    textPrimary: Color(0xFFF2F5FB),
-    textSecondary: Color(0xFFC2CADC),
-    textMuted: Color(0xFF7F8AA3),
-    accent: Color(0xFF3A7BD5),
-    accentText: Color(0xFF8EB6F2),
-    accentSoft: Color(0x263A7BD5),
-    success: Color(0xFF34D399),
-    warning: Color(0xFFFBBF24),
-    danger: Color(0xFFF87171),
-    info: Color(0xFF60A5FA),
-    shadow: Color(0x59000000),
-    sidebarBg: Color(0xFF0E1526),
-    sidebarBgDeep: Color(0xFF0A101D),
-    sidebarFg: Color(0xFFE8EDF8),
-    sidebarMuted: Color(0xFF8E9AB4),
-    sidebarHover: Color(0x14FFFFFF),
-    sidebarActiveBg: Color(0x2E3A7BD5),
-    sidebarBorder: Color(0x14FFFFFF),
-  );
+  /// Readable text colour on a tinted chip.
+  Color onSoft(Color color) =>
+      isDark
+          ? Color.lerp(color, Colors.white, 0.18)!
+          : Color.lerp(color, Colors.black, 0.22)!;
 
-  static const DesktopPalette light = DesktopPalette(
-    isDark: false,
-    background: Color(0xFFF3F5FA),
-    surface: Colors.white,
-    surfaceSoft: Color(0xFFF1F4F9),
-    border: Color(0xFFE4E8F1),
-    borderStrong: Color(0xFFD5DBE7),
-    textPrimary: Color(0xFF1B2333),
-    textSecondary: Color(0xFF4D5769),
-    textMuted: Color(0xFF8A93A6),
-    accent: Color(0xFF39A96B),
-    accentText: Color(0xFF2F7A50),
-    accentSoft: Color(0x1F39A96B),
-    success: Color(0xFF16A34A),
-    warning: Color(0xFFD97706),
-    danger: Color(0xFFDC2626),
-    info: Color(0xFF2563EB),
-    shadow: Color(0x140B1220),
-    sidebarBg: Color(0xFF0E1526),
-    sidebarBgDeep: Color(0xFF0A101D),
-    sidebarFg: Color(0xFFE8EDF8),
-    sidebarMuted: Color(0xFF8E9AB4),
-    sidebarHover: Color(0x14FFFFFF),
-    sidebarActiveBg: Color(0x2E3A7BD5),
-    sidebarBorder: Color(0x14FFFFFF),
-  );
-
-  /// يرجّع اللوحة المناسبة للثيم الحالي، والـ accent جاي من الثيم نفسه.
+  /// The palette for the current theme.
   static DesktopPalette of(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final base = isDark ? dark : light;
+    final tokens = context.saytarly;
     final primary = theme.colorScheme.primary;
+    final base = _fromTokens(tokens, primary);
 
-    final accentText = isDark
-        ? Color.lerp(primary, Colors.white, 0.38)!
-        : Color.lerp(primary, Colors.black, 0.42)!;
+    final accentText =
+        tokens.isDark
+            ? Color.lerp(primary, Colors.white, 0.32)!
+            : Color.lerp(primary, Colors.black, 0.24)!;
 
     return base.copyWith(
       accent: primary,
       accentText: accentText,
-      accentSoft: primary.withValues(alpha: isDark ? 0.2 : 0.13),
-      sidebarActiveBg: primary.withValues(alpha: isDark ? 0.24 : 0.18),
+      accentSoft: primary.withValues(alpha: tokens.isDark ? 0.20 : 0.11),
     );
   }
+
+  static DesktopPalette _fromTokens(SaytarlyThemeTokens t, Color accent) {
+    return DesktopPalette(
+      isDark: t.isDark,
+      background: t.canvas,
+      surface: t.surface,
+      surfaceSoft: t.surfaceSoft,
+      surfaceSunken: t.surfaceSunken,
+      border: t.border,
+      borderStrong: t.borderStrong,
+      textPrimary: t.textPrimary,
+      textSecondary: t.textSecondary,
+      textMuted: t.textMuted,
+      accent: accent,
+      accentText: accent,
+      accentSoft: t.softBlue,
+      success: t.success,
+      warning: t.warning,
+      danger: t.danger,
+      info: t.info,
+      profit: t.profit,
+      shadow: t.shadow,
+      sidebarBg: t.sidebar,
+      sidebarBgDeep: t.sidebarDeep,
+      sidebarFg: t.sidebarText,
+      sidebarMuted: t.sidebarMuted,
+      sidebarHover: Colors.white.withValues(alpha: 0.06),
+      sidebarActiveBg: t.sidebarActive,
+      sidebarBorder: t.sidebarBorder,
+    );
+  }
+
+  static DesktopPalette get light =>
+      _fromTokens(SaytarlyThemeTokens.light, SaytarlyColors.controlBlue);
+
+  static DesktopPalette get dark =>
+      _fromTokens(SaytarlyThemeTokens.dark, SaytarlyColors.darkAccent);
 
   DesktopPalette copyWith({
     bool? isDark,
     Color? background,
     Color? surface,
     Color? surfaceSoft,
+    Color? surfaceSunken,
     Color? border,
     Color? borderStrong,
     Color? textPrimary,
@@ -198,6 +195,7 @@ class DesktopPalette {
     Color? warning,
     Color? danger,
     Color? info,
+    Color? profit,
     Color? shadow,
     Color? sidebarBg,
     Color? sidebarBgDeep,
@@ -212,6 +210,7 @@ class DesktopPalette {
       background: background ?? this.background,
       surface: surface ?? this.surface,
       surfaceSoft: surfaceSoft ?? this.surfaceSoft,
+      surfaceSunken: surfaceSunken ?? this.surfaceSunken,
       border: border ?? this.border,
       borderStrong: borderStrong ?? this.borderStrong,
       textPrimary: textPrimary ?? this.textPrimary,
@@ -224,6 +223,7 @@ class DesktopPalette {
       warning: warning ?? this.warning,
       danger: danger ?? this.danger,
       info: info ?? this.info,
+      profit: profit ?? this.profit,
       shadow: shadow ?? this.shadow,
       sidebarBg: sidebarBg ?? this.sidebarBg,
       sidebarBgDeep: sidebarBgDeep ?? this.sidebarBgDeep,

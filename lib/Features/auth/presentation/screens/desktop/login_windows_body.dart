@@ -1,9 +1,9 @@
 part of '../login.dart';
 
-/// جسم شاشة تسجيل الدخول — نسخة الويندوز (Windows UI).
+/// Windows login screen.
 ///
-/// تقسيم الشاشة: فورم الدخول على اليمين، ولوحة البراند الجرافيكية على
-/// الشمال — تجربة سطح مكتب كاملة بالكيبورد والهوفر.
+/// Split layout: a focused sign-in card on the canvas, and a deep-navy brand
+/// panel that sells the product without stealing attention from the form.
 extension _LoginWindowsBody on _LoginViewState {
   Widget _buildWindowsBody(BuildContext context) {
     final viewModel = context.watch<LoginCubit>().state;
@@ -13,182 +13,234 @@ extension _LoginWindowsBody on _LoginViewState {
       backgroundColor: palette.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // على الشاشات الضيقة بنخفي لوحة البراند ونسيب الفورم لوحده.
-          final showBrand = constraints.maxWidth >= 980;
+          final showBrand = constraints.maxWidth >= 1000;
 
           final formSide = Stack(
             children: [
-              // لمسة ضوء ناعمة في الخلفية
               Positioned(
-                top: -140,
-                left: -100,
-                child: _glowCircle(palette.accent, 380),
+                top: -180,
+                left: -140,
+                child: _glowCircle(palette.accent, 460),
               ),
               Positioned(
-                top: 14,
-                left: 18,
-                child: Row(
-                  children: [
-                    const DesktopThemeToggle(),
-                    DrinksScreenModeButton(),
-                  ],
-                ),
+                bottom: -160,
+                right: -120,
+                child: _glowCircle(palette.info, 420),
               ),
-              Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 40,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(26, 20, 26, 0),
+                    child: Row(
                       children: [
-                        Text(
-                          viewModel.placeName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    color: palette.textPrimary,
-                                    fontSize: 30,
-                                  ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'تسجيل الدخول'.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: palette.textMuted,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        const SizedBox(height: DesktopTokens.gapLg),
-                        DesktopCard(
-                          padding: const EdgeInsets.all(26),
-                          radius: DesktopTokens.radiusXl,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _desktopTextField(
-                                controller: _userCtl,
-                                focusNode: _userFocus,
-                                label: 'اسم المستخدم'.tr(),
-                                icon: Icons.person_outline,
-                                action: TextInputAction.next,
-                                onSubmitted: (_) => FocusScope.of(context)
-                                    .requestFocus(_passFocus),
-                              ),
-                              const SizedBox(height: DesktopTokens.gapMd),
-                              _desktopTextField(
-                                controller: _passCtl,
-                                focusNode: _passFocus,
-                                label: 'كلمة المرور'.tr(),
-                                icon: Icons.lock_outline,
-                                action: TextInputAction.done,
-                                onSubmitted: (_) => _login(),
-                                obscure: _obscurePassword,
-                                suffix: IconButton(
-                                  splashRadius: 20,
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off_outlined,
-                                    size: 20,
-                                    color: palette.textMuted,
-                                  ),
-                                  onPressed: () => _refresh(
-                                    () =>
-                                        _obscurePassword = !_obscurePassword,
-                                  ),
-                                ),
-                              ),
-                               SizedBox(height: DesktopTokens.gapLg),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 48,
-                                child: FilledButton(
-                                  onPressed:
-                                      viewModel.loading ? null : _login,
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: palette.accent,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        DesktopTokens.radiusMd,
-                                      ),
-                                    ),
-                                    textStyle:  TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  child: viewModel.loading
-                                      ?  SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.4,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      :  Text('دخول'.tr()),
-                                ),
-                              ),
-                              if (viewModel.error != null) ...[
-                                const SizedBox(height: DesktopTokens.gapMd),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: palette.soft(palette.danger),
-                                    borderRadius: BorderRadius.circular(
-                                      DesktopTokens.radiusSm,
-                                    ),
-                                    border: Border.all(
-                                      color: palette.danger
-                                          .withValues(alpha: 0.35),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.error_outline,
-                                        size: 17,
-                                        color: palette.danger,
-                                      ),
-                                      const SizedBox(
-                                        width: DesktopTokens.gapSm,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          viewModel.error!,
-                                          style: TextStyle(
-                                            color: palette.danger,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                        const SaytarlyLogo(markSize: 32, showTagline: false),
+                        const Spacer(),
+                        const _LanguageSwitch(),
+                        const SizedBox(width: 6),
+                        const DesktopThemeToggle(),
+                        // const SizedBox(width: 2),
+                        // DrinksScreenModeButton(),
                       ],
                     ),
                   ),
-                ),
+                  Expanded(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 30,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 412),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'مرحبًا بعودتك'.tr(),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: palette.textPrimary,
+                                  fontSize: 29,
+                                  letterSpacing: -0.6,
+                                ),
+                              ),
+                              const SizedBox(height: 7),
+                              Text(
+                                'سجّل الدخول لإدارة {v1}'.tr({
+                                  'v1': viewModel.placeName,
+                                }),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodyMedium?.copyWith(
+                                  color: palette.textMuted,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                ),
+                              ),
+                              const SizedBox(height: DesktopTokens.gapLg),
+                              DesktopCard(
+                                padding: const EdgeInsets.all(24),
+                                radius: DesktopTokens.radiusXl,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _desktopTextField(
+                                      controller: _userCtl,
+                                      focusNode: _userFocus,
+                                      label: 'اسم المستخدم'.tr(),
+                                      icon: Icons.person_outline_rounded,
+                                      action: TextInputAction.next,
+                                      onSubmitted:
+                                          (_) => FocusScope.of(
+                                            context,
+                                          ).requestFocus(_passFocus),
+                                    ),
+                                    const SizedBox(height: DesktopTokens.gapMd),
+                                    _desktopTextField(
+                                      controller: _passCtl,
+                                      focusNode: _passFocus,
+                                      label: 'كلمة المرور'.tr(),
+                                      icon: Icons.lock_outline_rounded,
+                                      action: TextInputAction.done,
+                                      onSubmitted: (_) => _login(),
+                                      obscure: _obscurePassword,
+                                      suffix: IconButton(
+                                        splashRadius: 20,
+                                        icon: Icon(
+                                          _obscurePassword
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                          size: 19,
+                                          color: palette.textMuted,
+                                        ),
+                                        onPressed:
+                                            () => _refresh(
+                                              () =>
+                                                  _obscurePassword =
+                                                      !_obscurePassword,
+                                            ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: DesktopTokens.gapLg),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 46,
+                                      child: DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            DesktopTokens.radiusMd,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: palette.accent.withValues(
+                                                alpha: 0.22,
+                                              ),
+                                              blurRadius: 18,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                        ),
+                                        child: FilledButton(
+                                          onPressed:
+                                              viewModel.loading ? null : _login,
+                                          style: FilledButton.styleFrom(
+                                            backgroundColor: palette.accent,
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    DesktopTokens.radiusMd,
+                                                  ),
+                                            ),
+                                            textStyle: const TextStyle(
+                                              fontSize: 14.5,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          child:
+                                              viewModel.loading
+                                                  ? const SizedBox(
+                                                    width: 21,
+                                                    height: 21,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          strokeWidth: 2.3,
+                                                          color: Colors.white,
+                                                        ),
+                                                  )
+                                                  : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text('دخول'.tr()),
+                                                      const SizedBox(width: 8),
+                                                      const Icon(
+                                                        Icons
+                                                            .arrow_forward_rounded,
+                                                        size: 18,
+                                                      ),
+                                                    ],
+                                                  ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (viewModel.error != null) ...[
+                                      const SizedBox(
+                                        height: DesktopTokens.gapMd,
+                                      ),
+                                      _LoginError(message: viewModel.error!),
+                                    ],
+                                    const SizedBox(height: DesktopTokens.gapMd),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.verified_user_outlined,
+                                          size: 13,
+                                          color: palette.textMuted,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          'دخول آمن على هذا الجهاز'.tr(),
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall?.copyWith(
+                                            color: palette.textMuted,
+                                            fontSize: 10.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: DesktopTokens.gapLg),
+                              Center(
+                                child: Text(
+                                  'SAYTARLY • Restaurant & Café Management',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.copyWith(
+                                    color: palette.textMuted.withValues(
+                                      alpha: 0.75,
+                                    ),
+                                    fontSize: 9.5,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           );
@@ -197,8 +249,8 @@ extension _LoginWindowsBody on _LoginViewState {
 
           return Row(
             children: [
-              Expanded(flex: 5, child: formSide),
-              const Expanded(flex: 6, child: _LoginBrandPanel()),
+              Expanded(flex: 44, child: formSide),
+              const Expanded(flex: 56, child: _LoginBrandPanel()),
             ],
           );
         },
@@ -206,7 +258,6 @@ extension _LoginWindowsBody on _LoginViewState {
     );
   }
 
-  /// خانة إدخال بشكل سطح المكتب — ناعمة ومتسقة مع باقي الصفحات.
   Widget _desktopTextField({
     required TextEditingController controller,
     required FocusNode focusNode,
@@ -222,27 +273,29 @@ extension _LoginWindowsBody on _LoginViewState {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      textDirection: TextDirection.rtl,
       textInputAction: action,
       onSubmitted: onSubmitted,
       obscureText: obscure,
       style: TextStyle(
         color: palette.textPrimary,
-        fontSize: 14.5,
+        fontSize: 14,
         fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: palette.textMuted, fontSize: 13.5),
-        floatingLabelStyle: TextStyle(color: palette.accentText),
-        prefixIcon: Icon(icon, size: 20, color: palette.textMuted),
+        labelStyle: TextStyle(color: palette.textMuted, fontSize: 13),
+        floatingLabelStyle: TextStyle(
+          color: palette.accentText,
+          fontWeight: FontWeight.w600,
+        ),
+        prefixIcon: Icon(icon, size: 19, color: palette.textMuted),
         suffixIcon: suffix,
         filled: true,
         fillColor: palette.surfaceSoft,
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
-          vertical: 16,
+          vertical: 15,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
@@ -250,13 +303,12 @@ extension _LoginWindowsBody on _LoginViewState {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
-          borderSide: BorderSide(color: palette.accent, width: 1.5),
+          borderSide: BorderSide(color: palette.accent, width: 1.4),
         ),
       ),
     );
   }
 
-  /// دائرة ضوء ناعمة تُستخدم كخلفية جرافيكية.
   Widget _glowCircle(Color color, double size) {
     return IgnorePointer(
       child: Container(
@@ -265,10 +317,7 @@ extension _LoginWindowsBody on _LoginViewState {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
-            colors: [
-              color.withValues(alpha: 0.16),
-              color.withValues(alpha: 0),
-            ],
+            colors: [color.withValues(alpha: 0.12), color.withValues(alpha: 0)],
           ),
         ),
       ),
@@ -276,143 +325,271 @@ extension _LoginWindowsBody on _LoginViewState {
   }
 }
 
-/// لوحة البراند الجرافيكية — النص التجاري + المزايا + بيانات المطوّر.
-class _LoginBrandPanel extends StatelessWidget {
-  const _LoginBrandPanel();
+class _LanguageSwitch extends StatelessWidget {
+  const _LanguageSwitch();
 
   @override
   Widget build(BuildContext context) {
     final palette = DesktopPalette.of(context);
     final theme = Theme.of(context);
+    final isArabic = Str.isRtl;
 
-    final deep = Color.lerp(palette.accent, const Color(0xFF060D1C), 0.82)!;
-    final mid = Color.lerp(palette.accent, const Color(0xFF0B1426), 0.55)!;
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [deep, mid],
+    return Tooltip(
+      message: isArabic ? 'English' : 'العربية',
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap:
+              () => context.read<LocaleCubit>().changeLanguage(
+                isArabic ? 'en' : 'ar',
+              ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+            decoration: BoxDecoration(
+              color: palette.surface,
+              borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
+              border: Border.all(color: palette.border),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.translate_rounded,
+                  size: 14,
+                  color: palette.textSecondary,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  isArabic ? 'EN' : 'عربي',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: palette.textSecondary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _LoginError extends StatelessWidget {
+  const _LoginError({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = DesktopPalette.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: palette.soft(palette.danger),
+        borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+        border: Border.all(color: palette.danger.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            size: 17,
+            color: palette.onSoft(palette.danger),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: palette.onSoft(palette.danger),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Marketing side of the login screen.
+class _LoginBrandPanel extends StatelessWidget {
+  const _LoginBrandPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: const BoxDecoration(gradient: SaytarlyGradients.loginPanel),
       child: Stack(
         children: [
-          Positioned(
-            top: -90,
-            right: -70,
-            child: _glow(Colors.white, 400, 0.09),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(painter: _GridPatternPainter()),
+            ),
           ),
           Positioned(
-            bottom: -130,
-            left: -60,
-            child: _glow(palette.accent, 420, 0.22),
+            top: -130,
+            right: -100,
+            child: _glow(Colors.white, 460, 0.07),
+          ),
+          Positioned(
+            bottom: -170,
+            left: -120,
+            child: _glow(SaytarlyColors.controlBlue, 520, 0.20),
           ),
           Padding(
-            padding: const EdgeInsets.all(48),
+            padding: const EdgeInsets.fromLTRB(48, 38, 48, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 58,
-                      height: 58,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(
-                          DesktopTokens.radiusMd,
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: Image.asset(
-                        'assets/images/logo.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const Icon(
-                          Icons.local_cafe_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: DesktopTokens.gapMd),
-                    Expanded(
-                      child: Text(
-                        'نظام إدارة الكافيه'.tr(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const SaytarlyLogo(markSize: 42, onDark: true, showGlow: true),
                 const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: SaytarlyColors.darkAccent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 7),
+                      Text(
+                        'منصة إدارة المطاعم والكافيهات'.tr(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.82),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
                 Text(
-                  'كل حاجة في الكافيه\nمن شاشة واحدة'.tr(),
-                  style: theme.textTheme.displaySmall?.copyWith(
+                  'أدر مطعمك\nبذكاء وهدوء.'.tr(),
+                  style: theme.textTheme.displayMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 34,
-                    height: 1.35,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 42,
+                    height: 1.28,
+                    letterSpacing: -1.2,
                   ),
                 ),
-                const SizedBox(height: DesktopTokens.gapMd),
-                Text(
-                  ('كاشير، أقسام ومنتجات، مخزون وخامات، بلايستيشن، وتقارير — '.tr() + 'كلها مظبوطة ومن غير ورق.'.tr()),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    fontSize: 14.5,
-                    height: 1.7,
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Text(
+                    'من الكاشير والمخزون إلى الرواتب والتقارير — كل عملياتك في منصة واحدة، واضحة وسريعة ومصمّمة لسطح المكتب.'
+                        .tr(),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.68),
+                      fontSize: 14,
+                      height: 1.8,
+                    ),
                   ),
                 ),
-                const SizedBox(height: DesktopTokens.gapXl),
-                _feature(context, Icons.point_of_sale_outlined,
-                    'كاشير ومبيعات لحظية'.tr()),
-                _feature(context, Icons.category_outlined,
-                    'أقسام ومنتجات قابلة للتخصيص'.tr()),
-                _feature(context, Icons.inventory_2_outlined,
-                    'خامات ومخزون مشترك بين الأقسام'.tr()),
-                _feature(context, Icons.sports_esports_outlined,
-                    'إدارة بلايستيشن وترابيزات'.tr()),
-                _feature(context, Icons.insights_outlined,
-                    'تقارير ورديات مفصّلة'.tr()),
-                const Spacer(),
-                Divider(color: Colors.white.withValues(alpha: 0.14)),
-                const SizedBox(height: DesktopTokens.gapSm),
-                Row(
+                const SizedBox(height: 30),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    Flexible(
-                      child: Text(
-                        'Eng: Waled Mabrok',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                    _feature(
+                      context,
+                      Icons.point_of_sale_rounded,
+                      'كاشير ومبيعات لحظية'.tr(),
                     ),
-                    const Spacer(),
-                    Icon(
-                      Icons.phone,
-                      size: 16,
-                      color: Colors.white.withValues(alpha: 0.85),
+                    _feature(
+                      context,
+                      Icons.inventory_2_outlined,
+                      'مخزون وخامات'.tr(),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '01032548232',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontWeight: FontWeight.w800,
-                      ),
+                    _feature(
+                      context,
+                      Icons.insights_rounded,
+                      'تقارير وربحية'.tr(),
+                    ),
+                    _feature(
+                      context,
+                      Icons.badge_outlined,
+                      'موظفين ورواتب'.tr(),
+                    ),
+                    _feature(
+                      context,
+                      Icons.table_restaurant_outlined,
+                      'ترابيزات وبلايستيشن'.tr(),
+                    ),
+                    _feature(
+                      context,
+                      Icons.print_outlined,
+                      'فواتير وطباعة'.tr(),
                     ),
                   ],
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 13,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.055),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.10),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      _trustItem(
+                        context,
+                        Icons.language_rounded,
+                        'عربي / English'.tr(),
+                      ),
+                      _divider(),
+                      _trustItem(
+                        context,
+                        Icons.wifi_off_rounded,
+                        'يعمل محليًا'.tr(),
+                      ),
+                      _divider(),
+                      _trustItem(
+                        context,
+                        Icons.shield_outlined,
+                        'بياناتك على جهازك'.tr(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'SAYTARLY • Restaurant & Café Management',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 9.5,
+                    letterSpacing: 0.4,
+                  ),
                 ),
               ],
             ),
@@ -423,35 +600,73 @@ class _LoginBrandPanel extends StatelessWidget {
   }
 
   Widget _feature(BuildContext context, IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: DesktopTokens.gapMd),
+    final theme = Theme.of(context);
+    return Container(
+      width: 236,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+      ),
       child: Row(
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(9),
             ),
-            child: Icon(icon, size: 18, color: Colors.white),
+            child: Icon(icon, size: 16, color: Colors.white),
           ),
-          const SizedBox(width: DesktopTokens.gapMd),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: Colors.white.withValues(alpha: 0.88),
+                fontWeight: FontWeight.w600,
+                fontSize: 11.5,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _trustItem(BuildContext context, IconData icon, String label) {
+    return Expanded(
+      child: Row(
+        children: [
+          Icon(icon, size: 15, color: Colors.white.withValues(alpha: 0.64)),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Colors.white.withValues(alpha: 0.68),
+                fontSize: 9.8,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _divider() {
+    return Container(
+      width: 1,
+      height: 20,
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      color: Colors.white.withValues(alpha: 0.10),
     );
   }
 
@@ -472,4 +687,26 @@ class _LoginBrandPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+class _GridPatternPainter extends CustomPainter {
+  const _GridPatternPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.035)
+          ..strokeWidth = 1;
+    const step = 52.0;
+    for (double x = 0; x < size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GridPatternPainter oldDelegate) => false;
 }

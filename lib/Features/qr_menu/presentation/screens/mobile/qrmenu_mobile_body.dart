@@ -14,10 +14,14 @@ extension _MenuScreenMobileBody on _MenuScreenState {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text('📋 المنيو'.tr(),
-                  style: TextStyle(color: Colors.white, fontSize: 18)),
-              Text(widget.tableName,
-                  style: const TextStyle(color: Colors.amber, fontSize: 13)),
+              Text(
+                '📋 المنيو'.tr(),
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Text(
+                widget.tableName,
+                style: const TextStyle(color: Colors.amber, fontSize: 13),
+              ),
             ],
           ),
           bottom: TabBar(
@@ -26,45 +30,52 @@ extension _MenuScreenMobileBody on _MenuScreenState {
             indicatorColor: Colors.amber,
             labelColor: Colors.amber,
             unselectedLabelColor: Colors.white54,
-            tabs: _categories
-                .map((c) => Tab(text: c['label'] as String))
-                .toList(),
+            tabs:
+                _categories
+                    .map((c) => Tab(text: c['label'] as String))
+                    .toList(),
           ),
         ),
-        body: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: Colors.amber))
-            : Column(
-                children: [
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: _categories.map((c) {
-                        final drinks = _filteredDrinks(c['temps']);
-                        if (drinks.isEmpty) {
-                          return  Center(
-                            child: Text('لا يوجد منتجات'.tr(),
-                                style: TextStyle(color: Colors.white54)),
-                          );
-                        }
-                        return GridView.builder(
-                          padding: const EdgeInsets.all(12),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1.1,
-                          ),
-                          itemCount: drinks.length,
-                          itemBuilder: (_, i) => _buildDrinkCard(drinks[i]),
-                        );
-                      }).toList(),
+        body:
+            _loading
+                ? const Center(
+                  child: CircularProgressIndicator(color: Colors.amber),
+                )
+                : Column(
+                  children: [
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children:
+                            _categories.map((c) {
+                              final drinks = _filteredDrinks(c['temps']);
+                              if (drinks.isEmpty) {
+                                return Center(
+                                  child: Text(
+                                    'لا يوجد منتجات'.tr(),
+                                    style: TextStyle(color: Colors.white54),
+                                  ),
+                                );
+                              }
+                              return GridView.builder(
+                                padding: const EdgeInsets.all(12),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      childAspectRatio: 1.1,
+                                    ),
+                                itemCount: drinks.length,
+                                itemBuilder:
+                                    (_, i) => _buildDrinkCard(drinks[i]),
+                              );
+                            }).toList(),
+                      ),
                     ),
-                  ),
-                  if (_cart.isNotEmpty) _buildCartBar(),
-                ],
-              ),
+                    if (_cart.isNotEmpty) _buildCartBar(),
+                  ],
+                ),
       ),
     );
   }
@@ -94,35 +105,42 @@ extension _MenuScreenMobileBody on _MenuScreenState {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Text(
-              drink['name'] as String,
+              DrinkModel.displayNameFromMap(drink),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '{v1} ج'.tr({'v1': price.toStringAsFixed(0)}),
-            style:  TextStyle(color: Colors.amber, fontSize: 13),
+            style: TextStyle(color: Colors.amber, fontSize: 13),
           ),
-           SizedBox(height: 8),
+          SizedBox(height: 8),
           if (qty == 0)
             GestureDetector(
               onTap: () => _addToCart(id),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.amber,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child:  Text('إضافة'.tr(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black)),
+                child: Text(
+                  'إضافة'.tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
               ),
             )
           else
@@ -135,9 +153,10 @@ extension _MenuScreenMobileBody on _MenuScreenState {
                   child: Text(
                     '$qty',
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 _circleBtn(Icons.add, () => _addToCart(id)),
@@ -173,13 +192,15 @@ extension _MenuScreenMobileBody on _MenuScreenState {
           // ملاحظة
           TextField(
             style: const TextStyle(color: Colors.white),
-            decoration:  InputDecoration(
+            decoration: InputDecoration(
               hintText: 'ملاحظة للطلب (اختياري)'.tr(),
               hintStyle: TextStyle(color: Colors.white38),
               enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white24)),
+                borderSide: BorderSide(color: Colors.white24),
+              ),
               focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.amber)),
+                borderSide: BorderSide(color: Colors.amber),
+              ),
             ),
             onChanged: (v) => _note = v,
           ),
@@ -187,9 +208,14 @@ extension _MenuScreenMobileBody on _MenuScreenState {
           Row(
             children: [
               Text(
-                '{_cartTotal} صنف  |  {v2} ج'.tr({'_cartTotal': _cartTotal, 'v2': _cartPrice.toStringAsFixed(0)}),
+                '{_cartTotal} صنف  |  {v2} ج'.tr({
+                  '_cartTotal': _cartTotal,
+                  'v2': _cartPrice.toStringAsFixed(0),
+                }),
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Spacer(),
               ElevatedButton.icon(
@@ -197,17 +223,22 @@ extension _MenuScreenMobileBody on _MenuScreenState {
                   backgroundColor: Colors.amber,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: _submitting ? null : _submitOrder,
-                icon: _submitting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.black))
-                    : const Icon(Icons.send),
-                label:  Text('أرسل الطلب'.tr()),
+                icon:
+                    _submitting
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                        : const Icon(Icons.send),
+                label: Text('أرسل الطلب'.tr()),
               ),
             ],
           ),
@@ -227,12 +258,13 @@ extension _MenuScreenMobileBody on _MenuScreenState {
             children: [
               const Text('✅', style: TextStyle(fontSize: 80)),
               const SizedBox(height: 20),
-               Text(
+              Text(
                 'تم إرسال طلبك!'.tr(),
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -240,7 +272,7 @@ extension _MenuScreenMobileBody on _MenuScreenState {
                 style: const TextStyle(color: Colors.amber, fontSize: 18),
               ),
               const SizedBox(height: 8),
-               Text(
+              Text(
                 'سيتم تحضير طلبك قريباً 🎉'.tr(),
                 style: TextStyle(color: Colors.white54, fontSize: 15),
               ),
@@ -251,12 +283,13 @@ extension _MenuScreenMobileBody on _MenuScreenState {
                   foregroundColor: Colors.black,
                 ),
                 icon: const Icon(Icons.refresh),
-                label:  Text('طلب جديد'.tr()),
-                onPressed: () => _refresh(() {
-                  _cart.clear();
-                  _submitted = false;
-                  _note = '';
-                }),
+                label: Text('طلب جديد'.tr()),
+                onPressed:
+                    () => _refresh(() {
+                      _cart.clear();
+                      _submitted = false;
+                      _note = '';
+                    }),
               ),
             ],
           ),

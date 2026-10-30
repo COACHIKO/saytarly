@@ -12,8 +12,10 @@ library;
 
 export 'package:saytarly/core/desktop/desktop_tokens.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_card.dart';
+export 'package:saytarly/core/desktop/widgets/desktop_command_palette.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_controls.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_grid.dart';
+export 'package:saytarly/core/desktop/widgets/desktop_panel.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_scaffold.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_shell.dart';
 export 'package:saytarly/core/desktop/widgets/desktop_sidebar.dart';

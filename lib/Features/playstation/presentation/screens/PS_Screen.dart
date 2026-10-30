@@ -65,54 +65,58 @@ class _StaffDashboardState extends State<PsScreen> {
     // 🔹 عرض نافذة الاختيار
     final result = await showDialog<String>(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AppDialog(
-          title: Text('بدء جلسة جديدة'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedCustomer,
-                isExpanded: true,
-                hint: Text('اختر عميل موجود'.tr()),
-                items: customers
-                    .map(
-                      (c) => DropdownMenuItem<String>(
-                        value: c['customer_name'] as String,
-                        child: Text(c['customer_name'] as String),
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AppDialog(
+                  title: Text('بدء جلسة جديدة'.tr()),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: selectedCustomer,
+                        isExpanded: true,
+                        hint: Text('اختر عميل موجود'.tr()),
+                        items:
+                            customers
+                                .map(
+                                  (c) => DropdownMenuItem<String>(
+                                    value: c['customer_name'] as String,
+                                    child: Text(c['customer_name'] as String),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged:
+                            (val) => setState(() => selectedCustomer = val),
                       ),
-                    )
-                    .toList(),
-                onChanged: (val) => setState(() => selectedCustomer = val),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'أو أضف عميل جديد'.tr(),
-                  border: OutlineInputBorder(),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          labelText: 'أو أضف عميل جديد'.tr(),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, null),
+                      child: Text('إلغاء'.tr()),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final name = nameController.text.trim();
+                        Navigator.pop(
+                          context,
+                          name.isNotEmpty ? name : selectedCustomer,
+                        );
+                      },
+                      child: Text('ابدأ'.tr()),
+                    ),
+                  ],
                 ),
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                Navigator.pop(
-                  context,
-                  name.isNotEmpty ? name : selectedCustomer,
-                );
-              },
-              child: Text('ابدأ'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
 
     if (result == null || result.isEmpty) return;
@@ -162,15 +166,15 @@ class _StaffDashboardState extends State<PsScreen> {
     final hours = effectiveSeconds ~/ 3600; // عدد الساعات الكاملة
     final minutes = (effectiveSeconds % 3600) ~/ 60; // عدد الدقائق المتبقية
 
-    String displayDuration = c.fixedPrice != null
-        ? 'Match'
-        : '${hours} ساعة و ${minutes} دقيقة';
+    String displayDuration =
+        c.fixedPrice != null ? 'Match' : '${hours} ساعة و ${minutes} دقيقة';
 
     final duration = effectiveSeconds / 3600.0;
 
-    final deviceCost = (c.fixedPrice != null && c.fixedPrice! > 0)
-        ? c.fixedPrice!
-        : duration * c.pricePerHour;
+    final deviceCost =
+        (c.fixedPrice != null && c.fixedPrice! > 0)
+            ? c.fixedPrice!
+            : duration * c.pricePerHour;
 
     final drinksCost = await DBHelper.getDrinksCostForInvoice(
       invoice['id'] as int,
@@ -191,9 +195,10 @@ class _StaffDashboardState extends State<PsScreen> {
       where: 'invoice_id = ? AND item_type = ?',
       whereArgs: [invoice['id'], 'playstation'],
     );
-    final playstationName = c.fixedPrice != null
-        ? 'Playstation Match'
-        : 'Playstation ${duration.toStringAsFixed(2)} ساعة';
+    final playstationName =
+        c.fixedPrice != null
+            ? 'Playstation Match'
+            : 'Playstation ${duration.toStringAsFixed(2)} ساعة';
 
     if (existing.isEmpty && c.fixedPrice == null) {
       await db.insert('invoice_items', {
@@ -211,48 +216,55 @@ class _StaffDashboardState extends State<PsScreen> {
     // اختيار طريقة الدفع
     final paymentChoice = await showDialog<String>(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AppDialog(
-          title: Text('اختيار طريقة الدفع'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: discountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'الخصم'.tr(),
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  setState(() {
-                    double entered = double.tryParse(val) ?? 0.0;
-                    // نجبر الخصم يكون بين 0 و total
-                    if (entered > total) {
-                      discountController.text = total.toStringAsFixed(
-                        2,
-                      ); // نص الخصم يبقى مساوي للإجمالي
-                      discount = total;
-                      discountController.selection = TextSelection.fromPosition(
-                        TextPosition(offset: discountController.text.length),
-                      );
-                    } else if (entered < 0) {
-                      discount = 0;
-                    } else {
-                      discount = entered;
-                    }
-                  });
-                },
-              ),
-              SizedBox(height: 10),
-              Text(
-                'الإجمالي بعد الخصم: {v1} ج'.tr({'v1': totalAfterDiscount(discount).toStringAsFixed(2)}),
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          /*
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (context, setState) => AppDialog(
+                  title: Text('اختيار طريقة الدفع'.tr()),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: discountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'الخصم'.tr(),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            double entered = double.tryParse(val) ?? 0.0;
+                            // نجبر الخصم يكون بين 0 و total
+                            if (entered > total) {
+                              discountController.text = total.toStringAsFixed(
+                                2,
+                              ); // نص الخصم يبقى مساوي للإجمالي
+                              discount = total;
+                              discountController
+                                  .selection = TextSelection.fromPosition(
+                                TextPosition(
+                                  offset: discountController.text.length,
+                                ),
+                              );
+                            } else if (entered < 0) {
+                              discount = 0;
+                            } else {
+                              discount = entered;
+                            }
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'الإجمالي بعد الخصم: {v1} ج'.tr({
+                          'v1': totalAfterDiscount(discount).toStringAsFixed(2),
+                        }),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  /*
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context, 'cancel'),
@@ -266,54 +278,57 @@ class _StaffDashboardState extends State<PsScreen> {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                 child: Text('دفع كامل')),
           ],*/
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                  actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  actions: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, 'cancel'),
+                            child: Text(
+                              'إلغاء'.tr(),
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, 'debt'),
+                            child: Text(
+                              'على الحساب'.tr(),
+                              style: TextStyle(fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, 'paid'),
+                            child: Text(
+                              'دفع كامل'.tr(),
+                              style: TextStyle(fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () => Navigator.pop(context, 'cancel'),
-                    child:  Text('إلغاء'.tr(), style: TextStyle(fontSize: 13)),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onPressed: () => Navigator.pop(context, 'debt'),
-                    child:  Text(
-                      'على الحساب'.tr(),
-                      style: TextStyle(fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onPressed: () => Navigator.pop(context, 'paid'),
-                    child:  Text(
-                      'دفع كامل'.tr(),
-                      style: TextStyle(fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
     );
 
     if (paymentChoice == null || paymentChoice == 'cancel') return;
@@ -324,79 +339,87 @@ class _StaffDashboardState extends State<PsScreen> {
 
       final customerName = await showDialog<String>(
         context: context,
-        builder: (_) => AppDialog(
-          title:  Text('تسجيل الدين'.tr()),
-          content: FutureBuilder<List<String>>(
-            future: DBHelper.getDebtorsNames(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const SizedBox(
-                  height: 60,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
+        builder:
+            (_) => AppDialog(
+              title: Text('تسجيل الدين'.tr()),
+              content: FutureBuilder<List<String>>(
+                future: DBHelper.getDebtorsNames(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const SizedBox(
+                      height: 60,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-              final names = snapshot.data!;
+                  final names = snapshot.data!;
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration:  InputDecoration(
-                      labelText: 'عميل جديد'.tr(),
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person_add),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Autocomplete<String>(
-                    optionsBuilder: (value) {
-                      if (value.text.isEmpty) {
-                        return names;
-                      }
-
-                      return names.where(
-                        (n) =>
-                            n.toLowerCase().contains(value.text.toLowerCase()),
-                      );
-                    },
-                    onSelected: (value) {
-                      selectedCustomer = value;
-                    },
-                    fieldViewBuilder: (context, textCtrl, focusNode, onSubmit) {
-                      return TextField(
-                        controller: textCtrl,
-                        focusNode: focusNode,
-                        decoration:  InputDecoration(
-                          labelText: 'بحث عن عميل موجود'.tr(),
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          labelText: 'عميل جديد'.tr(),
                           border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.search),
+                          prefixIcon: Icon(Icons.person_add),
                         ),
-                      );
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:  Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final result = nameController.text.trim().isNotEmpty
-                    ? nameController.text.trim()
-                    : selectedCustomer;
+                      ),
+                      const SizedBox(height: 15),
+                      Autocomplete<String>(
+                        optionsBuilder: (value) {
+                          if (value.text.isEmpty) {
+                            return names;
+                          }
 
-                Navigator.pop(context, result);
-              },
-              child:  Text('حفظ'.tr()),
+                          return names.where(
+                            (n) => n.toLowerCase().contains(
+                              value.text.toLowerCase(),
+                            ),
+                          );
+                        },
+                        onSelected: (value) {
+                          selectedCustomer = value;
+                        },
+                        fieldViewBuilder: (
+                          context,
+                          textCtrl,
+                          focusNode,
+                          onSubmit,
+                        ) {
+                          return TextField(
+                            controller: textCtrl,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                              labelText: 'بحث عن عميل موجود'.tr(),
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.search),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('إلغاء'.tr()),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final result =
+                        nameController.text.trim().isNotEmpty
+                            ? nameController.text.trim()
+                            : selectedCustomer;
+
+                    Navigator.pop(context, result);
+                  },
+                  child: Text('حفظ'.tr()),
+                ),
+              ],
             ),
-          ],
-        ),
       );
       if (customerName == null || customerName.isEmpty) return;
 
@@ -476,62 +499,79 @@ class _StaffDashboardState extends State<PsScreen> {
     // عرض شاشة الفاتورة النهائية
     showDialog(
       context: context,
-      builder: (_) => AppDialog(
-        title: Text('الفاتورة النهائية'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('الجهاز: {v1}'.tr({'v1': c.name})),
-            Text('وقت الاستخدام: {displayDuration}'.tr({'displayDuration': displayDuration})),
-            Text('تكلفة الجهاز: {v1}'.tr({'v1': deviceCost.toStringAsFixed(2)})),
-            Text('تكلفة المشروبات: {v1}'.tr({'v1': drinksCost.toStringAsFixed(2)})),
-            Text('الخصم: {v1}'.tr({'v1': discount.toStringAsFixed(2)})),
-            Divider(),
-            Text(
-              'الإجمالي: {v1}'.tr({'v1': totalAfterDiscount(discount).toStringAsFixed(2)}),
-              style: TextStyle(fontWeight: FontWeight.bold),
+      builder:
+          (_) => AppDialog(
+            title: Text('الفاتورة النهائية'.tr()),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('الجهاز: {v1}'.tr({'v1': c.name})),
+                Text(
+                  'وقت الاستخدام: {displayDuration}'.tr({
+                    'displayDuration': displayDuration,
+                  }),
+                ),
+                Text(
+                  'تكلفة الجهاز: {v1}'.tr({
+                    'v1': deviceCost.toStringAsFixed(2),
+                  }),
+                ),
+                Text(
+                  'تكلفة المشروبات: {v1}'.tr({
+                    'v1': drinksCost.toStringAsFixed(2),
+                  }),
+                ),
+                Text('الخصم: {v1}'.tr({'v1': discount.toStringAsFixed(2)})),
+                Divider(),
+                Text(
+                  'الإجمالي: {v1}'.tr({
+                    'v1': totalAfterDiscount(discount).toStringAsFixed(2),
+                  }),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('حسناً'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context); // 🧃 جلب المشروبات من قاعدة البيانات
-              final drinks = await DBHelper.database.then((db) async {
-                final list = await db.rawQuery(
-                  ''' SELECT d.name, ii.qty, ii.total FROM invoice_items ii LEFT JOIN drinks d ON d.id = ii.drink_id WHERE ii.invoice_id = ? ''',
-                  [invoice['id']],
-                );
-                return list
-                    .map(
-                      (e) => {
-                        'name': e['name'] ?? 'بلاستيشن'.tr(),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('حسناً'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // 🧃 جلب المشروبات من قاعدة البيانات
+                  final drinks = await DBHelper.database.then((db) async {
+                    final list = await db.rawQuery(
+                      ''' SELECT d.name, d.name_en, ii.qty, ii.total FROM invoice_items ii LEFT JOIN drinks d ON d.id = ii.drink_id WHERE ii.invoice_id = ? ''',
+                      [invoice['id']],
+                    );
+                    return list.map((e) {
+                      final display = DrinkModel.displayNameFromMap(e);
+                      return {
+                        'name':
+                            display.isNotEmpty
+                                ? display
+                                : (e['name'] ?? 'بلاستيشن'.tr()),
                         'qty': e['qty'] ?? 1,
                         'total': e['total'] ?? 0.0,
-                      },
-                    )
-                    .toList();
-              }); // 🖨️ طباعة الفاتورة
-              await PlaystationInvoicePrinter.printSession(
-                staffName: widget.staffName,
-                consoleName: c.name,
-                duration: duration,
-                discount: discount,
-                deviceCost: deviceCost,
-                drinksCost: drinksCost,
-                total: total,
-                drinks: drinks,
-              );
-            },
-            child: Text('طباعة'.tr()),
+                      };
+                    }).toList();
+                  }); // 🖨️ طباعة الفاتورة
+                  await PlaystationInvoicePrinter.printSession(
+                    staffName: widget.staffName,
+                    consoleName: c.name,
+                    duration: duration,
+                    discount: discount,
+                    deviceCost: deviceCost,
+                    drinksCost: drinksCost,
+                    total: total,
+                    drinks: drinks,
+                  );
+                },
+                child: Text('طباعة'.tr()),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -569,14 +609,28 @@ class _StaffDashboardState extends State<PsScreen> {
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
-                  '📅 التاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}),
+                  '📅 التاريخ: {v1}'.tr({
+                    'v1': DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()),
+                  }),
                 ),
                 pw.Text('👤 الموظف: {v1}'.tr({'v1': widget.staffName})),
                 pw.Divider(),
                 pw.Text('🎮 الجهاز: {v1}'.tr({'v1': console.name})),
-                pw.Text('⏱ مدة الجلسة: {v1} ساعة'.tr({'v1': duration.toStringAsFixed(2)})),
-                pw.Text('💰 تكلفة الجهاز: {v1}'.tr({'v1': deviceCost.toStringAsFixed(2)})),
-                pw.Text('🥤 تكلفة المشروبات: {v1}'.tr({'v1': drinksCost.toStringAsFixed(2)})),
+                pw.Text(
+                  '⏱ مدة الجلسة: {v1} ساعة'.tr({
+                    'v1': duration.toStringAsFixed(2),
+                  }),
+                ),
+                pw.Text(
+                  '💰 تكلفة الجهاز: {v1}'.tr({
+                    'v1': deviceCost.toStringAsFixed(2),
+                  }),
+                ),
+                pw.Text(
+                  '🥤 تكلفة المشروبات: {v1}'.tr({
+                    'v1': drinksCost.toStringAsFixed(2),
+                  }),
+                ),
                 pw.Divider(),
                 pw.Text(
                   'الإجمالي: {v1}'.tr({'v1': total.toStringAsFixed(2)}),
@@ -613,4 +667,3 @@ class _StaffDashboardState extends State<PsScreen> {
         : _buildMobileBody(context);
   }
 }
-

@@ -2,7 +2,6 @@ part of '../DrinksScreen.dart';
 
 /// جسم لوحة الترابيزات — نسخة الموبايل (زي ما كانت بالظبط).
 extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
-
   Widget _buildMobileBody(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -74,71 +73,81 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                         final countCtrl = TextEditingController();
                         await showDialog(
                           context: context,
-                          builder: (dialogContext) => AppDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            title:  Text(
-                              'عدد الترابيزات الجديدة'.tr(),
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            content: TextField(
-                              controller: countCtrl,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                hintText: 'أدخل العدد'.tr(),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                          builder:
+                              (dialogContext) => AppDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
+                                title: Text(
+                                  'عدد الترابيزات الجديدة'.tr(),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(dialogContext),
-                                child:  Text('إلغاء'.tr()),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final count =
-                                      int.tryParse(countCtrl.text) ?? 0;
-                                  // جلب آخر ترابيزة موجودة
-                                  final tables = await DBHelper.getAllTables();
-                                  int lastNumber = tables.isEmpty
-                                      ? 0
-                                      : tables
-                                            .map(
-                                              (t) =>
-                                                  int.tryParse(
-                                                    t['name'].split(' ')[1],
-                                                  ) ??
-                                                  0,
-                                            )
-                                            .reduce((a, b) => a > b ? a : b);
-
-                                  // إضافة الترابيزات الجديدة بعد آخر رقم موجود
-                                  for (int i = 1; i <= count; i++) {
-                                    await DBHelper.insertTable(
-                                      'ترابيزة {v1}'.tr({'v1': lastNumber + i}),
-                                    );
-                                  }
-                                  Navigator.pop(dialogContext);
-                                  _refresh(() {
-                                    _load();
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                content: TextField(
+                                  controller: countCtrl,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    hintText: 'أدخل العدد'.tr(),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
                                   ),
                                 ),
-                                child:  Text('إضافة'.tr()),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(dialogContext),
+                                    child: Text('إلغاء'.tr()),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final count =
+                                          int.tryParse(countCtrl.text) ?? 0;
+                                      // جلب آخر ترابيزة موجودة
+                                      final tables =
+                                          await DBHelper.getAllTables();
+                                      int lastNumber =
+                                          tables.isEmpty
+                                              ? 0
+                                              : tables
+                                                  .map(
+                                                    (t) =>
+                                                        int.tryParse(
+                                                          t['name'].split(
+                                                            ' ',
+                                                          )[1],
+                                                        ) ??
+                                                        0,
+                                                  )
+                                                  .reduce(
+                                                    (a, b) => a > b ? a : b,
+                                                  );
+
+                                      // إضافة الترابيزات الجديدة بعد آخر رقم موجود
+                                      for (int i = 1; i <= count; i++) {
+                                        await DBHelper.insertTable(
+                                          'ترابيزة {v1}'.tr({
+                                            'v1': lastNumber + i,
+                                          }),
+                                        );
+                                      }
+                                      Navigator.pop(dialogContext);
+                                      _refresh(() {
+                                        _load();
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Text('إضافة'.tr()),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                         );
                       },
                       child: Text('إضافة عدد التربيزات'.tr()),
@@ -220,13 +229,14 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                 ),
                               ],
                             ),
-                            padding:  EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                               vertical: 18,
                               horizontal: 14,
                             ),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment
-                                  .spaceBetween, // 🔥 يظبط التوزيع
+                              mainAxisAlignment:
+                                  MainAxisAlignment
+                                      .spaceBetween, // 🔥 يظبط التوزيع
                               children: [
                                 // العنوان
                                 Row(
@@ -237,12 +247,12 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                       size: 26,
                                       color: Colors.blueGrey,
                                     ),
-                                     SizedBox(width: 6),
+                                    SizedBox(width: 6),
                                     Flexible(
                                       child: Text(
                                         t['displayName'],
                                         overflow: TextOverflow.ellipsis,
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -253,30 +263,31 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
 
                                 // الحالة
                                 Container(
-                                  padding:  EdgeInsets.symmetric(
+                                  padding: EdgeInsets.symmetric(
                                     vertical: 6,
                                     horizontal: 16,
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(30),
                                     gradient: LinearGradient(
-                                      colors: activeInvoice == null
-                                          ? [
-                                              Colors.green.shade400,
-                                              Colors.green.shade700,
-                                            ]
-                                          : [
-                                              Colors.red.shade400,
-                                              Colors.red.shade700,
-                                            ],
+                                      colors:
+                                          activeInvoice == null
+                                              ? [
+                                                Colors.green.shade400,
+                                                Colors.green.shade700,
+                                              ]
+                                              : [
+                                                Colors.red.shade400,
+                                                Colors.red.shade700,
+                                              ],
                                     ),
                                   ),
                                   child: FittedBox(
                                     child: Text(
                                       activeInvoice == null
                                           ? '✔ متاحة'.tr()
-                                          : "⛔ محجوزة",
-                                      style:  TextStyle(
+                                          : "⛔ محجوزة".tr(),
+                                      style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -298,7 +309,7 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                         borderRadius: BorderRadius.circular(14),
                                       ),
                                     ),
-                                    child:  Text('فتح ترابيزة'.tr()),
+                                    child: Text('فتح ترابيزة'.tr()),
                                   )
                                 else
                                   Row(
@@ -312,7 +323,9 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                             final ok = await _checkPassword();
 
                                             if (!ok) {
-                                              AppToast.show('كلمة المرور غير صحيحة'.tr(),);
+                                              AppToast.show(
+                                                'كلمة المرور غير صحيحة'.tr(),
+                                              );
                                               return;
                                             }
 
@@ -338,9 +351,10 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) => AddDrinksScreen(
-                                                  invoiceId: activeInvoice,
-                                                ),
+                                                builder:
+                                                    (_) => AddDrinksScreen(
+                                                      invoiceId: activeInvoice,
+                                                    ),
                                               ),
                                             );
                                           },
@@ -355,8 +369,8 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) =>
-                                                    DrinksInvoiceScreen(
+                                                builder:
+                                                    (_) => DrinksInvoiceScreen(
                                                       invoiceId: activeInvoice,
                                                     ),
                                               ),
@@ -437,4 +451,3 @@ extension _DrinksscreenDashboardMobileBody on _DrinksscreenDashboardState {
     );
   }
 }
-

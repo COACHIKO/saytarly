@@ -5,6 +5,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:saytarly/core/database/db_helper.dart';
+import 'package:saytarly/core/models/models.dart';
 import 'package:saytarly/core/services/business_profile.dart';
 import 'package:arabic_reshaper/arabic_reshaper.dart';
 import 'package:saytarly/core/desktop/desktop.dart';
@@ -233,16 +234,22 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       // تقرير قسم كامل — كل منتجات القسم مهما كانت تصنيفاتها
       catCondition = ' AND d.module_id = ?';
       catArgs = [widget.moduleId];
-    } else if (widget.categoryFilter != null && widget.categoryFilter!.isNotEmpty) {
-      final placeholders = List.filled(widget.categoryFilter!.length, '?').join(',');
+    } else if (widget.categoryFilter != null &&
+        widget.categoryFilter!.isNotEmpty) {
+      final placeholders = List.filled(
+        widget.categoryFilter!.length,
+        '?',
+      ).join(',');
       catCondition = ' AND d.temperature IN ($placeholders)';
       catArgs = widget.categoryFilter!;
     } else {
       // تقرير المشروبات فقط: استبعاد السجائر والشيشة والمنتجات
-      catCondition = " AND (d.temperature NOT IN ('cigarette', 'shisha', 'prodect') OR d.temperature IS NULL)";
+      catCondition =
+          " AND (d.temperature NOT IN ('cigarette', 'shisha', 'prodect') OR d.temperature IS NULL)";
     }
 
-    final salesRows = await db.rawQuery('''
+    final salesRows = await db.rawQuery(
+      '''
     SELECT
       ii.drink_id,
       SUM(ii.qty) as sold_qty,
@@ -296,7 +303,9 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     ) dc ON dc.invoice_id = i.id
     $whereClause $catCondition
     GROUP BY ii.drink_id
-  ''', [...args, ...catArgs]);
+  ''',
+      [...args, ...catArgs],
+    );
 
     final salesMap = <int, Map<String, dynamic>>{
       for (final r in salesRows)
@@ -328,32 +337,34 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       );
     }
 
-    final result = drinks.map((d) {
-      final id = d['id'] as int;
-      final sold = salesMap[id];
-      final revenue = (sold?['revenue'] as num?)?.toDouble() ?? 0.0;
-      final discountAmount =
-          (sold?['discount_amount'] as num?)?.toDouble() ?? 0.0;
-      final debtRevenue = (sold?['debt_revenue'] as num?)?.toDouble() ?? 0.0;
-      final debtCollectedRevenue =
-          (sold?['debt_collected_revenue'] as num?)?.toDouble() ?? 0.0;
+    final result =
+        drinks.map((d) {
+          final id = d['id'] as int;
+          final sold = salesMap[id];
+          final revenue = (sold?['revenue'] as num?)?.toDouble() ?? 0.0;
+          final discountAmount =
+              (sold?['discount_amount'] as num?)?.toDouble() ?? 0.0;
+          final debtRevenue =
+              (sold?['debt_revenue'] as num?)?.toDouble() ?? 0.0;
+          final debtCollectedRevenue =
+              (sold?['debt_collected_revenue'] as num?)?.toDouble() ?? 0.0;
 
-      return {
-        'id': id,
-        'name': d['name'],
-        'category': d['category'],
-        'unit': (d['unit'] as String?) ?? 'piece',
-        'is_weighted': (d['is_weighted'] ?? 0) == 1,
-        'sold_qty': (sold?['sold_qty'] as num?)?.toDouble() ?? 0.0,
-        'revenue': revenue,
-        'discount_amount': discountAmount,
-        'net_revenue': revenue - discountAmount,
-        'debt_qty': (sold?['debt_qty'] as num?)?.toDouble() ?? 0.0,
-        'debt_revenue': debtRevenue,
-        'debt_collected_revenue': debtCollectedRevenue,
-        'remaining_qty': (d['qty'] as num?)?.toDouble() ?? 0.0,
-      };
-    }).toList();
+          return {
+            'id': id,
+            'name': DrinkModel.displayNameFromMap(d),
+            'category': d['category'],
+            'unit': (d['unit'] as String?) ?? 'piece',
+            'is_weighted': (d['is_weighted'] ?? 0) == 1,
+            'sold_qty': (sold?['sold_qty'] as num?)?.toDouble() ?? 0.0,
+            'revenue': revenue,
+            'discount_amount': discountAmount,
+            'net_revenue': revenue - discountAmount,
+            'debt_qty': (sold?['debt_qty'] as num?)?.toDouble() ?? 0.0,
+            'debt_revenue': debtRevenue,
+            'debt_collected_revenue': debtCollectedRevenue,
+            'remaining_qty': (d['qty'] as num?)?.toDouble() ?? 0.0,
+          };
+        }).toList();
 
     result.sort(
       (a, b) => (b['sold_qty'] as double).compareTo(a['sold_qty'] as double),
@@ -371,9 +382,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         db,
         periodType: _periodType,
         date: _periodType == 'day' ? _selectedDate : null,
-        month: _periodType == 'month'
-            ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
-            : null,
+        month:
+            _periodType == 'month'
+                ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
+                : null,
         shiftId: _periodType == 'shift' ? _selectedShiftId : null,
       );
       // 🆕 المحصّل فعليًا في الفترة دي بغض النظر عن الفاتورة اتعملت امتى
@@ -381,9 +393,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         db,
         periodType: _periodType,
         date: _periodType == 'day' ? _selectedDate : null,
-        month: _periodType == 'month'
-            ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
-            : null,
+        month:
+            _periodType == 'month'
+                ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
+                : null,
         shiftId: _periodType == 'shift' ? _selectedShiftId : null,
       );
       setState(() {
@@ -402,9 +415,16 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
   String _periodLabel() {
     switch (_periodType) {
       case 'day':
-        return 'يوم {v1}-{v2}-{v3}'.tr({'v1': _selectedDate.year, 'v2': _selectedDate.month.toString().padLeft(2, '0'), 'v3': _selectedDate.day.toString().padLeft(2, '0')});
+        return 'يوم {v1}-{v2}-{v3}'.tr({
+          'v1': _selectedDate.year,
+          'v2': _selectedDate.month.toString().padLeft(2, '0'),
+          'v3': _selectedDate.day.toString().padLeft(2, '0'),
+        });
       case 'month':
-        return 'شهر {v1}-{v2}'.tr({'v1': _selectedMonth.year, 'v2': _selectedMonth.month.toString().padLeft(2, '0')});
+        return 'شهر {v1}-{v2}'.tr({
+          'v1': _selectedMonth.year,
+          'v2': _selectedMonth.month.toString().padLeft(2, '0'),
+        });
       case 'shift':
         final match = _shifts.where((s) => s['id'] == _selectedShiftId);
         if (match.isEmpty) return 'الشيفت المختار'.tr();
@@ -426,30 +446,37 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AppDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title:  Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 8),
-            Expanded(child: Text('تأكيد مسح المبيعات'.tr())),
-          ],
-        ),
-        content: Text(
-          ('هيتم مسح كل الفواتير وبنودها الخاصة بـ "{label}" نهائيًا من قاعدة البيانات.\n\n'.tr({'label': label}) + '⚠️ العملية دي لا يمكن التراجع عنها.\n'.tr() + 'ملحوظة: الديون (الآجل) المرتبطة بأي فاتورة هتتمسح مش هتتأثر — هتفضل موجودة لوحدها.'.tr()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child:  Text('إلغاء'.tr()),
+      builder:
+          (ctx) => AppDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red),
+                SizedBox(width: 8),
+                Expanded(child: Text('تأكيد مسح المبيعات'.tr())),
+              ],
+            ),
+            content: Text(
+              ('هيتم مسح كل الفواتير وبنودها الخاصة بـ "{label}" نهائيًا من قاعدة البيانات.\n\n'
+                      .tr({'label': label}) +
+                  '⚠️ العملية دي لا يمكن التراجع عنها.\n'.tr() +
+                  'ملحوظة: الديون (الآجل) المرتبطة بأي فاتورة هتتمسح مش هتتأثر — هتفضل موجودة لوحدها.'
+                      .tr()),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('إلغاء'.tr()),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('مسح نهائيًا'.tr()),
+              ),
+            ],
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(ctx, true),
-            child:  Text('مسح نهائيًا'.tr()),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -462,9 +489,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         db,
         periodType: _periodType,
         date: _periodType == 'day' ? _selectedDate : null,
-        month: _periodType == 'month'
-            ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
-            : null,
+        month:
+            _periodType == 'month'
+                ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
+                : null,
         shiftId: _periodType == 'shift' ? _selectedShiftId : null,
       );
 
@@ -505,7 +533,9 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       await _loadReport();
 
       if (!mounted) return;
-      AppToast.show('✅ تم مسح {v1} فاتورة وبنودها'.tr({'v1': invoiceIds.length}));
+      AppToast.show(
+        '✅ تم مسح {v1} فاتورة وبنودها'.tr({'v1': invoiceIds.length}),
+      );
     } catch (e) {
       if (!mounted) return;
       AppToast.show('خطأ أثناء المسح: {e}'.tr({'e': e}));
@@ -585,13 +615,17 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                 children: [
                   pw.Text(
                     _ar(
-                      'كمية: {v1}'.tr({'v1': _formatQty(item, item['sold_qty'] as double)}),
+                      'كمية: {v1}'.tr({
+                        'v1': _formatQty(item, item['sold_qty'] as double),
+                      }),
                     ), // <-- هنا
                     style: pw.TextStyle(font: fontRegular, fontSize: 6.5),
                   ),
                   pw.Text(
                     _ar(
-                      'إيراد: {v1}'.tr({'v1': (item['revenue'] as double).toStringAsFixed(2)}),
+                      'إيراد: {v1}'.tr({
+                        'v1': (item['revenue'] as double).toStringAsFixed(2),
+                      }),
                     ), // <-- هنا
                     style: pw.TextStyle(font: fontRegular, fontSize: 6.5),
                   ),
@@ -605,19 +639,28 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                   children: [
                     pw.Text(
                       _ar(
-                        'خصم: {v1}'.tr({'v1': (item['discount_amount'] as double).toStringAsFixed(2)}),
+                        'خصم: {v1}'.tr({
+                          'v1': (item['discount_amount'] as double)
+                              .toStringAsFixed(2),
+                        }),
                       ), // <-- هنا
                       style: pw.TextStyle(font: fontRegular, fontSize: 6.5),
                     ),
                     pw.Text(
                       _ar(
-                        'آجل: {v1}'.tr({'v1': (item['debt_revenue'] as double).toStringAsFixed(2)}),
+                        'آجل: {v1}'.tr({
+                          'v1': (item['debt_revenue'] as double)
+                              .toStringAsFixed(2),
+                        }),
                       ), // <-- هنا
                       style: pw.TextStyle(font: fontRegular, fontSize: 6.5),
                     ),
                     pw.Text(
                       _ar(
-                        'محصّل: {v1}'.tr({'v1': (item['debt_collected_revenue'] as double).toStringAsFixed(2)}),
+                        'محصّل: {v1}'.tr({
+                          'v1': (item['debt_collected_revenue'] as double)
+                              .toStringAsFixed(2),
+                        }),
                       ), // <-- هنا
                       style: pw.TextStyle(font: fontRegular, fontSize: 6.5),
                     ),
@@ -639,74 +682,80 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           ),
           textDirection: pw.TextDirection.rtl,
           margin: const pw.EdgeInsets.all(6),
-          build: (context) => [
-            pw.Center(
-              child: pw.Text(
-                '$placeName',
-                style: pw.TextStyle(
-                  font: fontBold,
-                  fontSize: 12,
-                  fontWeight: pw.FontWeight.bold,
+          build:
+              (context) => [
+                pw.Center(
+                  child: pw.Text(
+                    '$placeName',
+                    style: pw.TextStyle(
+                      font: fontBold,
+                      fontSize: 12,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            pw.SizedBox(height: 3),
-            pw.Center(
-              child: pw.Text(
-                widget.customTitle ?? 'تقرير المبيعات'.tr(),
-                style: pw.TextStyle(font: fontBold, fontSize: 9),
-              ),
-            ),
-            pw.Center(
-              child: pw.Text(
-                _periodLabel(),
-                style: pw.TextStyle(font: fontRegular, fontSize: 7),
-              ),
-            ),
-            pw.SizedBox(height: 2),
-            pw.Center(
-              child: pw.Text(
-                'تاريخ الطباعة: {v1}'.tr({'v1': DateTime.now().toString().substring(0, 16)}),
-                style: pw.TextStyle(
-                  font: fontRegular,
-                  fontSize: 6,
-                  color: PdfColors.grey700,
+                pw.SizedBox(height: 3),
+                pw.Center(
+                  child: pw.Text(
+                    widget.customTitle ?? 'تقرير المبيعات'.tr(),
+                    style: pw.TextStyle(font: fontBold, fontSize: 9),
+                  ),
                 ),
-              ),
-            ),
-            pw.SizedBox(height: 8),
-            pw.Divider(),
-            pw.SizedBox(height: 4),
+                pw.Center(
+                  child: pw.Text(
+                    _periodLabel(),
+                    style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                  ),
+                ),
+                pw.SizedBox(height: 2),
+                pw.Center(
+                  child: pw.Text(
+                    'تاريخ الطباعة: {v1}'.tr({
+                      'v1': DateTime.now().toString().substring(0, 16),
+                    }),
+                    style: pw.TextStyle(
+                      font: fontRegular,
+                      fontSize: 6,
+                      color: PdfColors.grey700,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Divider(),
+                pw.SizedBox(height: 4),
 
-            // الأصناف
-            if (items.isEmpty)
-              pw.Text(
-                'لا توجد مبيعات في هذه الفترة'.tr(),
-                style: pw.TextStyle(font: fontBold, fontSize: 8),
-              )
-            else
-              ...items.map((item) => itemBlock(item)),
+                // الأصناف
+                if (items.isEmpty)
+                  pw.Text(
+                    'لا توجد مبيعات في هذه الفترة'.tr(),
+                    style: pw.TextStyle(font: fontBold, fontSize: 8),
+                  )
+                else
+                  ...items.map((item) => itemBlock(item)),
 
-            pw.SizedBox(height: 8),
-            pw.Divider(),
-            pw.SizedBox(height: 4),
-            pw.Text('الملخص'.tr(), style: pw.TextStyle(font: fontBold, fontSize: 9)),
-            pw.SizedBox(height: 4),
-            summaryRow('عدد الأصناف المباعة'.tr(), items.length.toDouble()),
-            summaryRow('إجمالي الإيراد'.tr(), totalRevenue),
-            summaryRow('إجمالي الخصم'.tr(), totalDiscount),
-            summaryRow('آجل باقي (غير محصّل)'.tr(), totalDebt),
-            summaryRow(
-              'دفعات جزئية على تربيزات (غير مضاف للصافي)'.tr(),
-              totalDebtCollectedRev,
-            ),
-            summaryRow(
-              'اتحصّل فعليًا من آجل قديم (كاش)'.tr(),
-              _debtCollectedInPeriod,
-            ),
-            pw.Divider(),
-            summaryRow('الصافي المتوقع'.tr(), netCollected, isTotal: true),
-          ],
+                pw.SizedBox(height: 8),
+                pw.Divider(),
+                pw.SizedBox(height: 4),
+                pw.Text(
+                  'الملخص'.tr(),
+                  style: pw.TextStyle(font: fontBold, fontSize: 9),
+                ),
+                pw.SizedBox(height: 4),
+                summaryRow('عدد الأصناف المباعة'.tr(), items.length.toDouble()),
+                summaryRow('إجمالي الإيراد'.tr(), totalRevenue),
+                summaryRow('إجمالي الخصم'.tr(), totalDiscount),
+                summaryRow('آجل باقي (غير محصّل)'.tr(), totalDebt),
+                summaryRow(
+                  'دفعات جزئية على تربيزات (غير مضاف للصافي)'.tr(),
+                  totalDebtCollectedRev,
+                ),
+                summaryRow(
+                  'اتحصّل فعليًا من آجل قديم (كاش)'.tr(),
+                  _debtCollectedInPeriod,
+                ),
+                pw.Divider(),
+                summaryRow('الصافي المتوقع'.tr(), netCollected, isTotal: true),
+              ],
         ),
       );
 
@@ -763,13 +812,14 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     var list = _report.where((d) => (d['sold_qty'] as double) > 0).toList();
 
     if (_searchQuery.isNotEmpty) {
-      list = list
-          .where(
-            (d) => (d['name'] as String).toLowerCase().contains(
-              _searchQuery.toLowerCase(),
-            ),
-          )
-          .toList();
+      list =
+          list
+              .where(
+                (d) => (d['name'] as String).toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+              )
+              .toList();
     }
     return list;
   }
@@ -781,4 +831,3 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         : _buildMobileBody(context);
   }
 }
-

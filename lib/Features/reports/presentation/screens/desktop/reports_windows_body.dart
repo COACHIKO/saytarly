@@ -19,10 +19,11 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
 
     return DesktopPageScaffold(
       title: 'تقارير مفصلة'.tr(),
-      subtitle: _selectedDate == null
-          ? 'كل الفواتير • {v1} فاتورة'.tr({'v1': invoices.length})
-          : 'بتاريخ ${DateFormat('yyyy-MM-dd').format(_selectedDate!)} • '
-                '${invoices.length} فاتورة',
+      subtitle:
+          _selectedDate == null
+              ? 'كل الفواتير • {v1} فاتورة'.tr({'v1': invoices.length})
+              : 'بتاريخ ${DateFormat('yyyy-MM-dd').format(_selectedDate!)} • '
+                  '${invoices.length} فاتورة',
       actions: [
         DesktopButton.ghost(
           label: 'عرض كل الفواتير'.tr(),
@@ -35,10 +36,12 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
           onPressed: _pickDate,
         ),
         DesktopToolbarIconButton(
-          icon: _numbersVisible
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
-          tooltip: _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام',
+          icon:
+              _numbersVisible
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+          tooltip:
+              _numbersVisible ? 'إخفاء الأرقام'.tr() : 'إظهار الأرقام'.tr(),
           onPressed: _toggleNumbersVisibility,
         ),
         DesktopToolbarIconButton(
@@ -64,7 +67,7 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
         children: [
           // نفس فلتر الموبايل بالظبط: _selectedDate == null يعني "كل الفواتير".
           DesktopSegmented<String>(
-            items:  [
+            items: [
               DesktopSegmentItem(
                 value: 'all',
                 label: 'كل الفواتير'.tr(),
@@ -87,7 +90,9 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
           ),
           if (_selectedDate != null)
             DesktopInfoChip(
-              label: 'بتاريخ: {v1}'.tr({'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!)}),
+              label: 'بتاريخ: {v1}'.tr({
+                'v1': DateFormat('yyyy-MM-dd').format(_selectedDate!),
+              }),
               icon: Icons.event,
               color: palette.accent,
             ),
@@ -108,7 +113,9 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
             children: [
               DesktopStatCard(
                 label: 'رصيد درج الكاش'.tr(),
-                value: _mask('${formatter.format(cashDrawerBalance)} ${Money.txt}'),
+                value: _mask(
+                  '${formatter.format(cashDrawerBalance)} ${Money.txt}',
+                ),
                 icon: Icons.point_of_sale_outlined,
                 color: palette.info,
                 hint: 'النقدية الموجودة في الدرج'.tr(),
@@ -135,7 +142,9 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
               if (_cigarettesEnabled)
                 DesktopStatCard(
                   label: 'مبيعات السجائر'.tr(),
-                  value: _mask('${formatter.format(cigarettesSales)} ${Money.txt}'),
+                  value: _mask(
+                    '${formatter.format(cigarettesSales)} ${Money.txt}',
+                  ),
                   icon: Icons.smoking_rooms_outlined,
                   color: palette.warning,
                 ),
@@ -166,7 +175,7 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
               ),
             ],
           ),
-           SizedBox(height: DesktopTokens.gapLg),
+          SizedBox(height: DesktopTokens.gapLg),
 
           // ==================== قائمة الفواتير ====================
           DesktopSectionTitle(
@@ -178,7 +187,7 @@ extension _ReportsScreenWindowsBody on _ReportsScreenState {
             ),
           ),
           if (invoices.isEmpty)
-             DesktopEmptyState(
+            DesktopEmptyState(
               icon: Icons.receipt_long_outlined,
               title: 'لا توجد فواتير'.tr(),
               message: 'مفيش فواتير مسجلة في الفترة المعروضة.'.tr(),
@@ -235,19 +244,21 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
   Widget _invoiceCard(Map<String, dynamic> inv, DesktopPalette palette) {
     final id = inv['id'];
     final start = DateTime.parse(inv['start_time']);
-    final end = inv['end_time'] != null
-        ? DateTime.parse(inv['end_time'])
-        : null;
+    final end =
+        inv['end_time'] != null ? DateTime.parse(inv['end_time']) : null;
 
     final isDebt = inv['payment_type'] == 'علي الحساب';
     final isCancelled = inv['payment_type'] == 'ملغي';
-    final statusColor = isCancelled
-        ? palette.textMuted
-        : (isDebt ? palette.danger : palette.success);
-    final statusLabel = isCancelled ? 'ملغية'.tr() : (isDebt ? 'آجل'.tr() : 'مدفوعة');
-    final statusIcon = isCancelled
-        ? Icons.cancel
-        : (isDebt ? Icons.account_balance_wallet : Icons.check_circle);
+    final statusColor =
+        isCancelled
+            ? palette.textMuted
+            : (isDebt ? palette.danger : palette.success);
+    final statusLabel =
+        isCancelled ? 'ملغية'.tr() : (isDebt ? 'آجل'.tr() : 'مدفوعة');
+    final statusIcon =
+        isCancelled
+            ? Icons.cancel
+            : (isDebt ? Icons.account_balance_wallet : Icons.check_circle);
 
     final remaining = (inv['_remaining'] as double?) ?? 0.0;
 
@@ -295,17 +306,16 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
                     const SizedBox(height: 3),
                     Text(
                       DateFormat('yyyy-MM-dd HH:mm').format(start),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: palette.textMuted,
-                      ),
+                      style: TextStyle(fontSize: 12, color: palette.textMuted),
                     ),
                   ],
                 ),
               ),
               if (isDebt && remaining > 0) ...[
                 DesktopInfoChip(
-                  label: 'متبقي: {v1}'.tr({'v1': widget.mask(remaining.toStringAsFixed(2))}),
+                  label: 'متبقي: {v1}'.tr({
+                    'v1': widget.mask(remaining.toStringAsFixed(2)),
+                  }),
                   icon: Icons.warning_amber_rounded,
                   color: palette.danger,
                   dense: true,
@@ -319,7 +329,10 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
                   children: [
                     Text(
                       'الإجمالي'.tr(),
-                      style: TextStyle(fontSize: 10.5, color: palette.textMuted),
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: palette.textMuted,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -398,7 +411,9 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
                 _infoRow('النوع'.tr(), 'ترابيزة'.tr(), palette),
               _infoRow(
                 'وقت الدفع'.tr(),
-                end != null ? DateFormat('yyyy-MM-dd HH:mm').format(end) : 'جاري',
+                end != null
+                    ? DateFormat('yyyy-MM-dd HH:mm').format(end)
+                    : 'جاري'.tr(),
                 palette,
               ),
               const SizedBox(height: DesktopTokens.gapMd),
@@ -444,7 +459,8 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
               if (productsCost > 0)
                 _financialRow('المنتجات / مأكولات'.tr(), productsCost, palette),
               if (cigCost > 0) _financialRow('السجائر'.tr(), cigCost, palette),
-              if (shishaCost > 0) _financialRow('الشيشة'.tr(), shishaCost, palette),
+              if (shishaCost > 0)
+                _financialRow('الشيشة'.tr(), shishaCost, palette),
               if (deviceCost > 0)
                 _financialRow('تكلفة الجهاز'.tr(), deviceCost, palette),
               if (discount > 0)
@@ -456,7 +472,10 @@ class _DesktopInvoicesBrowserState extends State<_DesktopInvoicesBrowser> {
                 ),
               const SizedBox(height: DesktopTokens.gapXs),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: palette.accentSoft,
                   borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),

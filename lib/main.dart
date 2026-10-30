@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/app/bloc_observer.dart';
 import 'core/app/connectivity_controller.dart';
@@ -52,6 +53,11 @@ Future<void> _bootstrap() async {
   Bloc.observer = AppBlocObserver();
 
   await SharedPref.init();
+
+  // Date/time formatting is used by reports, shifts, receipts and the
+  // dashboard. Load both supported locales once so DateFormat never throws.
+  await initializeDateFormatting('ar');
+  await initializeDateFormatting('en');
 
   // Best-effort connection watcher; must never block startup.
   unawaited(ConnectivityController.instance.init());

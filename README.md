@@ -14,6 +14,17 @@ flutter run -d windows          # or: flutter build windows --debug
 flutter test                    # unit tests (localization runtime)
 ```
 
+## Brand and preferences
+
+- The SAYTARLY identity is fixed: deep navy `#0B1F3A`, Control Blue `#1677FF`,
+  cool-gray working surfaces and semantic status colours.
+- Users choose **light or dark mode** only; there is no arbitrary accent-colour
+  override.
+- Arabic and English are first-class languages. Switch from **Settings →
+  Language**, or from the language chip on the login screen. The choice is
+  persisted and the whole app rebuilds in the selected direction and font.
+- Desktop typography: Inter for Latin, Alexandria for Arabic.
+
 ## Feature structure (conventions)
 
 Every feature lives under `lib/Features/<feature>/`:

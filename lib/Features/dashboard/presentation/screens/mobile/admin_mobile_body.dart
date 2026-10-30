@@ -11,7 +11,8 @@ extension _AdminMobileBody on _AdminDashboardState {
         ),
         actions: [
           IconButton(
-            tooltip: _showStats ? 'إخفاء الإحصائيات'.tr() : 'إظهار الإحصائيات',
+            tooltip:
+                _showStats ? 'إخفاء الإحصائيات'.tr() : 'إظهار الإحصائيات'.tr(),
             icon: Icon(
               _showStats
                   ? Icons.visibility_outlined
@@ -24,30 +25,31 @@ extension _AdminMobileBody on _AdminDashboardState {
             icon: const Icon(Icons.palette_outlined),
             initialValue: _style,
             onSelected: _changeStyle,
-            itemBuilder: (context) => [
-              _styleMenuItem(
-                DashStyle.current,
-                'التصميم الحالي'.tr(),
-                Icons.dashboard_customize_outlined,
-              ),
-              _styleMenuItem(
-                DashStyle.warmCafe,
-                'كافيه دافئ'.tr(),
-                Icons.local_cafe_outlined,
-              ),
-              _styleMenuItem(
-                DashStyle.professional,
-                'لوحة احترافية'.tr(),
-                Icons.dashboard_outlined,
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  _styleMenuItem(
+                    DashStyle.current,
+                    'التصميم الحالي'.tr(),
+                    Icons.dashboard_customize_outlined,
+                  ),
+                  _styleMenuItem(
+                    DashStyle.warmCafe,
+                    'كافيه دافئ'.tr(),
+                    Icons.local_cafe_outlined,
+                  ),
+                  _styleMenuItem(
+                    DashStyle.professional,
+                    'لوحة احترافية'.tr(),
+                    Icons.dashboard_outlined,
+                  ),
+                ],
           ),
           Padding(
-            padding:  EdgeInsets.symmetric(horizontal: 8),
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: FilledButton.tonalIcon(
               onPressed: _clearAllData,
-              icon:  Icon(Icons.delete_outline),
-              label:  Text('مسح'.tr()),
+              icon: Icon(Icons.delete_outline),
+              label: Text('مسح'.tr()),
               style: FilledButton.styleFrom(
                 foregroundColor: Colors.red,
                 backgroundColor: Colors.red.withOpacity(.1),
@@ -58,11 +60,12 @@ extension _AdminMobileBody on _AdminDashboardState {
           ),
         ],
       ),
-      body: _style == DashStyle.current
-          ? _buildCurrentBody()
-          : _style == DashStyle.warmCafe
-          ? _buildWarmCafeBody()
-          : _buildProfessionalBody(),
+      body:
+          _style == DashStyle.current
+              ? _buildCurrentBody()
+              : _style == DashStyle.warmCafe
+              ? _buildWarmCafeBody()
+              : _buildProfessionalBody(),
     );
   }
 
@@ -117,45 +120,12 @@ extension _AdminMobileBody on _AdminDashboardState {
             itemBuilder: (context, index) {
               final action = _actions[index];
               return _actionCardCurrent(
-                action['title'] as String,
+                (action['title'] as String).tr(),
                 action['icon'] as IconData,
                 action['color'] as Color,
                 action['onTap'] as VoidCallback,
               );
             },
-          ),
-        ),
-        Positioned(
-          right: 15,
-          bottom: 10,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: const [
-              Text(
-                "Eng: Waled Mabrok",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(height: 2),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "01032548232",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                  Icon(Icons.phone, size: 18, color: Colors.red),
-                ],
-              ),
-            ],
           ),
         ),
       ],
@@ -262,7 +232,7 @@ extension _AdminMobileBody on _AdminDashboardState {
                 itemBuilder: (context, index) {
                   final action = _actions[index];
                   return _warmCard(
-                    action['title'] as String,
+                    (action['title'] as String).tr(),
                     action['icon'] as IconData,
                     action['color'] as Color,
                     action['onTap'] as VoidCallback,
@@ -412,7 +382,7 @@ extension _AdminMobileBody on _AdminDashboardState {
                     itemBuilder: (context, index) {
                       final action = _actions[index];
                       return _proCard(
-                        action['title'] as String,
+                        (action['title'] as String).tr(),
                         action['icon'] as IconData,
                         action['color'] as Color,
                         action['onTap'] as VoidCallback,
@@ -608,17 +578,18 @@ extension _AdminMobileBody on _AdminDashboardState {
     );
   }
 
-  // Shared small credit line used by the two light styles.
+  // Shared small brand line used by the two light styles.
   Widget _creditFooterLight(Color color) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Text(
-        'Eng: Waled Mabrok — 01032548232',
+        'SAYTARLY',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 12,
           color: color,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
         ),
       ),
     );

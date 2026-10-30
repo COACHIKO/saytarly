@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:saytarly/core/desktop/desktop.dart';
 import 'package:saytarly/core/database/db_helper.dart';
+import 'package:saytarly/core/models/app_modules.dart';
 import 'package:saytarly/core/models/models.dart';
 import 'package:saytarly/core/services/app_settings.dart';
 import 'package:saytarly/core/utils/money.dart';
@@ -42,12 +43,13 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
   List<Map<String, dynamic>> _categories = [];
   Set<int> _enabledModuleIds = {};
 
-  List<Map<String, dynamic>> get _visibleCategories => _categories.where((c) {
-    final key = c['key'] as String? ?? '';
-    if (key == 'cigarette' && !_cigarettesEnabled) return false;
-    if (key == 'shisha' && !_shishaEnabled) return false;
-    return true;
-  }).toList();
+  List<Map<String, dynamic>> get _visibleCategories =>
+      _categories.where((c) {
+        final key = c['key'] as String? ?? '';
+        if (key == 'cigarette' && !_cigarettesEnabled) return false;
+        if (key == 'shisha' && !_shishaEnabled) return false;
+        return true;
+      }).toList();
 
   // 🆕 تبويب الفئات — لوحة الويندوز
   String _windowsTab = 'all';
@@ -84,9 +86,10 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
     final rows = await DBHelper.getAllDrinks();
     final modules = await DBHelper.getModules(enabledOnly: true);
     final moduleIds = modules.map((m) => m['id'] as int).toSet();
-    final cats = (await DBHelper.getCategories(enabledOnly: true))
-        .where((c) => moduleIds.contains(c['module_id'] as int?))
-        .toList();
+    final cats =
+        (await DBHelper.getCategories(
+          enabledOnly: true,
+        )).where((c) => moduleIds.contains(c['module_id'] as int?)).toList();
     if (!mounted) return;
     setState(() {
       drinks = rows.map((r) => DrinkModel.fromMap(r)).toList();
@@ -98,9 +101,7 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
 
   List<DrinkModel> _filterDrinks(List<DrinkModel> list) {
     if (searchQuery.isEmpty) return list;
-    return list
-        .where((d) => d.name.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+    return list.where((d) => d.matchesQuery(searchQuery)).toList();
   }
 
   // ============================================================
@@ -123,13 +124,19 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
 
     final currentStock = stockData.first['qty'] as int;
     if (qty > currentStock) {
-      _showSnack('الكمية ({qty}) أكبر من المتاح ({currentStock}) لـ {v3}'.tr({'qty': qty, 'currentStock': currentStock, 'v3': d.name}));
+      _showSnack(
+        'الكمية ({qty}) أكبر من المتاح ({currentStock}) لـ {v3}'.tr({
+          'qty': qty,
+          'currentStock': currentStock,
+          'v3': d.displayName,
+        }),
+      );
       return false;
     }
 
     final canMake = await DBHelper.canConsumeRecipe(d.id!, qty);
     if (!canMake) {
-      _showSnack('لا توجد خامات كافية لـ {v1}'.tr({'v1': d.name}));
+      _showSnack('لا توجد خامات كافية لـ {v1}'.tr({'v1': d.displayName}));
       return false;
     }
 
@@ -138,7 +145,7 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
       d.id!,
       qty,
       d.price,
-      d.name,
+      d.displayName,
     );
     await DBHelper.consumeRecipe(d.id!, qty);
     await DBHelper.updateInvoiceDrinksCost(widget.invoiceId);
@@ -208,10 +215,15 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
       for (final entry in entries.entries) {
         final drink = drinks.firstWhere(
           (d) => d.id == entry.key,
-          orElse: () =>
-              DrinkModel(id: entry.key, name: '', price: 0, temperature: ''),
+          orElse:
+              () => DrinkModel(
+                id: entry.key,
+                name: '',
+                price: 0,
+                temperature: '',
+              ),
         );
-        if (drink.name.isEmpty) continue;
+        if (drink.displayName.isEmpty) continue;
 
         final ok = await _addSingleItemToInvoice(drink, entry.value);
         if (ok) {
@@ -226,7 +238,11 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
       setState(() => _isLoading = false);
 
       if (successCount > 0) {
-        _showSnack('✅ تمت إضافة {successCount} صنف للفاتورة'.tr({'successCount': successCount}));
+        _showSnack(
+          '✅ تمت إضافة {successCount} صنف للفاتورة'.tr({
+            'successCount': successCount,
+          }),
+        );
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -250,9 +266,9 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
   // 🖥️ وضع الكاشير (POS): شبكة أيقونات + فاتورة الطلب في السايد
   // ============================================================
   Map<String, String> get _categoryLabels => {
-    'all': 'الكل',
+    'all': 'الكل'.tr(),
     for (final c in _visibleCategories)
-      (c['key'] as String? ?? ''): c['name'] as String? ?? '',
+      (c['key'] as String? ?? ''): AppModuleCategory.displayNameFromMap(c),
   };
   IconData _iconForTemperature(String? temp) {
     switch (temp) {
@@ -289,4 +305,3 @@ class _AddDrinksScreenState extends State<AddDrinksScreen> {
         : _buildMobileBody(context);
   }
 }
-

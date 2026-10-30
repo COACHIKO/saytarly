@@ -2,14 +2,13 @@ part of '../print_cards_page.dart';
 
 /// جسم شاشة طباعة كروت الإنترنت — نسخة الموبايل (زي ما كانت بالظبط).
 extension _PrintCardsPageMobileBody on _PrintCardsPageState {
-
   Widget _buildMobileBody(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(title:  Text('طباعة كروت الإنترنت'.tr())),
+      appBar: AppBar(title: Text('طباعة كروت الإنترنت'.tr())),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -47,7 +46,9 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '{v1} كارت لكل صفحة مصدر'.tr({'v1': _PrintCardsPageState.totalCards}),
+                            '{v1} كارت لكل صفحة مصدر'.tr({
+                              'v1': _PrintCardsPageState.totalCards,
+                            }),
                             style: textTheme.titleMedium?.copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -55,7 +56,10 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                             ),
                           ),
                           Text(
-                            '{v1} أعمدة × {v2} صف'.tr({'v1': _PrintCardsPageState.columns, 'v2': _PrintCardsPageState.rows}),
+                            '{v1} أعمدة × {v2} صف'.tr({
+                              'v1': _PrintCardsPageState.columns,
+                              'v2': _PrintCardsPageState.rows,
+                            }),
                             style: textTheme.bodyMedium?.copyWith(
                               fontSize: 12,
                               color: scheme.primary.withOpacity(0.75),
@@ -92,7 +96,9 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'المخزون: {queueCount} كارت متاح'.tr({'queueCount': queueCount}),
+                        'المخزون: {queueCount} كارت متاح'.tr({
+                          'queueCount': queueCount,
+                        }),
                         style: textTheme.titleMedium?.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -103,7 +109,7 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                 ),
               ),
 
-               SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // 🖼️ منطقة عرض الصورة
               Expanded(
@@ -113,38 +119,40 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                     color: scheme.surface,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: imageBytes == null
-                          ? scheme.outline.withOpacity(0.3)
-                          : scheme.secondary,
+                      color:
+                          imageBytes == null
+                              ? scheme.outline.withOpacity(0.3)
+                              : scheme.secondary,
                       width: imageBytes == null ? 1 : 1.5,
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: imageBytes == null
-                      ? _buildEmptyState(scheme, textTheme)
-                      : Stack(
-                          children: [
-                            Positioned.fill(
-                              child: InteractiveViewer(
-                                minScale: 0.5,
-                                maxScale: 4,
-                                child: Image.memory(
-                                  imageBytes!,
-                                  fit: BoxFit.contain,
+                  child:
+                      imageBytes == null
+                          ? _buildEmptyState(scheme, textTheme)
+                          : Stack(
+                            children: [
+                              Positioned.fill(
+                                child: InteractiveViewer(
+                                  minScale: 0.5,
+                                  maxScale: 4,
+                                  child: Image.memory(
+                                    imageBytes!,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: 10,
-                              left: 10,
-                              child: _buildBadge(scheme, 'الصورة جاهزة'.tr()),
-                            ),
-                          ],
-                        ),
+                              Positioned(
+                                top: 10,
+                                left: 10,
+                                child: _buildBadge(scheme, 'الصورة جاهزة'.tr()),
+                              ),
+                            ],
+                          ),
                 ),
               ),
 
-               SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // 🔘 اختيار صورة + استخراج وحفظ
               Row(
@@ -153,11 +161,10 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                     child: SizedBox(
                       height: 50,
                       child: OutlinedButton.icon(
-                        onPressed: (isExtracting || isPrinting)
-                            ? null
-                            : pickImage,
-                        icon:  Icon(Icons.image_outlined, size: 18),
-                        label:  Text(
+                        onPressed:
+                            (isExtracting || isPrinting) ? null : pickImage,
+                        icon: Icon(Icons.image_outlined, size: 18),
+                        label: Text(
                           'اختيار صورة'.tr(),
                           style: TextStyle(fontSize: 14),
                         ),
@@ -173,27 +180,30 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                       ),
                     ),
                   ),
-                   SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton.icon(
                         onPressed:
                             (imageBytes != null && !isExtracting && !isPrinting)
-                            ? extractAndSaveCards
-                            : null,
-                        icon: isExtracting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.save_alt, size: 18),
+                                ? extractAndSaveCards
+                                : null,
+                        icon:
+                            isExtracting
+                                ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Icon(Icons.save_alt, size: 18),
                         label: Text(
-                          isExtracting ? 'جارٍ الاستخراج...'.tr() : "استخراج وحفظ",
+                          isExtracting
+                              ? 'جارٍ الاستخراج...'.tr()
+                              : "استخراج وحفظ".tr(),
                           style: const TextStyle(fontSize: 14),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -247,18 +257,19 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
                       child: ElevatedButton.icon(
                         onPressed:
                             (queueCount > 0 && !isPrinting && !isExtracting)
-                            ? printFromQueue
-                            : null,
-                        icon: isPrinting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.print_rounded, size: 20),
+                                ? printFromQueue
+                                : null,
+                        icon:
+                            isPrinting
+                                ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Icon(Icons.print_rounded, size: 20),
                         label: Text(
                           isPrinting ? 'جارٍ الطباعة...'.tr() : "طباعة",
                           style: const TextStyle(
@@ -313,7 +324,11 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
             ),
             const SizedBox(height: 6),
             Text(
-              '{v1} كارت في شبكة {v2} × {v3}'.tr({'v1': _PrintCardsPageState.totalCards, 'v2': _PrintCardsPageState.columns, 'v3': _PrintCardsPageState.rows}),
+              '{v1} كارت في شبكة {v2} × {v3}'.tr({
+                'v1': _PrintCardsPageState.totalCards,
+                'v2': _PrintCardsPageState.columns,
+                'v3': _PrintCardsPageState.rows,
+              }),
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: scheme.onSurface.withOpacity(0.6),
@@ -350,4 +365,3 @@ extension _PrintCardsPageMobileBody on _PrintCardsPageState {
     );
   }
 }
-

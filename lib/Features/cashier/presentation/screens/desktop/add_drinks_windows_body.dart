@@ -23,11 +23,15 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
 
     return DesktopPageScaffold(
       title: 'إضافة مشروبات'.tr(),
-      subtitle: ('فاتورة #{v1} • '.tr({'v1': widget.invoiceId}) + '{v1}'.tr({'v1': _isPosMode ? 'وضع الكاشير'.tr() : "وضع القائمة"})),
+      subtitle:
+          ('فاتورة #{v1} • '.tr({'v1': widget.invoiceId}) +
+              '{v1}'.tr({
+                'v1': _isPosMode ? 'وضع الكاشير'.tr() : "وضع القائمة".tr(),
+              })),
       actions: [
         DesktopToolbarIconButton(
           icon: _isPosMode ? Icons.view_list_rounded : Icons.grid_view_rounded,
-          tooltip: _isPosMode ? 'عرض كقائمة'.tr() : 'عرض كاشير',
+          tooltip: _isPosMode ? 'عرض كقائمة'.tr() : 'عرض كاشير'.tr(),
           onPressed: () => _refresh(() => _isPosMode = !_isPosMode),
         ),
         DesktopToolbarIconButton(
@@ -41,7 +45,7 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
           if (cats.isNotEmpty || hasOther)
             DesktopSegmented<String>(
               items: [
-                 DesktopSegmentItem(
+                DesktopSegmentItem(
                   value: 'all',
                   label: 'الكل'.tr(),
                   icon: Icons.apps_rounded,
@@ -49,11 +53,11 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
                 for (final c in cats)
                   DesktopSegmentItem(
                     value: c['key'] as String? ?? '',
-                    label: c['name'] as String? ?? '',
+                    label: AppModuleCategory.displayNameFromMap(c),
                     icon: _iconForTemperature(c['key'] as String?),
                   ),
                 if (hasOther)
-                   DesktopSegmentItem(
+                  DesktopSegmentItem(
                     value: 'other',
                     label: 'أخرى'.tr(),
                     icon: Icons.category_outlined,
@@ -72,19 +76,21 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
       ),
       // وضع الكاشير بياخد ارتفاع الصفحة كامل، والقائمة بتسكرول عادي.
       scrollable: !_isPosMode,
-      child: _isPosMode
-          ? _windowsPosLayout(context, available, visible)
-          : _windowsListLayout(context, visible),
+      child:
+          _isPosMode
+              ? _windowsPosLayout(context, available, visible)
+              : _windowsListLayout(context, visible),
     );
   }
 
   /// نفس استبعاد نسخة الموبايل: السجائر/الشيشة المقفولة + الأقسام المقفولة
   /// + منتجات الأقسام غير المفعّلة.
   List<DrinkModel> _windowsAvailableDrinks() {
-    final disabledKeys = _categories
-        .where((c) => (c['is_enabled'] ?? 1) != 1)
-        .map((c) => c['key'] as String? ?? '')
-        .toSet();
+    final disabledKeys =
+        _categories
+            .where((c) => (c['is_enabled'] ?? 1) != 1)
+            .map((c) => c['key'] as String? ?? '')
+            .toSet();
 
     return drinks.where((d) {
       if (d.temperature == 'cigarette' && !_cigarettesEnabled) return false;
@@ -109,10 +115,15 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
       return DesktopCard(
         child: DesktopEmptyState(
           icon: Icons.local_drink_outlined,
-          title: drinks.isEmpty ? 'مفيش منتجات'.tr() : 'لا توجد أصناف متاحة',
-          message: drinks.isEmpty
-              ? ('ضيف منتجات من إدارة المنتجات الأول، وبعدها هتظهر هنا '.tr() + 'جاهزة للبيع.'.tr())
-              : 'الأصناف الموجودة دلوقتي كلها مقفولة أو مش مفعّلة من الإعدادات.',
+          title:
+              drinks.isEmpty ? 'مفيش منتجات'.tr() : 'لا توجد أصناف متاحة'.tr(),
+          message:
+              drinks.isEmpty
+                  ? ('ضيف منتجات من إدارة المنتجات الأول، وبعدها هتظهر هنا '
+                          .tr() +
+                      'جاهزة للبيع.'.tr())
+                  : 'الأصناف الموجودة دلوقتي كلها مقفولة أو مش مفعّلة من الإعدادات.'
+                      .tr(),
         ),
       );
     }
@@ -122,23 +133,24 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
       children: [
         // ==================== شبكة المنتجات ====================
         Expanded(
-          child: visible.isEmpty
-              ?  DesktopEmptyState(
-                  icon: Icons.search_off_outlined,
-                  title: 'مفيش نتائج مطابقة'.tr(),
-                  message: 'جرّب تغيّر البحث أو الفئة من فوق.'.tr(),
-                )
-              : SingleChildScrollView(
-                  child: DesktopResponsiveGrid(
-                    minTileWidth: 172,
-                    maxColumns: 8,
-                    spacing: 12,
-                    children: [
-                      for (final d in visible)
-                        _windowsProductTile(context, d),
-                    ],
+          child:
+              visible.isEmpty
+                  ? DesktopEmptyState(
+                    icon: Icons.search_off_outlined,
+                    title: 'مفيش نتائج مطابقة'.tr(),
+                    message: 'جرّب تغيّر البحث أو الفئة من فوق.'.tr(),
+                  )
+                  : SingleChildScrollView(
+                    child: DesktopResponsiveGrid(
+                      minTileWidth: 172,
+                      maxColumns: 8,
+                      spacing: 12,
+                      children: [
+                        for (final d in visible)
+                          _windowsProductTile(context, d),
+                      ],
+                    ),
                   ),
-                ),
         ),
         const SizedBox(width: DesktopTokens.gapMd),
 
@@ -164,16 +176,19 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
         child: DesktopCard(
           hover: true,
           selected: selected,
-          onTap: outOfStock
-              ? null
-              : () {
-                  final currentInCart = _cartQty[d.id!] ?? 0;
-                  if (currentInCart + 1 > d.qty) {
-                    _showSnack('الكمية أكبر من المتاح ({v1})'.tr({'v1': d.qty}));
-                    return;
-                  }
-                  _incrementCart(d);
-                },
+          onTap:
+              outOfStock
+                  ? null
+                  : () {
+                    final currentInCart = _cartQty[d.id!] ?? 0;
+                    if (currentInCart + 1 > d.qty) {
+                      _showSnack(
+                        'الكمية أكبر من المتاح ({v1})'.tr({'v1': d.qty}),
+                      );
+                      return;
+                    }
+                    _incrementCart(d);
+                  },
           padding: const EdgeInsets.all(DesktopTokens.gapSm + 2),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +219,7 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
               ),
               const Spacer(),
               Text(
-                d.name,
+                d.displayName,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -264,7 +279,11 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
             ),
             child: Row(
               children: [
-                Icon(Icons.receipt_long_rounded, size: 20, color: palette.accent),
+                Icon(
+                  Icons.receipt_long_rounded,
+                  size: 20,
+                  color: palette.accent,
+                ),
                 const SizedBox(width: DesktopTokens.gapSm),
                 Text(
                   'فاتورة الطلب'.tr(),
@@ -285,20 +304,21 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
 
           // ---- بنود السلة ----
           Expanded(
-            child: cartEntries.isEmpty
-                ?  DesktopEmptyState(
-                    icon: Icons.shopping_cart_outlined,
-                    title: 'السلة فاضية'.tr(),
-                    message: 'دوس على أي صنف عشان تضيفه للطلب.'.tr(),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: DesktopTokens.gapXs,
+            child:
+                cartEntries.isEmpty
+                    ? DesktopEmptyState(
+                      icon: Icons.shopping_cart_outlined,
+                      title: 'السلة فاضية'.tr(),
+                      message: 'دوس على أي صنف عشان تضيفه للطلب.'.tr(),
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: DesktopTokens.gapXs,
+                      ),
+                      itemCount: cartEntries.length,
+                      itemBuilder:
+                          (_, i) => _windowsCartRow(context, cartEntries[i]),
                     ),
-                    itemCount: cartEntries.length,
-                    itemBuilder: (_, i) =>
-                        _windowsCartRow(context, cartEntries[i]),
-                  ),
           ),
 
           // ---- الإجمالي والتأكيد ----
@@ -340,9 +360,10 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
                   child: DesktopButton.primary(
                     label: 'تأكيد الطلب'.tr(),
                     icon: Icons.check_circle_outline,
-                    onPressed: (_isLoading || cartEntries.isEmpty)
-                        ? null
-                        : _confirmCartOrder,
+                    onPressed:
+                        (_isLoading || cartEntries.isEmpty)
+                            ? null
+                            : _confirmCartOrder,
                   ),
                 ),
               ],
@@ -359,8 +380,13 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
     final theme = Theme.of(context);
     final drink = drinks.firstWhere(
       (d) => d.id == entry.key,
-      orElse: () =>
-          DrinkModel(id: entry.key, name: '؟'.tr(), price: 0, temperature: ''),
+      orElse:
+          () => DrinkModel(
+            id: entry.key,
+            name: '؟'.tr(),
+            price: 0,
+            temperature: '',
+          ),
     );
     final lineTotal = drink.price * entry.value;
 
@@ -385,7 +411,7 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  drink.name,
+                  drink.displayName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -395,7 +421,11 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
                   ),
                 ),
                 Text(
-                  ('{v1} ج × {v2}'.tr({'v1': drink.price.toStringAsFixed(2), 'v2': entry.value}) + ' = {v1} ج'.tr({'v1': lineTotal.toStringAsFixed(2)})),
+                  ('{v1} ج × {v2}'.tr({
+                        'v1': drink.price.toStringAsFixed(2),
+                        'v2': entry.value,
+                      }) +
+                      ' = {v1} ج'.tr({'v1': lineTotal.toStringAsFixed(2)})),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -430,7 +460,9 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
             color: palette.success,
             onTap: () {
               if (entry.value + 1 > drink.qty) {
-                _showSnack('الكمية أكبر من المتاح ({v1})'.tr({'v1': drink.qty}));
+                _showSnack(
+                  'الكمية أكبر من المتاح ({v1})'.tr({'v1': drink.qty}),
+                );
                 return;
               }
               _incrementCart(drink);
@@ -450,7 +482,9 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
         child: DesktopEmptyState(
           icon: Icons.local_drink_outlined,
           title: 'مفيش منتجات'.tr(),
-          message: ('ضيف منتجات من إدارة المنتجات الأول، وبعدها هتظهر هنا '.tr() + 'جاهزة للإضافة على الفواتير.'.tr()),
+          message:
+              ('ضيف منتجات من إدارة المنتجات الأول، وبعدها هتظهر هنا '.tr() +
+                  'جاهزة للإضافة على الفواتير.'.tr()),
         ),
       );
     }
@@ -466,7 +500,7 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
         const SizedBox(height: DesktopTokens.gapXs),
         if (visible.isEmpty)
           DesktopCard(
-            child:  DesktopEmptyState(
+            child: DesktopEmptyState(
               icon: Icons.search_off_outlined,
               title: 'مفيش نتائج مطابقة'.tr(),
               message: 'جرّب تغيّر البحث أو الفئة من فوق.'.tr(),
@@ -490,9 +524,10 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
       child: DesktopCard(
         hover: true,
         selected: selected,
-        onTap: () => _refresh(() {
-          selectedDrinkId = d.id == selectedDrinkId ? null : d.id;
-        }),
+        onTap:
+            () => _refresh(() {
+              selectedDrinkId = d.id == selectedDrinkId ? null : d.id;
+            }),
         padding: const EdgeInsets.symmetric(
           horizontal: DesktopTokens.gapMd,
           vertical: DesktopTokens.gapSm,
@@ -512,7 +547,7 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    d.name,
+                    d.displayName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -523,7 +558,10 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'المتاح: {v1} • السعر: {v2} ج'.tr({'v1': d.qty, 'v2': d.price.toStringAsFixed(2)}),
+                    'المتاح: {v1} • السعر: {v2} ج'.tr({
+                      'v1': d.qty,
+                      'v2': d.price.toStringAsFixed(2),
+                    }),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: palette.textMuted,
                       fontSize: 12,
@@ -537,9 +575,10 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
               context: context,
               icon: Icons.remove_circle_outline,
               tooltip: 'إنقاص'.tr(),
-              onTap: qty > 1
-                  ? () => _refresh(() => qtyMap[d.id!] = qty - 1)
-                  : null,
+              onTap:
+                  qty > 1
+                      ? () => _refresh(() => qtyMap[d.id!] = qty - 1)
+                      : null,
             ),
             SizedBox(
               width: 36,
@@ -590,35 +629,38 @@ extension _AddDrinksScreenWindowsBody on _AddDrinksScreenState {
     Color? color,
   }) {
     final palette = DesktopPalette.of(context);
-    final tint = onTap == null
-        ? palette.textMuted.withValues(alpha: 0.4)
-        : (color ?? palette.textSecondary);
+    final tint =
+        onTap == null
+            ? palette.textMuted.withValues(alpha: 0.4)
+            : (color ?? palette.textSecondary);
 
     Widget button = HoverBuilder(
-      cursor: onTap == null
-          ? SystemMouseCursors.basic
-          : SystemMouseCursors.click,
-      builder: (context, hovering) => GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: DesktopTokens.fast,
-          width: 30,
-          height: 30,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: hovering && onTap != null
-                ? palette.surfaceSoft
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
-            border: Border.all(
-              color: hovering && onTap != null
-                  ? palette.border
-                  : Colors.transparent,
+      cursor:
+          onTap == null ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      builder:
+          (context, hovering) => GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: DesktopTokens.fast,
+              width: 30,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color:
+                    hovering && onTap != null
+                        ? palette.surfaceSoft
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+                border: Border.all(
+                  color:
+                      hovering && onTap != null
+                          ? palette.border
+                          : Colors.transparent,
+                ),
+              ),
+              child: Icon(icon, size: 18, color: tint),
             ),
           ),
-          child: Icon(icon, size: 18, color: tint),
-        ),
-      ),
     );
 
     if (tooltip != null) {

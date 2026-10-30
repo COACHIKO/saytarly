@@ -12,15 +12,16 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
       title: 'مولّد أكواد التفعيل'.tr(),
       subtitle: 'أداة المهندس — توليد كود تفعيل لأي جهاز'.tr(),
       maxWidth: 900,
-      child: _unlocked
-          ? _generatorForm(context, palette)
-          : Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
-                child: _passwordGate(context, palette),
+      child:
+          _unlocked
+              ? _generatorForm(context, palette)
+              : Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 440),
+                  child: _passwordGate(context, palette),
+                ),
               ),
-            ),
     );
   }
 
@@ -88,7 +89,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                 ),
               ),
               icon: const Icon(Icons.lock_open_rounded, size: 19),
-              label:  Text('دخول'.tr()),
+              label: Text('دخول'.tr()),
             ),
           ),
         ],
@@ -152,9 +153,10 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                 DesktopButton.ghost(
                   label: 'نسخ'.tr(),
                   icon: Icons.copy_rounded,
-                  onPressed: () => Clipboard.setData(
-                    ClipboardData(text: _currentDeviceId),
-                  ),
+                  onPressed:
+                      () => Clipboard.setData(
+                        ClipboardData(text: _currentDeviceId),
+                      ),
                 ),
               ],
             ),
@@ -169,7 +171,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-               DesktopSectionTitle(
+              DesktopSectionTitle(
                 title: 'الخطوة 1 — كود الجهاز (من العميل)'.tr(),
               ),
               _desktopField(
@@ -191,9 +193,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                         color: palette.textMuted,
                       ),
                       onPressed: () async {
-                        final d = await Clipboard.getData(
-                          Clipboard.kTextPlain,
-                        );
+                        final d = await Clipboard.getData(Clipboard.kTextPlain);
                         if (d?.text != null) {
                           _deviceIdCtrl.text = d!.text!.trim();
                         }
@@ -223,7 +223,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-               DesktopSectionTitle(title: 'الخطوة 2 — مدة الترخيص'.tr()),
+              DesktopSectionTitle(title: 'الخطوة 2 — مدة الترخيص'.tr()),
               Row(
                 children: [
                   Expanded(
@@ -293,7 +293,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
             ],
           ),
         ),
-         SizedBox(height: DesktopTokens.gapLg),
+        SizedBox(height: DesktopTokens.gapLg),
 
         // ── زرار التوليد ──
         SizedBox(
@@ -306,13 +306,10 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
               ),
-              textStyle:  TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
             ),
-            icon:  Icon(Icons.key_rounded, size: 20),
-            label:  Text('توليد كود التفعيل'.tr()),
+            icon: Icon(Icons.key_rounded, size: 20),
+            label: Text('توليد كود التفعيل'.tr()),
           ),
         ),
 
@@ -349,9 +346,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                   padding: const EdgeInsets.all(DesktopTokens.gapMd),
                   decoration: BoxDecoration(
                     color: palette.surface,
-                    borderRadius: BorderRadius.circular(
-                      DesktopTokens.radiusMd,
-                    ),
+                    borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
                     border: Border.all(
                       color: palette.accent.withValues(alpha: 0.35),
                     ),
@@ -382,10 +377,7 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                       _isLifetime
                           ? 'ترخيص دائم مدى الحياة'.tr()
                           : 'صالح لمدة ${int.tryParse(_customDaysCtrl.text) ?? _selectedDays} يوم',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: palette.textMuted,
-                      ),
+                      style: TextStyle(fontSize: 12, color: palette.textMuted),
                     ),
                   ],
                 ),
@@ -395,9 +387,8 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                   child: FilledButton.icon(
                     onPressed: _copyCode,
                     style: FilledButton.styleFrom(
-                      backgroundColor: _justCopied
-                          ? palette.success
-                          : palette.accent,
+                      backgroundColor:
+                          _justCopied ? palette.success : palette.accent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
@@ -413,7 +404,9 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
                       _justCopied ? Icons.check : Icons.copy_rounded,
                       size: 19,
                     ),
-                    label: Text(_justCopied ? 'تم النسخ!'.tr() : 'نسخ الكود'),
+                    label: Text(
+                      _justCopied ? 'تم النسخ!'.tr() : 'نسخ الكود'.tr(),
+                    ),
                   ),
                 ),
               ],
@@ -486,9 +479,10 @@ extension _CodeGeneratorScreenWindowsBody on _CodeGeneratorScreenState {
         floatingLabelStyle: TextStyle(color: palette.accentText),
         hintStyle: TextStyle(color: palette.textMuted),
         errorStyle: TextStyle(color: palette.danger, fontSize: 11.5),
-        prefixIcon: icon != null
-            ? Icon(icon, size: 19, color: palette.textMuted)
-            : null,
+        prefixIcon:
+            icon != null
+                ? Icon(icon, size: 19, color: palette.textMuted)
+                : null,
         suffixIcon: suffix,
         filled: true,
         fillColor: palette.surfaceSoft,

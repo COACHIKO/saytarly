@@ -10,7 +10,9 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
 
     return DesktopPageScaffold(
       title: 'وصفة المشروب'.tr(),
-      subtitle: ('الخامات المستخدمة: {v1} • '.tr({'v1': recipeItems.length}) + 'الخامات المتاحة: {v1}'.tr({'v1': materials.length})),
+      subtitle:
+          ('الخامات المستخدمة: {v1} • '.tr({'v1': recipeItems.length}) +
+              'الخامات المتاحة: {v1}'.tr({'v1': materials.length})),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -30,7 +32,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
             count: recipeItems.length,
           ),
           if (recipeItems.isEmpty)
-             DesktopEmptyState(
+            DesktopEmptyState(
               icon: Icons.restaurant_menu_outlined,
               title: 'لا توجد خامات مضافة لهذا المشروب'.tr(),
               message: 'اختار خامة من "الخامات المتاحة" تحت وحدد الكمية.'.tr(),
@@ -51,7 +53,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
                 ],
               ),
             ),
-           SizedBox(height: DesktopTokens.gapXl),
+          SizedBox(height: DesktopTokens.gapXl),
 
           // ==================== الخامات المتاحة ====================
           DesktopSectionTitle(
@@ -59,7 +61,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
             count: materials.length,
           ),
           if (materials.isEmpty)
-             DesktopEmptyState(
+            DesktopEmptyState(
               icon: Icons.inventory_2_outlined,
               title: 'مفيش خامات مسجلة'.tr(),
               message: 'ضيف الخامات الأول من شاشة إدارة الخامات.'.tr(),
@@ -69,8 +71,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
               minTileWidth: 250,
               maxColumns: 4,
               children: [
-                for (final m in materials)
-                  _windowsMaterialCard(palette, m),
+                for (final m in materials) _windowsMaterialCard(palette, m),
               ],
             ),
         ],
@@ -79,10 +80,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
   }
 
   /// صف بند في الوصفة — اسم + كمية/وحدة + حذف.
-  Widget _windowsRecipeRow(
-    DesktopPalette palette,
-    Map<String, dynamic> item,
-  ) {
+  Widget _windowsRecipeRow(DesktopPalette palette, Map<String, dynamic> item) {
     return Row(
       children: [
         DesktopIconBadge(
@@ -109,10 +107,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
               const SizedBox(height: 2),
               Text(
                 '${item['qty']} ${item['unit']}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: palette.textMuted,
-                ),
+                style: TextStyle(fontSize: 12, color: palette.textMuted),
               ),
             ],
           ),
@@ -128,10 +123,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
   }
 
   /// كارت خامة متاحة — الاسم + المخزون + زرار إضافة.
-  Widget _windowsMaterialCard(
-    DesktopPalette palette,
-    Map<String, dynamic> m,
-  ) {
+  Widget _windowsMaterialCard(DesktopPalette palette, Map<String, dynamic> m) {
     return DesktopCard(
       hover: true,
       child: Column(
@@ -163,10 +155,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
           const SizedBox(height: DesktopTokens.gapSm),
           Text(
             'المخزون: {v1} {v2}'.tr({'v1': m['qty'], 'v2': m['unit']}),
-            style: TextStyle(
-              fontSize: 12,
-              color: palette.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: palette.textSecondary),
           ),
           const SizedBox(height: DesktopTokens.gapMd),
           Align(
@@ -174,11 +163,7 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
             child: DesktopButton.primary(
               label: 'إضافة'.tr(),
               icon: Icons.add,
-              onPressed: () => addRecipeMaterial(
-                m['id'],
-                m['name'],
-                m['unit'],
-              ),
+              onPressed: () => addRecipeMaterial(m['id'], m['name'], m['unit']),
             ),
           ),
         ],
@@ -211,7 +196,11 @@ extension _DrinkRecipeScreenWindowsBody on _DrinkRecipeScreenState {
                   color: hovering ? palette.border : Colors.transparent,
                 ),
               ),
-              child: Icon(icon, size: 17, color: color ?? palette.textSecondary),
+              child: Icon(
+                icon,
+                size: 17,
+                color: color ?? palette.textSecondary,
+              ),
             ),
           );
         },

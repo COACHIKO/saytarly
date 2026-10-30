@@ -1,48 +1,52 @@
 import 'package:flutter/material.dart';
 
+import 'package:saytarly/core/design/saytarly_brand.dart';
+
+/// Legacy colour aliases kept for the mobile surfaces and older widgets.
+///
+/// New desktop code should read [SaytarlyThemeTokens] through
+/// `context.saytarly` instead of hard-coding colours.
 class CColors {
-  // App theme colors
-  //static const Color primary = Colors.purple;
+  // App theme colours.
+  static const Color primary = SaytarlyColors.controlBlue;
+  static const Color secondary = SaytarlyColors.deepNavy;
+  static const Color accent = SaytarlyColors.softBlue;
 
-  static const Color primary = Color(0xFF5fb141);
-  static const Color secondary = Color(0xff1f1f1F);
-  static const Color accent = Color(0xFFb0c7ff);
-
-  // Text colors
-  static const Color textPrimary = Color(0xFF333333);
-  static const Color textSecondary = Color(0xFF6C757D);
+  // Text colours.
+  static const Color textPrimary = SaytarlyColors.textPrimary;
+  static const Color textSecondary = SaytarlyColors.textSecondary;
   static const Color textWhite = Colors.white;
 
-  // Background colors
-  static const Color light = Color(0xFFF6F6F6);
-  static const Color dark = Color(0xFF272727);
-  static const Color primaryBackground = Color(0xFFF3F5FF);
+  // Background colours.
+  static const Color light = SaytarlyColors.appCanvas;
+  static const Color dark = SaytarlyColors.textPrimary;
+  static const Color primaryBackground = SaytarlyColors.softBlue;
 
-  // Background Container colors
-  static const Color lightContainer = Color(0xFFF6F6F6);
-  static Color darkContainer = CColors.white.withOpacity(0.1);
+  // Background container colours.
+  static const Color lightContainer = SaytarlyColors.surfaceSoft;
+  static Color darkContainer = CColors.white.withValues(alpha: 0.1);
 
-  // Button colors
-  static const Color buttonPrimary = Color(0xFF5fb141);
-  static const Color buttonSecondary = Color(0xFF6C757D);
-  static const Color buttonDisabled = Color(0xFFC4C4C4);
+  // Button colours.
+  static const Color buttonPrimary = SaytarlyColors.controlBlue;
+  static const Color buttonSecondary = SaytarlyColors.textSecondary;
+  static const Color buttonDisabled = Color(0xFFCBD5E1);
 
-  // Border colors
-  static const Color borderPrimary = Color(0xFFD9D9D9);
-  static const Color borderSecondary = Color(0xFFE6E6E6);
+  // Border colours.
+  static const Color borderPrimary = SaytarlyColors.border;
+  static const Color borderSecondary = Color(0xFFF1F5F9);
 
-  // Error and validation colors
-  static const Color error = Color(0xFFD32F2F);
-  static const Color success = Color(0xFF388E3C);
-  static const Color warning = Color(0xFFF57C00);
-  static const Color info = Color(0xFF1976D2);
+  // Error and validation colours.
+  static const Color error = SaytarlyColors.danger;
+  static const Color success = SaytarlyColors.success;
+  static const Color warning = SaytarlyColors.warning;
+  static const Color info = SaytarlyColors.information;
 
-  // Neutral Shades
-  static const Color black = Color(0xFF232323);
-  static const Color darkerGrey = Color(0xFF4F4F4F);
-  static const Color darkGrey = Color(0xFF939393);
-  static const Color grey = Color(0xFFE0E0E0);
-  static const Color softGrey = Color(0xFFF4F4F4);
-  static const Color lightGrey = Color(0xFFF9F9F9);
+  // Neutral shades.
+  static const Color black = SaytarlyColors.textPrimary;
+  static const Color darkerGrey = SaytarlyColors.textSecondary;
+  static const Color darkGrey = SaytarlyColors.textMuted;
+  static const Color grey = SaytarlyColors.border;
+  static const Color softGrey = SaytarlyColors.surfaceSoft;
+  static const Color lightGrey = SaytarlyColors.appCanvas;
   static const Color white = Color(0xFFFFFFFF);
 }

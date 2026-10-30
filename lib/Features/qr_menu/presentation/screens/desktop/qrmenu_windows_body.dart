@@ -14,7 +14,10 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
 
     return DesktopPageScaffold(
       title: 'المنيو'.tr(),
-      subtitle: '{v1} • {v2} صنف'.tr({'v1': widget.tableName, 'v2': _allDrinks.length}),
+      subtitle: '{v1} • {v2} صنف'.tr({
+        'v1': widget.tableName,
+        'v2': _allDrinks.length,
+      }),
       scrollable: false,
       actions: [
         DesktopToolbarIconButton(
@@ -40,28 +43,32 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
           ),
         ),
       ),
-      child: _loading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      child:
+          _loading
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: palette.accent),
+                    const SizedBox(height: DesktopTokens.gapMd),
+                    Text(
+                      'جاري تحميل المنيو...'.tr(),
+                      style: TextStyle(
+                        color: palette.textMuted,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  CircularProgressIndicator(color: palette.accent),
-                  const SizedBox(height: DesktopTokens.gapMd),
-                  Text(
-                    'جاري تحميل المنيو...'.tr(),
-                    style: TextStyle(color: palette.textMuted, fontSize: 13.5),
-                  ),
+                  Expanded(child: _windowsMenuGrid(context, drinks)),
+                  const SizedBox(width: DesktopTokens.gapMd),
+                  SizedBox(width: 330, child: _windowsCartPanel(context)),
                 ],
               ),
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: _windowsMenuGrid(context, drinks)),
-                const SizedBox(width: DesktopTokens.gapMd),
-                SizedBox(width: 330, child: _windowsCartPanel(context)),
-              ],
-            ),
     );
   }
 
@@ -74,7 +81,7 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
     List<Map<String, dynamic>> drinks,
   ) {
     if (drinks.isEmpty) {
-      return  DesktopEmptyState(
+      return DesktopEmptyState(
         icon: Icons.local_cafe_outlined,
         title: 'لا يوجد منتجات'.tr(),
         message: 'مفيش أصناف في القسم ده دلوقتي.'.tr(),
@@ -82,16 +89,17 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
     }
 
     return DesktopScrollbar(
-      builder: (c) => SingleChildScrollView(
-        controller: c,
-        child: DesktopResponsiveGrid(
-          minTileWidth: 215,
-          maxColumns: 6,
-          children: [
-            for (final drink in drinks) _windowsDrinkCard(context, drink),
-          ],
-        ),
-      ),
+      builder:
+          (c) => SingleChildScrollView(
+            controller: c,
+            child: DesktopResponsiveGrid(
+              minTileWidth: 215,
+              maxColumns: 6,
+              children: [
+                for (final drink in drinks) _windowsDrinkCard(context, drink),
+              ],
+            ),
+          ),
     );
   }
 
@@ -104,106 +112,107 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
     final price = (drink['price'] as num).toDouble();
 
     return HoverBuilder(
-      builder: (context, hovering) => DesktopCard(
-        hover: true,
-        selected: qty > 0,
-        padding: const EdgeInsets.all(DesktopTokens.gapMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+      builder:
+          (context, hovering) => DesktopCard(
+            hover: true,
+            selected: qty > 0,
+            padding: const EdgeInsets.all(DesktopTokens.gapMd),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                AnimatedScale(
-                  scale: hovering ? 1.08 : 1,
-                  duration: DesktopTokens.fast,
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: palette.soft(palette.accent),
-                      borderRadius: BorderRadius.circular(
-                        DesktopTokens.radiusMd,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _drinkEmoji(drink['temperature'] as String? ?? ''),
-                      style: const TextStyle(fontSize: 21),
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                if (qty > 0)
-                  DesktopInfoChip(
-                    label: '×$qty',
-                    icon: Icons.shopping_cart_outlined,
-                    color: palette.accentText,
-                    dense: true,
-                  ),
-              ],
-            ),
-            const SizedBox(height: DesktopTokens.gapSm + 2),
-            Text(
-              drink['name'] as String,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: palette.textPrimary,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '{v1} ج'.tr({'v1': price.toStringAsFixed(0)}),
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: palette.accentText,
-                fontWeight: FontWeight.w900,
-                fontSize: 15,
-              ),
-            ),
-             SizedBox(height: DesktopTokens.gapSm + 2),
-            if (qty == 0)
-              SizedBox(
-                width: double.infinity,
-                child: DesktopButton.primary(
-                  label: 'إضافة'.tr(),
-                  icon: Icons.add,
-                  onPressed: () => _addToCart(id),
-                ),
-              )
-            else
-              Row(
-                children: [
-                  _windowsQtyButton(
-                    context,
-                    icon: Icons.remove,
-                    onTap: () => _removeFromCart(id),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        '$qty',
-                        style: TextStyle(
-                          color: palette.textPrimary,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
+                Row(
+                  children: [
+                    AnimatedScale(
+                      scale: hovering ? 1.08 : 1,
+                      duration: DesktopTokens.fast,
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: palette.soft(palette.accent),
+                          borderRadius: BorderRadius.circular(
+                            DesktopTokens.radiusMd,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          _drinkEmoji(drink['temperature'] as String? ?? ''),
+                          style: const TextStyle(fontSize: 21),
                         ),
                       ),
                     ),
+                    const Spacer(),
+                    if (qty > 0)
+                      DesktopInfoChip(
+                        label: '×$qty',
+                        icon: Icons.shopping_cart_outlined,
+                        color: palette.accentText,
+                        dense: true,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: DesktopTokens.gapSm + 2),
+                Text(
+                  DrinkModel.displayNameFromMap(drink),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: palette.textPrimary,
+                    fontSize: 14,
+                    height: 1.4,
                   ),
-                  _windowsQtyButton(
-                    context,
-                    icon: Icons.add,
-                    onTap: () => _addToCart(id),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '{v1} ج'.tr({'v1': price.toStringAsFixed(0)}),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: palette.accentText,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
                   ),
-                ],
-              ),
-          ],
-        ),
-      ),
+                ),
+                SizedBox(height: DesktopTokens.gapSm + 2),
+                if (qty == 0)
+                  SizedBox(
+                    width: double.infinity,
+                    child: DesktopButton.primary(
+                      label: 'إضافة'.tr(),
+                      icon: Icons.add,
+                      onPressed: () => _addToCart(id),
+                    ),
+                  )
+                else
+                  Row(
+                    children: [
+                      _windowsQtyButton(
+                        context,
+                        icon: Icons.remove,
+                        onTap: () => _removeFromCart(id),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            '$qty',
+                            style: TextStyle(
+                              color: palette.textPrimary,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      _windowsQtyButton(
+                        context,
+                        icon: Icons.add,
+                        onTap: () => _addToCart(id),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
     );
   }
 
@@ -220,31 +229,35 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           DesktopSectionTitle(
+          DesktopSectionTitle(
             title: 'سلة الطلب'.tr(),
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: DesktopTokens.gapSm + 2),
           Expanded(
-            child: entries.isEmpty
-                ?  DesktopEmptyState(
-                    icon: Icons.shopping_cart_outlined,
-                    title: 'السلة فاضية'.tr(),
-                    message: 'اختار أصناف من المنيو وهتظهر هنا.'.tr(),
-                  )
-                : DesktopScrollbar(
-                    builder: (c) => ListView.separated(
-                      controller: c,
-                      padding: EdgeInsets.zero,
-                      itemCount: entries.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 4),
-                      itemBuilder: (_, i) => _windowsCartRow(
-                        context,
-                        entries[i].key,
-                        entries[i].value,
-                      ),
+            child:
+                entries.isEmpty
+                    ? DesktopEmptyState(
+                      icon: Icons.shopping_cart_outlined,
+                      title: 'السلة فاضية'.tr(),
+                      message: 'اختار أصناف من المنيو وهتظهر هنا.'.tr(),
+                    )
+                    : DesktopScrollbar(
+                      builder:
+                          (c) => ListView.separated(
+                            controller: c,
+                            padding: EdgeInsets.zero,
+                            itemCount: entries.length,
+                            separatorBuilder:
+                                (_, _) => const SizedBox(height: 4),
+                            itemBuilder:
+                                (_, i) => _windowsCartRow(
+                                  context,
+                                  entries[i].key,
+                                  entries[i].value,
+                                ),
+                          ),
                     ),
-                  ),
           ),
           const SizedBox(height: DesktopTokens.gapSm),
           TextField(
@@ -335,7 +348,7 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  drink['name'] as String,
+                  DrinkModel.displayNameFromMap(drink),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -393,26 +406,27 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
     final palette = DesktopPalette.of(context);
 
     return HoverBuilder(
-      builder: (context, hovering) => GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: DesktopTokens.fast,
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: hovering ? palette.accent : palette.surfaceSoft,
-            borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
-            border: Border.all(
-              color: hovering ? palette.accent : palette.border,
+      builder:
+          (context, hovering) => GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: DesktopTokens.fast,
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: hovering ? palette.accent : palette.surfaceSoft,
+                borderRadius: BorderRadius.circular(DesktopTokens.radiusSm),
+                border: Border.all(
+                  color: hovering ? palette.accent : palette.border,
+                ),
+              ),
+              child: Icon(
+                icon,
+                size: 16,
+                color: hovering ? Colors.white : palette.textSecondary,
+              ),
             ),
           ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: hovering ? Colors.white : palette.textSecondary,
-          ),
-        ),
-      ),
     );
   }
 
@@ -487,11 +501,12 @@ extension _MenuScreenWindowsBody on _MenuScreenState {
                 DesktopButton.primary(
                   label: 'طلب جديد'.tr(),
                   icon: Icons.refresh,
-                  onPressed: () => _refresh(() {
-                    _cart.clear();
-                    _submitted = false;
-                    _note = '';
-                  }),
+                  onPressed:
+                      () => _refresh(() {
+                        _cart.clear();
+                        _submitted = false;
+                        _note = '';
+                      }),
                 ),
               ],
             ),

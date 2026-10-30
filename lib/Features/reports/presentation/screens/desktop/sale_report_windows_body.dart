@@ -23,9 +23,8 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
     );
     final netCollected =
         totalRevenue - totalDiscount - totalDebt + _debtCollectedInPeriod;
-    final soldItemsCount = _report
-        .where((d) => (d['sold_qty'] as double) > 0)
-        .length;
+    final soldItemsCount =
+        _report.where((d) => (d['sold_qty'] as double) > 0).length;
     final totalDebtCollected = _report.fold<double>(
       0,
       (sum, item) => sum + (item['debt_collected_revenue'] as double),
@@ -34,7 +33,10 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
 
     return DesktopPageScaffold(
       title: widget.customTitle ?? 'تقرير المبيعات'.tr(),
-      subtitle: '{v1} • {soldItemsCount} صنف'.tr({'v1': _periodLabel(), 'soldItemsCount': soldItemsCount}),
+      subtitle: '{v1} • {soldItemsCount} صنف'.tr({
+        'v1': _periodLabel(),
+        'soldItemsCount': soldItemsCount,
+      }),
       actions: [
         DesktopToolbarIconButton(
           icon: Icons.refresh,
@@ -61,7 +63,7 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
         runSpacing: DesktopTokens.gapSm,
         children: [
           DesktopSegmented<String>(
-            items:  [
+            items: [
               DesktopSegmentItem(
                 value: 'day',
                 label: 'يومي'.tr(),
@@ -91,91 +93,94 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
             onChanged: (value) => _refresh(() => _searchQuery = value),
           ),
           DesktopInfoChip(
-            label: '{soldItemsCount} صنف'.tr({'soldItemsCount': soldItemsCount}),
+            label: '{soldItemsCount} صنف'.tr({
+              'soldItemsCount': soldItemsCount,
+            }),
             icon: Icons.inventory_2_outlined,
             color: palette.accent,
           ),
         ],
       ),
-      child: _isLoading
-          ?  Padding(
-              padding: EdgeInsets.symmetric(vertical: 90),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ==================== مؤشرات (نفس قيم الموبايل) ====================
-                DesktopResponsiveGrid(
-                  minTileWidth: 250,
-                  maxColumns: 3,
-                  children: [
-                    DesktopStatCard(
-                      label: 'الصافي المتوقع'.tr(),
-                      value: netCollected.toStringAsFixed(2),
-                      icon: Icons.account_balance_wallet_outlined,
-                      color: palette.accent,
-                      hint: 'الإيراد − الخصم − الآجل + المحصّل'.tr(),
-                    ),
-                    DesktopStatCard(
-                      label: 'إيراد'.tr(),
-                      value: totalRevenue.toStringAsFixed(0),
-                      icon: Icons.payments_outlined,
-                      color: palette.success,
-                    ),
-                    DesktopStatCard(
-                      label: 'خصم'.tr(),
-                      value: totalDiscount.toStringAsFixed(0),
-                      icon: Icons.discount_outlined,
-                      color: palette.warning,
-                    ),
-                    DesktopStatCard(
-                      label: 'آجل باقي'.tr(),
-                      value: totalDebt.toStringAsFixed(0),
-                      icon: Icons.schedule_outlined,
-                      color: palette.danger,
-                    ),
-                    DesktopStatCard(
-                      label: 'دفع جزء من تربيزات (غير مضاف للصافي)'.tr(),
-                      value: totalDebtCollected.toStringAsFixed(0),
-                      icon: Icons.price_check_outlined,
-                      color: palette.info,
-                      hint: 'دفعات جزئية على الفواتير الآجلة'.tr(),
-                    ),
-                    DesktopStatCard(
-                      label: 'اتحصّل فعليًا (كاش)'.tr(),
-                      value: _debtCollectedInPeriod.toStringAsFixed(0),
-                      icon: Icons.account_balance_wallet_outlined,
-                      color: palette.info,
-                      hint: 'من آجل قديم خارج الفترة'.tr(),
-                    ),
-                  ],
-                ),
-                 SizedBox(height: DesktopTokens.gapLg),
+      child:
+          _isLoading
+              ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 90),
+                child: Center(child: CircularProgressIndicator()),
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ==================== مؤشرات (نفس قيم الموبايل) ====================
+                  DesktopResponsiveGrid(
+                    minTileWidth: 250,
+                    maxColumns: 3,
+                    children: [
+                      DesktopStatCard(
+                        label: 'الصافي المتوقع'.tr(),
+                        value: netCollected.toStringAsFixed(2),
+                        icon: Icons.account_balance_wallet_outlined,
+                        color: palette.accent,
+                        hint: 'الإيراد − الخصم − الآجل + المحصّل'.tr(),
+                      ),
+                      DesktopStatCard(
+                        label: 'إيراد'.tr(),
+                        value: totalRevenue.toStringAsFixed(0),
+                        icon: Icons.payments_outlined,
+                        color: palette.success,
+                      ),
+                      DesktopStatCard(
+                        label: 'خصم'.tr(),
+                        value: totalDiscount.toStringAsFixed(0),
+                        icon: Icons.discount_outlined,
+                        color: palette.warning,
+                      ),
+                      DesktopStatCard(
+                        label: 'آجل باقي'.tr(),
+                        value: totalDebt.toStringAsFixed(0),
+                        icon: Icons.schedule_outlined,
+                        color: palette.danger,
+                      ),
+                      DesktopStatCard(
+                        label: 'دفع جزء من تربيزات (غير مضاف للصافي)'.tr(),
+                        value: totalDebtCollected.toStringAsFixed(0),
+                        icon: Icons.price_check_outlined,
+                        color: palette.info,
+                        hint: 'دفعات جزئية على الفواتير الآجلة'.tr(),
+                      ),
+                      DesktopStatCard(
+                        label: 'اتحصّل فعليًا (كاش)'.tr(),
+                        value: _debtCollectedInPeriod.toStringAsFixed(0),
+                        icon: Icons.account_balance_wallet_outlined,
+                        color: palette.info,
+                        hint: 'من آجل قديم خارج الفترة'.tr(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: DesktopTokens.gapLg),
 
-                // ==================== جدول الأصناف ====================
-                DesktopSectionTitle(
-                  title: 'الأصناف المباعة'.tr(),
-                  count: filtered.length,
-                ),
-                _desktopTableHeader(palette),
-                const SizedBox(height: DesktopTokens.gapSm),
-                if (filtered.isEmpty)
-                   DesktopEmptyState(
-                    icon: Icons.receipt_long_outlined,
-                    title: 'لا توجد مبيعات في هذه الفترة'.tr(),
-                    message: 'جرّب تغيير الفترة أو البحث عن صنف تاني.'.tr(),
-                  )
-                else ...[
-                  for (final item in filtered) ...[
-                    _desktopItemRow(item, palette),
-                    const SizedBox(height: DesktopTokens.gapSm),
+                  // ==================== جدول الأصناف ====================
+                  DesktopSectionTitle(
+                    title: 'الأصناف المباعة'.tr(),
+                    count: filtered.length,
+                  ),
+                  _desktopTableHeader(palette),
+                  const SizedBox(height: DesktopTokens.gapSm),
+                  if (filtered.isEmpty)
+                    DesktopEmptyState(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'لا توجد مبيعات في هذه الفترة'.tr(),
+                      message: 'جرّب تغيير الفترة أو البحث عن صنف تاني.'.tr(),
+                    )
+                  else ...[
+                    for (final item in filtered) ...[
+                      _desktopItemRow(item, palette),
+                      const SizedBox(height: DesktopTokens.gapSm),
+                    ],
+                    const SizedBox(height: DesktopTokens.gapXs),
+                    _desktopTotalsRow(palette, filtered.length, totalRevenue),
                   ],
-                  const SizedBox(height: DesktopTokens.gapXs),
-                  _desktopTotalsRow(palette, filtered.length, totalRevenue),
                 ],
-              ],
-            ),
+              ),
     );
   }
 
@@ -226,22 +231,23 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
                 fontWeight: FontWeight.w700,
                 color: palette.textPrimary,
               ),
-              items: _shifts
-                  .map(
-                    (s) => DropdownMenuItem<int>(
-                      value: s['id'] as int,
-                      child: Text(
-                        _shiftLabel(s),
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: palette.textPrimary,
+              items:
+                  _shifts
+                      .map(
+                        (s) => DropdownMenuItem<int>(
+                          value: s['id'] as int,
+                          child: Text(
+                            _shiftLabel(s),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: palette.textPrimary,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
-                  .toList(),
+                      )
+                      .toList(),
               onChanged: (value) {
                 _refresh(() => _selectedShiftId = value);
                 _loadReport();
@@ -286,11 +292,7 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
           ),
           Expanded(
             flex: 3,
-            child: Text(
-              'الإيراد'.tr(),
-              textAlign: TextAlign.end,
-              style: style,
-            ),
+            child: Text('الإيراد'.tr(), textAlign: TextAlign.end, style: style),
           ),
         ],
       ),
@@ -305,9 +307,10 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
     final discountAmount = item['discount_amount'] as double;
     final debtRevenue = item['debt_revenue'] as double;
     final debtCollected = item['debt_collected_revenue'] as double;
-    final unit = item['is_weighted'] as bool
-        ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم')
-        : '';
+    final unit =
+        item['is_weighted'] as bool
+            ? (item['unit'] == 'kg' ? 'كجم'.tr() : 'جم'.tr())
+            : '';
     final lowStock = remaining <= 5;
     final hasExtra =
         discountAmount > 0 || debtRevenue > 0.01 || debtCollected > 0.01;
@@ -382,21 +385,27 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
               children: [
                 if (discountAmount > 0)
                   DesktopInfoChip(
-                    label: 'خصم {v1}'.tr({'v1': discountAmount.toStringAsFixed(2)}),
+                    label: 'خصم {v1}'.tr({
+                      'v1': discountAmount.toStringAsFixed(2),
+                    }),
                     icon: Icons.discount_outlined,
                     color: palette.warning,
                     dense: true,
                   ),
                 if (debtRevenue > 0.01)
                   DesktopInfoChip(
-                    label: 'آجل {v1}'.tr({'v1': debtRevenue.toStringAsFixed(2)}),
+                    label: 'آجل {v1}'.tr({
+                      'v1': debtRevenue.toStringAsFixed(2),
+                    }),
                     icon: Icons.schedule_outlined,
                     color: palette.danger,
                     dense: true,
                   ),
                 if (debtCollected > 0.01)
                   DesktopInfoChip(
-                    label: 'اتحصّل {v1}'.tr({'v1': debtCollected.toStringAsFixed(2)}),
+                    label: 'اتحصّل {v1}'.tr({
+                      'v1': debtCollected.toStringAsFixed(2),
+                    }),
                     icon: Icons.price_check_outlined,
                     color: palette.info,
                     dense: true,
@@ -434,7 +443,9 @@ extension _SalesReportScreenWindowsBody on _SalesReportScreenState {
           ),
           const SizedBox(width: DesktopTokens.gapSm),
           DesktopInfoChip(
-            label: '{soldItemsCount} صنف'.tr({'soldItemsCount': soldItemsCount}),
+            label: '{soldItemsCount} صنف'.tr({
+              'soldItemsCount': soldItemsCount,
+            }),
             icon: Icons.inventory_2_outlined,
             color: palette.accent,
             dense: true,
