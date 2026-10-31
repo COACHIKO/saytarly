@@ -85,10 +85,22 @@ extension _SubStaffScreenMobileBody on _SubStaffScreenState {
                 },
               ),
             ),
-            ElevatedButton.icon(
-              onPressed: () => _showForm(),
-              icon: Icon(Icons.add),
-              label: Text('إضافة موظف فرعي'.tr()),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _showForm(),
+                  icon: const Icon(Icons.person_search_outlined),
+                  label: Text('تعيين ويتر موجود'.tr()),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _createWaiterSubStaff,
+                  icon: const Icon(Icons.person_add_alt_1),
+                  label: Text('ويتر جديد'.tr()),
+                ),
+              ],
             ),
           ],
         ),

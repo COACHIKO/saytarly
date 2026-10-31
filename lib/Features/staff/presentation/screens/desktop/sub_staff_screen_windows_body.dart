@@ -19,10 +19,15 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
           tooltip: 'تحديث'.tr(),
           onPressed: () => _loadSubStaff(),
         ),
-        DesktopButton.primary(
-          label: 'إضافة موظف فرعي'.tr(),
-          icon: Icons.person_add_alt,
+        DesktopToolbarIconButton(
+          icon: Icons.person_search_outlined,
+          tooltip: 'تعيين ويتر موجود'.tr(),
           onPressed: () => _showForm(),
+        ),
+        DesktopButton.primary(
+          label: 'ويتر جديد'.tr(),
+          icon: Icons.person_add_alt_1,
+          onPressed: _createWaiterSubStaff,
         ),
       ],
       child:
@@ -31,12 +36,13 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
                 icon: Icons.people_outline,
                 title: 'مفيش موظفين فرعيين'.tr(),
                 message:
-                    ('ضيف موظفين تابعين للمشرف ده وحدد راتب الساعة '.tr() +
-                        'وساعات العمل اليومية.'.tr()),
+                    ('ضيف ويتر جديد وتعيّنه فورًا، أو عيّن ويتر موجود من الزرار فوق — '
+                            .tr() +
+                        'وتقدر تضيف أكثر من ويتر.'.tr()),
                 action: DesktopButton.primary(
-                  label: 'إضافة موظف فرعي'.tr(),
-                  icon: Icons.person_add_alt,
-                  onPressed: () => _showForm(),
+                  label: 'إضافة ويتر جديد'.tr(),
+                  icon: Icons.person_add_alt_1,
+                  onPressed: _createWaiterSubStaff,
                 ),
               )
               : SingleChildScrollView(

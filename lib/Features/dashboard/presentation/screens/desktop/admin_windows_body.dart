@@ -9,7 +9,13 @@ extension _AdminWindowsBody on _AdminDashboardState {
   Future<void> _logoutToLogin() => LogoutHelper.confirmAndLogout(context);
 
   void _pushPage(Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    final pageRoute = MaterialPageRoute<void>(builder: (_) => page);
+    final shellNavigator = _shellNavKey.currentState;
+    if (shellNavigator != null) {
+      shellNavigator.push(pageRoute);
+    } else {
+      Navigator.push(context, pageRoute);
+    }
   }
 
   void _openReports() => _pushPage(ReportsScreen());
@@ -67,6 +73,7 @@ extension _AdminWindowsBody on _AdminDashboardState {
                         : null,
                 badgeColor: SaytarlyColors.warning,
                 onTap: action['onTap'] as VoidCallback,
+                pageBuilder: action['page'] as WidgetBuilder?,
               ),
           ],
         ),
@@ -130,7 +137,7 @@ extension _AdminWindowsBody on _AdminDashboardState {
       roleLabel: 'مدير النظام'.tr(),
       groups: _windowsNavGroups(),
       activeId: 'admin-home',
-      onSelect: (item) => item.onTap?.call(),
+      navigatorKey: _shellNavKey,
       userName: CurrentUser.displayName,
       userRole: 'مدير النظام'.tr(),
       onSettings: _openSettings,
@@ -205,7 +212,14 @@ extension _AdminWindowsBody on _AdminDashboardState {
                 title: (action['title'] as String).tr(),
                 icon: action['icon'] as IconData,
                 color: action['color'] as Color,
-                onTap: action['onTap'] as VoidCallback,
+                onTap: () {
+                  final page = action['page'] as WidgetBuilder?;
+                  if (page != null) {
+                    _pushPage(page(context));
+                  } else {
+                    (action['onTap'] as VoidCallback?)?.call();
+                  }
+                },
               ),
           ],
         ),

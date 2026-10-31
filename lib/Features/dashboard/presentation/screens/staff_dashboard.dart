@@ -56,6 +56,9 @@ class _StaffDashboardState extends State<StaffDashboard> {
   /// اسم المحل — بيظهر في السايد بار في واجهة الويندوز.
   String _placeName = BusinessProfile.fallbackName;
 
+  /// Navigator الخاص بهيكل الويندوز — بيخلي كل الشاشات تفتح جنب السايد بار.
+  final GlobalKey<NavigatorState> _shellNavKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
@@ -3269,11 +3272,17 @@ class _StaffDashboardState extends State<StaffDashboard> {
       customerName: customerName.isEmpty ? null : customerName,
     );
 
-    // فتح شاشة إضافة مشروبات مباشرة
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AddDrinksScreen(invoiceId: invoiceId)),
-    ).then((_) {
+    // فتح شاشة إضافة مشروبات مباشرة — جوه هيكل الويندوز لو موجود
+    // عشان السايد بار يفضل ظاهر، وبره الهيكل على الموبايل.
+    final addDrinksRoute = MaterialPageRoute<void>(
+      builder: (_) => AddDrinksScreen(invoiceId: invoiceId),
+    );
+    final shellNavigator = _shellNavKey.currentState;
+    final opening =
+        shellNavigator != null
+            ? shellNavigator.push(addDrinksRoute)
+            : Navigator.push(context, addDrinksRoute);
+    opening.then((_) {
       // بعد إضافة المشروبات، يمكن إنهاء الفاتورة مباشرة
 
       _handleTakeawayPayment(invoiceId, customerName: customerName);

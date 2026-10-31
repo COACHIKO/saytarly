@@ -20,70 +20,51 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
     );
   }
 
-  void _openPlaystation() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) =>
-                PsScreen(staffName: widget.staffName, shiftId: widget.shiftId),
-      ),
-    );
+  /// Opens a page inside the desktop shell so the sidebar stays visible.
+  void _pushShellPage(Widget page) {
+    final route = MaterialPageRoute<void>(builder: (_) => page);
+    final shellNavigator = _shellNavKey.currentState;
+    if (shellNavigator != null) {
+      shellNavigator.push(route);
+    } else {
+      Navigator.push(context, route);
+    }
   }
 
-  void _openTables() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => DrinksscreenDashboard(
-              staffName: widget.staffName,
-              shiftId: widget.shiftId,
-            ),
-      ),
-    );
-  }
+  Widget _playstationPage(BuildContext context) =>
+      PsScreen(staffName: widget.staffName, shiftId: widget.shiftId);
 
-  void _openExpense() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => CashierExpensesScreen(
-              shiftId: widget.shiftId,
-              cashierName: widget.staffName,
-            ),
-      ),
-    );
-  }
+  Widget _tablesPage(BuildContext context) => DrinksscreenDashboard(
+    staffName: widget.staffName,
+    shiftId: widget.shiftId,
+  );
 
-  void _openSubStaff() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => SubStaffPage(
-              staffId: widget.staffId,
-              shiftId: widget.shiftId,
-              cashierName: widget.staffName,
-            ),
-      ),
-    );
-  }
+  Widget _expensePage(BuildContext context) => CashierExpensesScreen(
+    shiftId: widget.shiftId,
+    cashierName: widget.staffName,
+  );
 
-  void _openAllSales() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => ShiftDetailsPage(
-              shiftId: widget.shiftId,
-              staffName: widget.staffName,
-              staffId: widget.staffId,
-            ),
-      ),
-    );
-  }
+  Widget _subStaffPage(BuildContext context) => SubStaffPage(
+    staffId: widget.staffId,
+    shiftId: widget.shiftId,
+    cashierName: widget.staffName,
+  );
+
+  Widget _allSalesPage(BuildContext context) => ShiftDetailsPage(
+    shiftId: widget.shiftId,
+    staffName: widget.staffName,
+    staffId: widget.staffId,
+  );
+
+  void _openPlaystation() => _pushShellPage(_playstationPage(context));
+
+  void _openTables() => _pushShellPage(_tablesPage(context));
+
+  void _openExpense() => _pushShellPage(_expensePage(context));
+
+  void _openSubStaff() => _pushShellPage(_subStaffPage(context));
+
+  void _openAllSales() => _pushShellPage(_allSalesPage(context));
 
   Widget _buildWindowsBody(BuildContext context) {
     final palette = DesktopPalette.of(context);
@@ -107,7 +88,7 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               id: 'staff-ps',
               label: 'البلايستيشن'.tr(),
               icon: Icons.sports_esports_outlined,
-              onTap: _openPlaystation,
+              pageBuilder: _playstationPage,
             ),
             DesktopNavItem(
               id: 'staff-takeaway',
@@ -119,19 +100,19 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               id: 'staff-tables',
               label: 'الترابيزات'.tr(),
               icon: Icons.table_restaurant_outlined,
-              onTap: _openTables,
+              pageBuilder: _tablesPage,
             ),
             DesktopNavItem(
               id: 'staff-expense',
               label: 'إضافة مصروف'.tr(),
               icon: Icons.receipt_long_outlined,
-              onTap: _openExpense,
+              pageBuilder: _expensePage,
             ),
             DesktopNavItem(
               id: 'staff-substaff',
               label: 'شيفتات موظفين'.tr(),
               icon: Icons.badge_outlined,
-              onTap: _openSubStaff,
+              pageBuilder: _subStaffPage,
             ),
           ],
         ),
@@ -148,7 +129,7 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               id: 'staff-sales',
               label: 'كل المبيعات'.tr(),
               icon: Icons.query_stats_outlined,
-              onTap: _openAllSales,
+              pageBuilder: _allSalesPage,
             ),
             DesktopNavItem(
               id: 'staff-close',
@@ -166,7 +147,7 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
         ),
       ],
       activeId: 'staff-home',
-      onSelect: (item) => item.onTap?.call(),
+      navigatorKey: _shellNavKey,
       title: 'الكاشير — {v1}'.tr({'v1': widget.staffName}),
       subtitle: 'شيفت رقم {v1} • {_placeName}'.tr({
         'v1': widget.shiftId,

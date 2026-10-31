@@ -58,6 +58,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // 🆕 بحث الأدوات — لوحة الويندوز
   String _searchQuery = '';
 
+  /// Navigator used by the Windows shell so every section opens next to the
+  /// sidebar instead of replacing the whole window.
+  final GlobalKey<NavigatorState> _shellNavKey = GlobalKey<NavigatorState>();
+
   // Which design is currently shown. Change the default here if you want
   // a specific style to open by default.
   DashStyle _style = DashStyle.current;
@@ -422,6 +426,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'المتابعة'.tr(),
       'icon': Icons.bar_chart,
       'color': SaytarlyColors.warning,
+      'page': (BuildContext _) => ReportsScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -434,6 +439,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'المتابعة'.tr(),
       'icon': Icons.payments,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => DebtsScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -446,6 +452,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'المتابعة'.tr(),
       'icon': Icons.schedule,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => ShiftsReportScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -459,6 +466,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'البلايستيشن'.tr(),
         'icon': Icons.videogame_asset,
         'color': SaytarlyColors.information,
+        'page': (BuildContext _) => ManageConsolesScreen(),
         'onTap':
             () => Navigator.push(
               context,
@@ -471,6 +479,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'البلايستيشن'.tr(),
         'icon': Icons.sports_esports,
         'color': SaytarlyColors.information,
+        'page': (BuildContext _) => const PlaystationSalesReportScreen(),
         'onTap':
             () => Navigator.push(
               context,
@@ -503,6 +512,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'الأقسام'.tr(),
         'icon': ModuleIcons.iconData(m['icon'] as String? ?? 'category'),
         'color': Color((m['color'] as num?)?.toInt() ?? 0xFF14B8A6),
+        'page':
+            (BuildContext _) => ManageDrinksScreen(
+              moduleId: m['id'] as int,
+              moduleName: AppModule.displayNameFromMap(m),
+            ),
         'onTap':
             () => Navigator.push(
               context,
@@ -521,6 +535,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'الأقسام'.tr(),
         'icon': Icons.insert_chart_outlined,
         'color': Color((m['color'] as num?)?.toInt() ?? 0xFF14B8A6),
+        'page':
+            (BuildContext _) => SalesReportScreen(
+              moduleId: m['id'] as int,
+              customTitle: 'تقرير {v1}'.tr({
+                'v1': AppModule.displayNameFromMap(m),
+              }),
+            ),
         'onTap':
             () => Navigator.push(
               context,
@@ -544,6 +565,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'الأقسام'.tr(),
         'icon': Icons.inventory_2,
         'color': SaytarlyColors.profit,
+        'page': (BuildContext _) => const ManageMaterialsScreen(),
         'onTap':
             () => Navigator.push(
               context,
@@ -556,6 +578,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'الأقسام'.tr(),
         'icon': Icons.local_drink,
         'color': SaytarlyColors.profit,
+        'page': (BuildContext _) => MaterialsReportScreen(),
         'onTap':
             () => Navigator.push(
               context,
@@ -569,6 +592,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'المتابعة'.tr(),
       'icon': Icons.shopping_bag_outlined,
       'color': SaytarlyColors.profit,
+      'page': (BuildContext _) => const ProductsReportScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -582,6 +606,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'المتابعة'.tr(),
         'icon': Icons.smoking_rooms,
         'color': SaytarlyColors.warning,
+        'page':
+            (BuildContext _) => SalesReportScreen(
+              categoryFilter: ['cigarette'],
+              customTitle: 'تقرير السجائر'.tr(),
+            ),
         'onTap':
             () => Navigator.push(
               context,
@@ -601,6 +630,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'group': 'المتابعة'.tr(),
         'icon': Icons.blur_on,
         'color': SaytarlyColors.information,
+        'page':
+            (BuildContext _) => SalesReportScreen(
+              categoryFilter: ['shisha'],
+              customTitle: 'تقرير الشيشة'.tr(),
+            ),
         'onTap':
             () => Navigator.push(
               context,
@@ -620,6 +654,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.person,
       'color': SaytarlyColors.danger,
+      'page': (BuildContext _) => ManageUsersScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -632,6 +667,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.attach_money,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => AdminExpensesScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -644,6 +680,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.person,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => CustomersReportScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -656,6 +693,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.sd_card,
       'color': SaytarlyColors.warning,
+      'page': (BuildContext _) => PrintCardsPage(),
       'onTap':
           () => Navigator.push(
             context,
@@ -668,6 +706,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.payments,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => PendingSalariesScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -680,6 +719,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.history,
       'color': SaytarlyColors.information,
+      'page': (BuildContext _) => const AuditLogScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -692,6 +732,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.settings,
       'color': SaytarlyColors.textSecondary,
+      'page': (BuildContext _) => const SettingsScreen(),
       'onTap':
           () => Navigator.push(
             context,
@@ -704,6 +745,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.settings,
       'color': SaytarlyColors.textSecondary,
+      'page': (BuildContext _) => const LicenseGeneratorScreen(),
       'onTap':
           () => Navigator.push(
             context,

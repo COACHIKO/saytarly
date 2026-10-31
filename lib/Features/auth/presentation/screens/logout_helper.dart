@@ -51,7 +51,9 @@ class LogoutHelper {
 
     if (confirmed != true) return;
     if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
+      // Root navigator: a page inside the desktop shell must leave the whole
+      // workspace when logging out, not only the nested content navigator.
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => LoginScreen()),
         (route) => false,
       );

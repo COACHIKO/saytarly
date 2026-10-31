@@ -443,6 +443,13 @@ class _LoginBrandPanel extends StatelessWidget {
             left: -120,
             child: _glow(SaytarlyColors.controlBlue, 520, 0.20),
           ),
+          // Oversized, ghosted S from the same brand artwork. It gives the
+          // dark panel a signature depth without competing with the copy.
+          const Positioned(
+            right: -118,
+            bottom: -96,
+            child: SaytarlyLogoWatermark(width: 620, rotation: -0.10),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(48, 38, 48, 32),
             child: Column(

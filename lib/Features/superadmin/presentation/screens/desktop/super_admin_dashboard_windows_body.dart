@@ -29,6 +29,16 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
       userRole: 'السوبر ادمن'.tr(),
       onLogout: _logoutToLogin,
       groups: [
+        DesktopNavGroup(
+          title: 'نظرة عامة'.tr(),
+          items: [
+            DesktopNavItem(
+              id: 'super-home',
+              label: 'لوحة التحكم'.tr(),
+              icon: Icons.space_dashboard_outlined,
+            ),
+          ],
+        ),
         for (final entry in _groupedActions().entries)
           DesktopNavGroup(
             title: entry.key.tr(),
@@ -39,11 +49,14 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
                   label: (action['title'] as String).tr(),
                   icon: action['icon'] as IconData,
                   onTap: action['onTap'] as VoidCallback,
+                  pageBuilder: action['page'] as WidgetBuilder?,
+                  onPageClosed: _load,
                 ),
             ],
           ),
       ],
-      onSelect: (item) => item.onTap?.call(),
+      activeId: 'super-home',
+      navigatorKey: _shellNavKey,
       title: 'لوحة السوبر ادمن'.tr(),
       subtitle: '$_placeName • $_typeLabel',
       actions: [

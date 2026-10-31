@@ -35,6 +35,9 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   bool _setupCompleted = true;
   bool _wizardOpened = false;
 
+  /// Navigator الخاص بهيكل الويندوز — بيخلي كل الشاشات تفتح جنب السايد بار.
+  final GlobalKey<NavigatorState> _shellNavKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
@@ -65,13 +68,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       SetupWizardScreen.wasShownOnce = true;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const SetupWizardScreen(fromDashboard: true),
-          ),
-        );
-        _load();
+        await _push(const SetupWizardScreen(fromDashboard: true));
       });
     }
   }
@@ -149,7 +146,13 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   }
 
   Future<void> _push(Widget screen) async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+    final route = MaterialPageRoute<void>(builder: (_) => screen);
+    final shellNavigator = _shellNavKey.currentState;
+    if (shellNavigator != null) {
+      await shellNavigator.push(route);
+    } else {
+      await Navigator.push(context, route);
+    }
     _load();
   }
 
@@ -160,6 +163,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'التخصيص'.tr(),
       'icon': Icons.storefront,
       'color': Colors.teal,
+      'page': (BuildContext _) => const BusinessProfileScreen(),
       'onTap': () => _push(const BusinessProfileScreen()),
     },
     {
@@ -171,6 +175,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'التخصيص'.tr(),
       'icon': Icons.category,
       'color': const Color(0xFF14B8A6),
+      'page': (BuildContext _) => const ModulesManagerScreen(),
       'onTap': () => _push(const ModulesManagerScreen()),
     },
     {
@@ -182,6 +187,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'التخصيص'.tr(),
       'icon': Icons.rocket_launch,
       'color': Colors.deepPurple,
+      'page': (BuildContext _) => const SetupWizardScreen(fromDashboard: true),
       'onTap': () => _push(const SetupWizardScreen(fromDashboard: true)),
     },
     {
@@ -190,6 +196,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.manage_accounts,
       'color': Colors.red,
+      'page': (BuildContext _) => ManageUsersScreen(),
       'onTap': () => _push(ManageUsersScreen()),
     },
     {
@@ -198,7 +205,13 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.dashboard,
       'color': Colors.indigo,
-      'onTap': () => _push(AdminDashboard()),
+      // Switching to the admin workspace means entering a different shell,
+      // so this one intentionally opens on the root navigator.
+      'onTap':
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AdminDashboard()),
+          ),
     },
     {
       'title': 'الإعدادات'.tr(),
@@ -206,6 +219,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.settings,
       'color': Colors.blueGrey,
+      'page': (BuildContext _) => const SettingsScreen(),
       'onTap': () => _push(const SettingsScreen()),
     },
     {
@@ -214,6 +228,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'group': 'الإدارة'.tr(),
       'icon': Icons.key,
       'color': Colors.amber,
+      'page': (BuildContext _) => const LicenseGeneratorScreen(),
       'onTap': () => _push(const LicenseGeneratorScreen()),
     },
     {

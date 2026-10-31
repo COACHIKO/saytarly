@@ -78,6 +78,20 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     final passCtl = TextEditingController(text: edit?['password'] ?? '');
     String role = edit?['role'] ?? 'cashier';
 
+    // المشرف/الكاشير المسؤول — بيظهر لما الدور يكون «موظف طلبات (ويتر)».
+    // الويتر بيتضاف كموظف فرعي مباشرة، وتقدر تضيف أكثر من ويتر لنفس المشرف.
+    final supervisorOptions =
+        users
+            .where((u) => u['role'] == 'admin' || u['role'] == 'cashier')
+            .toList();
+    final supervisorIds =
+        supervisorOptions.map((u) => (u['id'] as num).toInt()).toSet();
+    final initialSupervisorId = (edit?['supervisor_id'] as num?)?.toInt();
+    int? selectedSupervisorId =
+        supervisorIds.contains(initialSupervisorId)
+            ? initialSupervisorId
+            : null;
+
     // إعدادات الموظف
     final settings =
         edit == null ? null : await DBHelper.getStaffSettings(edit['id']);
@@ -142,6 +156,38 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             if (v != null) setDialogState(() => role = v);
                           },
                         ),
+                        if (role == 'waiter') ...[
+                          SizedBox(height: 10),
+                          DropdownButtonFormField<int>(
+                            value: selectedSupervisorId ?? 0,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: 'المشرف / الكاشير المسؤول'.tr(),
+                              helperText:
+                                  'الويتر هيتضاف كموظف فرعي تحت المشرف ده. تقدر تضيف أكثر من ويتر — كل واحد حساب مستقل.'
+                                      .tr(),
+                            ),
+                            items: [
+                              DropdownMenuItem(
+                                value: 0,
+                                child: Text('بدون مشرف — ويتر مستقل'.tr()),
+                              ),
+                              for (final s in supervisorOptions)
+                                DropdownMenuItem(
+                                  value: (s['id'] as num).toInt(),
+                                  child: Text(
+                                    '${s['username']} • ${_roleLabel(s['role'])}',
+                                  ),
+                                ),
+                            ],
+                            onChanged: (v) {
+                              setDialogState(() {
+                                selectedSupervisorId =
+                                    (v == null || v == 0) ? null : v;
+                              });
+                            },
+                          ),
+                        ],
                         SizedBox(height: 5),
                         if (_roleHasSalary(role)) ...[
                           Divider(),
@@ -182,6 +228,8 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         if (u.isEmpty || p.isEmpty) return;
 
                         final db = await DBHelper.database;
+                        final waiterSupervisorId =
+                            role == 'waiter' ? selectedSupervisorId : null;
                         int userId;
 
                         if (edit == null) {
@@ -189,12 +237,17 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             'username': u,
                             'password': p,
                             'role': role,
+                            'supervisor_id': waiterSupervisorId,
                           });
                         } else {
                           userId = edit['id'];
                           await db.update(
                             'users',
-                            {'password': p, 'role': role},
+                            {
+                              'password': p,
+                              'role': role,
+                              'supervisor_id': waiterSupervisorId,
+                            },
                             where: 'id=?',
                             whereArgs: [userId],
                           );
