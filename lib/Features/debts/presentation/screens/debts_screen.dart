@@ -1045,9 +1045,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       }
 
                       // ✅ إغلاق dialog الدفع والـ bottomsheet باستخدام context الشاشة
-                      Navigator.of(screenContext).pop(); // dialog الدفع
-                      Navigator.of(screenContext).pop(); // bottomsheet
-                      _loadDebts();
+                      // (بحماية: ممكن الشاشة تكون اتقفلت أثناء الحفظ)
+                      if (screenContext.mounted) {
+                        Navigator.of(screenContext).pop(); // dialog الدفع
+                        Navigator.of(screenContext).pop(); // bottomsheet
+                        _loadDebts();
+                      }
 
                       // ✅ اسأل المستخدم يطبع ولا لأ
                       if (screenContext.mounted) {

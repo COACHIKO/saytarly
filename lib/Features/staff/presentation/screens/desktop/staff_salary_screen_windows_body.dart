@@ -147,6 +147,7 @@ extension _StaffSalaryScreenWindowsBody on _StaffSalaryScreenState {
               tooltip: 'تاريخ الصرف'.tr(),
               onPressed: () async {
                 final hist = await _history(u['id']);
+                if (!context.mounted) return; // الشاشة قفلت — ما نلمس contextش
                 showDialog(
                   context: context,
                   builder:

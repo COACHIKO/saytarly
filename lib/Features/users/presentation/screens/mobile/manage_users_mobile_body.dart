@@ -20,9 +20,10 @@ extension _ManageUsersScreenMobileBody on _ManageUsersScreenState {
         }
       }
 
+      if (!mounted) return; // الشاشة قفلت أثناء حساب الرواتب
       showDialog(
         context: context,
-        builder: (_) => AppDialog(
+        builder: (dialogContext) => AppDialog(
           title: Text('رواتب الشهر {month}'.tr({'month': month})),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -35,7 +36,7 @@ extension _ManageUsersScreenMobileBody on _ManageUsersScreenState {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text('إغلاق'.tr()),
             ),
           ],

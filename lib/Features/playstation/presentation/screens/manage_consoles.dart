@@ -25,6 +25,7 @@ class _ManageConsolesScreenState extends State<ManageConsolesScreen> {
 
   Future<void> _load() async {
     final rows = await DBHelper.getAllConsoles();
+    if (!mounted) return;
     setState(
       () => consoles = rows.map((r) => ConsoleModel.fromMap(r)).toList(),
     );

@@ -31,6 +31,7 @@ extension _StaffSalaryScreenMobileBody on _StaffSalaryScreenState {
                   icon: Icon(Icons.history),
                   onPressed: () async {
                     final hist = await _history(u['id']);
+                    if (!mounted) return; // الشاشة قفلت — ما نلمس contextش
                     showDialog(
                       context: context,
                       builder: (_) => AppDialog(

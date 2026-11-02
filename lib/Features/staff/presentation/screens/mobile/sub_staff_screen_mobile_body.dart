@@ -8,10 +8,30 @@ extension _SubStaffScreenMobileBody on _SubStaffScreenState {
     return ElevatedButton(
       onPressed: () async {
         final now = DateTime.now();
+        // 🌿 الفروع: شيفت الموظف الفرعي بيتسجل على شيفت الكاشير المفتوح
+        // — عشان التحاسب ياخد مالكه الصح حتى لو شغّال عند كاشيرات كتير.
         if (!isWorking) {
-          await DBHelper.startStaffShift(u['id'], now);
+          final openShiftId = await DBHelper.getOpenShiftId(
+            widget.supervisorId,
+          );
+          if (openShiftId == null) {
+            AppToast.show('افتح شيفت الكاشير الأول بدءًا من شاشة البداية'.tr());
+            return;
+          }
+          await DBHelper.startShiftForSubStaff(
+            staffId: u['id'] as int,
+            supervisorShiftId: openShiftId,
+            startTime: now.toIso8601String(),
+          );
         } else {
-          await DBHelper.endStaffShift(u['id'], now);
+          final openShiftId = await DBHelper.getOpenShiftId(
+            widget.supervisorId,
+          );
+          await DBHelper.endStaffShift(
+            u['id'] as int,
+            now,
+            supervisorShiftId: openShiftId ?? 0,
+          );
         }
         _loadSubStaff();
       },
@@ -47,6 +67,15 @@ extension _SubStaffScreenMobileBody on _SubStaffScreenState {
                               'v1': u['salary_per_hour'] ?? 'غير محدد'.tr(),
                             }),
                           ),
+                          // 🌿 لو متعيين عند كاشيرات كمان — تنبيه إن حذفه
+                          // من هنا مش هيشيله من هناك.
+                          if (((u['assign_count'] ?? 0) as num) > 1)
+                            Text(
+                              'متعيّن عند كاشيرات تانية ({v1}) — إزالته من هنا مش هتشيله منهم'.tr({
+                                'v1': ((u['assign_count'] as num) - 1).toString(),
+                              }),
+                              style: const TextStyle(fontSize: 11.5),
+                            ),
                           if (u['shift_start'] != null)
                             Text(
                               'بدأت العمل: {v1}'.tr({

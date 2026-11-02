@@ -50,6 +50,7 @@ class _SubStaffPageState extends State<SubStaffPage> {
 
   Future<void> _loadSubStaff() async {
     final subStaffList = await DBHelper.getSubStaff(widget.staffId);
+    if (!mounted) return;
     setState(() {
       editableSubStaff = List<Map<String, dynamic>>.from(subStaffList);
       _loading = false;
@@ -176,10 +177,12 @@ class _SubStaffPageState extends State<SubStaffPage> {
 
       if (action == null || action == 'cancel') return; // لو إلغاء
 
-      // إنهاء الشيفت أولاً
+      // إنهاء الشيفت أولاً — 🌿 بنسجل النهاية على شيفت الكاشير ده بس
+      // (لو الموظف شغّال عند كاشير تاني في نفس الوقت ما يتقفلش غلط).
       await DBHelper.endShiftForSubStaff(
         staffId: staffId,
         endTime: end.toIso8601String(),
+        supervisorShiftId: widget.shiftId,
       );
 
       // تنفيذ الإجراء المختار

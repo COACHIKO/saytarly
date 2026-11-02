@@ -30,15 +30,18 @@ class _DrinkRecipeScreenState extends State<DrinkRecipeScreen> {
   Future<void> loadMaterials() async {
     final db = await DBHelper.database;
 
-    materials = await db.query('raw_materials', orderBy: 'name');
+    final rows = await db.query('raw_materials', orderBy: 'name');
 
-    setState(() {});
+    if (!mounted) return;
+    setState(() {
+      materials = rows;
+    });
   }
 
   Future<void> loadRecipe() async {
     final db = await DBHelper.database;
 
-    recipeItems = await db.rawQuery(
+    final rows = await db.rawQuery(
       '''
       SELECT
       dr.id,
@@ -53,7 +56,10 @@ class _DrinkRecipeScreenState extends State<DrinkRecipeScreen> {
       [widget.drinkId],
     );
 
-    setState(() {});
+    if (!mounted) return;
+    setState(() {
+      recipeItems = rows;
+    });
   }
 
   Future<void> deleteRecipeItem(int id) async {

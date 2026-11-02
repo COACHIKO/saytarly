@@ -77,6 +77,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
   Future<void> _load() async {
     final cs = await DBHelper.getAllConsoles();
     final inv = await DBHelper.getActiveInvoices();
+    if (!mounted) return;
     setState(() {
       consoles = cs.map((r) => ConsoleModel.fromMap(r)).toList();
       activeInvoices = inv;
@@ -116,6 +117,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     await _load();
 
+    if (!mounted) return; // الشاشة قفلت بعد القفل — ما نفتحش دايلوج على State ميت
     showDialog(
       context: context,
       builder:
@@ -257,11 +259,14 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                           DateTime.now().toIso8601String(),
                                     );
                                   } else {
-                                    // إنهاء الشيفت
-                                    await DBHelper.endShiftForSubStaff(
-                                      staffId: staffId,
-                                      endTime: DateTime.now().toIso8601String(),
-                                    );
+                                     // إنهاء الشيفت — 🌿 بنسجل النهاية على
+                                     // شيفت الكاشير ده بس (فروع كاشيرات
+                                     // تانيين ما تتقفلش غلط).
+                                     await DBHelper.endShiftForSubStaff(
+                                       staffId: staffId,
+                                       endTime: DateTime.now().toIso8601String(),
+                                       supervisorShiftId: widget.shiftId,
+                                     );
                                   }
 
                                   // تحديث البيانات بعد أي تغيير
@@ -404,6 +409,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                 .join('\n');
 
     // عرض الـ AlertDialog
+    if (!mounted) return; // الشاشة قفلت أثناء التحميل — ما نلمس contextش
     showDialog(
       context: context,
       builder:
@@ -608,8 +614,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
                     print(row);
                   }
 
-                  // 3️⃣ إغلاق الموظفين الفرعيين
-                  await DBHelper.closeAllOpenSubStaffShifts();
+                  // 3️⃣ إغلاق الموظفين الفرعيين — 🌿 شيفتات فروع الكاشير ده
+                  // بس: الموظف لو شغّال عند كاشير تاني في نفس الوقت ما
+                  // يتقفلش شيفته غلط ويتحاسب الكاشير التاني عليه صح.
+                  await DBHelper.closeAllOpenSubStaffShifts(
+                    supervisorShiftId: widget.shiftId,
+                  );
                   print('widget.shiftId = ${widget.shiftId}');
 
                   await Future.delayed(
@@ -815,6 +825,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
       orderBy: 'username ASC',
     );
 
+    if (!mounted) return null; // الشاشة قفلت — ما نفتحش دايلوج على State ميت
     return showDialog<Map<String, Object?>?>(
       context: context,
       builder:
@@ -3201,6 +3212,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
     String? selectedCustomer;
     final customerNameCtrl = TextEditingController();
 
+    if (!mounted) return; // الشاشة قفلت أثناء جلب العملاء — ما نلمس contextش
     // نافذة اختيار العميل أو إدخاله
     final customerName = await showDialog<String>(
       context: context,
@@ -3263,6 +3275,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     if (customerName == null) return;
 
+    if (!mounted) return; // الشاشة قفلت بعد اختيار العميل — ما نلمس contextش
     // إنشاء فاتورة جديدة بدون ربط ترابيزة
     final invoiceId = await DBHelper.createInvoice(
       0, // 0 لأن هذه فاتورة Takeaway
@@ -3272,6 +3285,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
       customerName: customerName.isEmpty ? null : customerName,
     );
 
+    if (!mounted) return; // الشاشة قفلت أثناء إنشاء الفاتورة — ما نلمس contextش
     // فتح شاشة إضافة مشروبات مباشرة — جوه هيكل الويندوز لو موجود
     // عشان السايد بار يفضل ظاهر، وبره الهيكل على الموبايل.
     final addDrinksRoute = MaterialPageRoute<void>(
@@ -3294,6 +3308,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
     String? customerName,
   }) async {
     final drinksCost = await DBHelper.getDrinksCostForInvoice(invoiceId);
+    if (!mounted) return; // الشاشة قفلت بعد إضافة المشروبات — ما نلمس contextش
     double discount = 0.0;
     bool shouldPrint = false;
     final discountController = TextEditingController();
@@ -3499,6 +3514,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
       // لو مفيش اسم، اسأل عنه
       if (debtCustomerName == null || debtCustomerName.isEmpty) {
+        if (!mounted) return; // الشاشة قفلت بعد الدايلوج الأول — ما نلمس contextش
         debtCustomerName = await showDialog<String>(
           barrierDismissible: false,
           context: context,

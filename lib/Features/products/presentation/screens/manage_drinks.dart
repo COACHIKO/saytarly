@@ -167,7 +167,7 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
     showDialog(
       context: context,
       builder:
-          (_) => AppDialog(
+          (dialogContext) => AppDialog(
             title: Text('استيراد البيانات'.tr()),
             content: Text(
               'هل تريد استبدال البيانات الحالية أم الإضافة عليها؟'.tr(),
@@ -175,12 +175,12 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
             actions: [
               TextButton(
                 child: Text('إلغاء'.tr()),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
               ),
               ElevatedButton(
                 child: Text('إضافة على الموجود'.tr()),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   importDrinks(context, replace: false, reload: reload);
                 },
               ),
@@ -188,7 +188,7 @@ class _ManageDrinksScreenState extends State<ManageDrinksScreen> {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: Text('استبدال الكل'.tr()),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   importDrinks(context, replace: true, reload: reload);
                 },
               ),

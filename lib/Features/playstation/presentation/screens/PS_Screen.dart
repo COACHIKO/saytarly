@@ -42,6 +42,7 @@ class _StaffDashboardState extends State<PsScreen> {
   Future<void> _load() async {
     final cs = await DBHelper.getAllConsoles();
     final inv = await DBHelper.getActiveInvoices();
+    if (!mounted) return;
     setState(() {
       consoles = cs.map((r) => ConsoleModel.fromMap(r)).toList();
       activeInvoices = inv;
@@ -62,6 +63,7 @@ class _StaffDashboardState extends State<PsScreen> {
     String? selectedCustomer;
     final nameController = TextEditingController();
 
+    if (!mounted) return; // الشاشة قفلت أثناء جلب العملاء — ما نلمس contextش
     // 🔹 عرض نافذة الاختيار
     final result = await showDialog<String>(
       context: context,
@@ -214,6 +216,7 @@ class _StaffDashboardState extends State<PsScreen> {
     }
 
     // اختيار طريقة الدفع
+    if (!mounted) return null; // الشاشة قفلت أثناء الجلسة — ما نلمس contextش
     final paymentChoice = await showDialog<String>(
       context: context,
       builder:
@@ -496,11 +499,12 @@ class _StaffDashboardState extends State<PsScreen> {
 
     await _load();
 
+    if (!mounted) return; // الشاشة قفلت بعد القفل — ما نفتحش دايلوج على State ميت
     // عرض شاشة الفاتورة النهائية
     showDialog(
       context: context,
       builder:
-          (_) => AppDialog(
+          (dialogContext) => AppDialog(
             title: Text('الفاتورة النهائية'.tr()),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -534,12 +538,12 @@ class _StaffDashboardState extends State<PsScreen> {
             ),
             actions: [
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: Text('حسناً'.tr()),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  Navigator.pop(context); // 🧃 جلب المشروبات من قاعدة البيانات
+                  Navigator.pop(dialogContext); // 🧃 جلب المشروبات من قاعدة البيانات
                   final drinks = await DBHelper.database.then((db) async {
                     final list = await db.rawQuery(
                       ''' SELECT d.name, d.name_en, ii.qty, ii.total FROM invoice_items ii LEFT JOIN drinks d ON d.id = ii.drink_id WHERE ii.invoice_id = ? ''',

@@ -196,7 +196,7 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
                       showDialog(
                         context: context,
                         builder:
-                            (_) => AppDialog(
+                            (dialogContext) => AppDialog(
                               title: Text('زيادة الكمية'.tr()),
                               content: TextField(
                                 controller: qtyController,
@@ -208,7 +208,8 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () =>
+                                      Navigator.pop(dialogContext),
                                   child: Text('إلغاء'.tr()),
                                 ),
                                 ElevatedButton(
@@ -224,7 +225,9 @@ extension _ManageDrinksScreenMobileBody on _ManageDrinksScreenState {
                                       );
                                       _load();
                                     }
-                                    Navigator.pop(context);
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
                                   },
                                   child: Text('تأكيد'.tr()),
                                 ),

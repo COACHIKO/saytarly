@@ -70,7 +70,6 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
   ) {
     final theme = Theme.of(context);
     final isWorking = u['shift_start'] != null && u['shift_end'] == null;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: DesktopTokens.gapSm + 2),
       child: DesktopCard(
@@ -119,6 +118,19 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
                           fontSize: 12,
                         ),
                       ),
+                      // 🌿 لو متعيين عند كاشيرات كمان — تنبيه إن إزالته
+                      // من هنا مش هيشيله من هناك.
+                      if (((u['assign_count'] ?? 0) as num) > 1)
+                        DesktopInfoChip(
+                          label:
+                              ('متعيّن عند كاشيرات تانية ({v1})'.tr({
+                                'v1': ((u['assign_count'] as num) - 1)
+                                    .toString(),
+                              })),
+                          icon: Icons.people_outline,
+                          color: palette.warning,
+                          dense: true,
+                        ),
                       if (u['shift_start'] != null)
                         DesktopInfoChip(
                           label:
@@ -164,10 +176,30 @@ extension _SubStaffScreenWindowsBody on _SubStaffScreenState {
               color: isWorking ? palette.danger : palette.success,
               onPressed: () async {
                 final now = DateTime.now();
+                // 🌿 الفروع: بدء/إنهاء شيفت الموظف الفرعي بيتسجل على شيفت
+                // الكاشير المفتوح — حتى لو شغّال عند كاشيرات كتير في نفس الوقت.
                 if (!isWorking) {
-                  await DBHelper.startStaffShift(u['id'], now);
+                  final openShiftId = await DBHelper.getOpenShiftId(
+                    widget.supervisorId,
+                  );
+                  if (openShiftId == null) {
+                    AppToast.show('افتح شيفت الكاشير الأول بدءًا من شاشة البداية'.tr());
+                    return;
+                  }
+                  await DBHelper.startShiftForSubStaff(
+                    staffId: u['id'] as int,
+                    supervisorShiftId: openShiftId,
+                    startTime: now.toIso8601String(),
+                  );
                 } else {
-                  await DBHelper.endStaffShift(u['id'], now);
+                  final openShiftId = await DBHelper.getOpenShiftId(
+                    widget.supervisorId,
+                  );
+                  await DBHelper.endStaffShift(
+                    u['id'] as int,
+                    now,
+                    supervisorShiftId: openShiftId ?? 0,
+                  );
                 }
                 _loadSubStaff();
               },

@@ -450,20 +450,17 @@ class AppDialog extends StatelessWidget {
     final palette = DesktopPalette.of(context);
     final theme = Theme.of(context);
 
-    final body = Container(
+    // 🧱 الماتيريال هو اللي بيشيل لون الخلفية والحدود — مش Container ملوّن.
+    // السبب: أي ListTile جوه الدايلوج بيرسم خلفيته و ink splashes على أقرب
+    // Material؛ لو بينه وبينه DecoratedBox/ColoredBox بلون، فلاتر بيطلع
+    // خطأ «ListTile background color or ink splashes may be invisible»
+    // والضغطات ما بتظهرش. الحل: Material حقيقي + الظل برّاه (بدون لون).
+    final body = Material(
+      color: backgroundColor ?? palette.surface,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: palette.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: palette.border, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: palette.shadow.withValues(alpha: palette.isDark ? .55 : .28),
-            blurRadius: 36,
-            offset: const Offset(0, 20),
-            spreadRadius: 2,
-          ),
-        ],
+        side: BorderSide(color: palette.border, width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -533,6 +530,23 @@ class AppDialog extends StatelessWidget {
       ),
     );
 
+    // الظل برّه الماتيريال — DecoratedBox من غير لون خلفية، فمش بيتدخل
+    // بين الـ ListTile والماتيريال (يعني الـ ink بيترسم عادي).
+    final shadowedBody = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: palette.shadow.withValues(alpha: palette.isDark ? .55 : .28),
+            blurRadius: 36,
+            offset: const Offset(0, 20),
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: body,
+    );
+
     // أزرار تنسيق ويندوز: سفلية الارتفاع، انحناء 6، عرض مناسب
     return Theme(
       data: theme.copyWith(
@@ -566,7 +580,7 @@ class AppDialog extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
         child: ConstrainedBox(
           constraints: BoxConstraints(minWidth: minWidth, maxWidth: maxWidth),
-          child: body,
+          child: shadowedBody,
         ),
       ),
     );

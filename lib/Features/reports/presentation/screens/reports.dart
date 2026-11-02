@@ -328,6 +328,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     });
 
     totalCigarettes = await calculateTotalCigarettes(invoices);
+    if (!mounted) return;
     setState(() {});
   }
 

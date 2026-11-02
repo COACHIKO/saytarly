@@ -29,6 +29,7 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
 
   Future<void> _loadSubStaff() async {
     final rows = await DBHelper.getSubStaff(widget.supervisorId);
+    if (!mounted) return;
     setState(() => subStaff = rows);
   }
 
@@ -51,7 +52,7 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
     showDialog(
       context: context,
       builder:
-          (_) => AppDialog(
+          (dialogContext) => AppDialog(
             title: Text('تعديل الموظف: {v1}'.tr({'v1': edit['username']})),
             content: SingleChildScrollView(
               child: Column(
@@ -125,7 +126,9 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
                     );
                   }
 
-                  Navigator.pop(context);
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
                   _loadSubStaff();
                 },
                 child: Text('حفظ'.tr()),
@@ -187,8 +190,10 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
                                     ('${c['username']}' +
                                         '{v1}'.tr({
                                           'v1':
-                                              c['supervisor_id'] != null
-                                                  ? ' — منقول من مشرف تاني'.tr()
+                                              ((c['assign_count'] ??
+                                                          0) as num) >
+                                                      0
+                                                  ? ' — متعيّن عند مشرف تاني كمان'.tr()
                                                   : '',
                                         })),
                                     overflow: TextOverflow.ellipsis,
@@ -255,11 +260,12 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
                                       int.tryParse(hoursCtrl.text) ?? 8;
 
                                   final db = await DBHelper.database;
-                                  await db.update(
-                                    'users',
-                                    {'supervisor_id': widget.supervisorId},
-                                    where: 'id=?',
-                                    whereArgs: [userId],
+                                  // 🌿 تعيين إضافي مش نقلي: الويتر هيتضاف
+                                  // للكاشير ده بدون ما يتشال من كاشير
+                                  // تاني هو متعيّن عنده.
+                                  await DBHelper.assignWaiterToSupervisor(
+                                    waiterId: userId,
+                                    supervisorId: widget.supervisorId,
                                   );
 
                                   final existing =
@@ -428,6 +434,12 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
                                   'role': 'waiter',
                                   'supervisor_id': widget.supervisorId,
                                 });
+                                // 🌿 سجّل فرع التعيين في جدول الفروع كمان —
+                                // الشاشات بترجع التعيين من جدول الفروع.
+                                await DBHelper.assignWaiterToSupervisor(
+                                  waiterId: userId,
+                                  supervisorId: widget.supervisorId,
+                                );
                                 await DBHelper.insertStaffSettings(
                                   userId: userId,
                                   salaryPerHour:
@@ -463,8 +475,8 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
     );
   }
 
-  /// بيشيل الموظف الفرعي من الشيفت ده (بدون مسح الحساب) — الحساب يرجع
-  /// متاح للتعيين عند أي كاشير تاني من إدارة المستخدمين.
+  /// بيشيل الموظف الفرعي من عند الكاشير ده بس (بدون مسح الحساب) — فروع
+  /// التعيين التانية عند كاشيرات تانيين ما بتتأثرش، والحساب يفضل شغال.
   Future<void> _removeSubStaff(Map<String, dynamic> u) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -472,7 +484,7 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
           (_) => AppDialog(
             title: Text('إزالة {v1} من الشيفت ده'.tr({'v1': u['username']})),
             content: Text(
-              'الحساب نفسه مش هيتحذف — هيبقى متاح للتعيين عند أي كاشير تاني من إدارة المستخدمين.'
+              'الحساب نفسه مش هيتحذف — ولو هو متعيين عند كاشير تاني بيفضل شغال عنده. هيتشال من عند الكاشير ده بس.'
                   .tr(),
             ),
             actions: [
@@ -489,18 +501,24 @@ class _SubStaffScreenState extends State<SubStaffScreen> {
     );
     if (confirm != true) return;
 
-    // لو عنده شيفت شغّال دلوقتي بنقفله الأول
+    // لو عنده شيفت شغّال دلوقتي بنقفله الأول — شيفتات نفس الكاشير بس
+    // (ومشرف 0 يقفل الصفوف القديمة غير المرتبطة من غير ما يمس شيفت
+    // كاشير تاني شغّال في نفس الوقت).
     final isWorking = u['shift_start'] != null && u['shift_end'] == null;
     if (isWorking) {
-      await DBHelper.endStaffShift(u['id'] as int, DateTime.now());
+      final openShiftId = await DBHelper.getOpenShiftId(widget.supervisorId);
+      await DBHelper.endStaffShift(
+        u['id'] as int,
+        DateTime.now(),
+        supervisorShiftId: openShiftId ?? 0,
+      );
     }
-    final db = await DBHelper.database;
-    await db.update(
-      'users',
-      {'supervisor_id': null},
-      where: 'id=?',
-      whereArgs: [u['id']],
+    // 🌿 شيل فرع التعيين بتاع الكاشير ده بس — الفروع التانية بتفضل زي ما هي.
+    await DBHelper.unassignWaiterFromSupervisor(
+      waiterId: u['id'] as int,
+      supervisorId: widget.supervisorId,
     );
+    if (!mounted) return;
     _loadSubStaff();
   }
 

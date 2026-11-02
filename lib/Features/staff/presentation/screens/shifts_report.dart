@@ -182,6 +182,7 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       editableShifts.add(shift);
     }
 
+    if (!mounted) return;
     setState(() => shifts = editableShifts);
   }
 

@@ -140,7 +140,7 @@ class _CashierOrdersScreenState extends State<CashierOrdersScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AppDialog(
+      builder: (dialogContext) => AppDialog(
         content: Row(
           children: [
             CircularProgressIndicator(),
@@ -152,9 +152,11 @@ class _CashierOrdersScreenState extends State<CashierOrdersScreen>
     );
     try {
       await SupabaseOrdersService.syncMenuToSupabase();
+      if (!mounted) return; // الشاشة قفلت أثناء المزامنة — ما نلمس contextش
       Navigator.pop(context);
       _showSnack('✅ تم تحديث المنيو بنجاح'.tr(), Colors.green);
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       _showSnack('❌ فشل المزامنة: {e}'.tr({'e': e}), Colors.red);
     }

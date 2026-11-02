@@ -63,6 +63,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
       return {...t, 'displayName': displayName};
     }).toList();
 
+    if (!mounted) return; // الشاشة قفلت بعد التحميل — ما نحدثش الواجهة
     setState(() {
       tables = tablesWithNames;
     });
@@ -82,6 +83,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
     String? selectedCustomer;
     final customerNameCtrl = TextEditingController();
 
+    if (!mounted) return; // الشاشة قفلت أثناء جلب العملاء — ما نلمس contextش
     // 🔹 نافذة اختيار العميل
     final customerName = await showDialog<String>(
       context: context,
@@ -176,6 +178,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
     final amountController = TextEditingController();
     double amount = 0.0;
 
+    if (!mounted) return; // الشاشة قفلت بعد الحساب — ما نلمس contextش
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => StatefulBuilder(
@@ -315,6 +318,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
     double totalAfterDiscount(double discount) =>
         (drinksCost - discount - alreadyPaid).clamp(0, double.infinity);
 
+    if (!mounted) return 0.0; // الشاشة قفلت قبل نافذة الدفع — ما نلمس contextش
     final paymentChoice = await showDialog<String>(
       context: context,
       builder: (_) => StatefulBuilder(
@@ -457,6 +461,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
     print('➡️ ENTER DEBT FLOW');
 
     if (paymentChoice == 'debt') {
+      if (!mounted) return 0.0; // الشاشة قفلت بعد الدايلوج — ما نلمس contextش
       final nameController = TextEditingController();
       String? selectedCustomer;
 
@@ -1440,6 +1445,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
       whereArgs: [tableId],
     );
 
+    if (!mounted) return; // الشاشة قفلت بعد الحذف — ما نحدثش الواجهة
     setState(() {});
   }
 

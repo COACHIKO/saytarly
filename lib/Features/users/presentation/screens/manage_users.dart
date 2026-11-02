@@ -51,6 +51,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       enriched.add(user);
     }
 
+    if (!mounted) return;
     setState(() => users = enriched);
   }
 
@@ -103,6 +104,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
     final daysOffCtl = TextEditingController(text: settings?['days_off'] ?? '');
 
+    if (!mounted) return; // الشاشة قفلت أثناء تحميل الإعدادات — ما نلمس contextش
     showDialog(
       context: context,
       builder:
@@ -283,7 +285,19 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                           }
                         }
 
-                        Navigator.pop(context);
+                        // 🌿 مزامنة فروع التعيين: الويتر اللي ليه مشرف في
+                        // إدارة المستخدمين بيضاف عند المشرف ده من غير ما
+                        // يتشال من كاشيرات تانيين هو متعيّن عندهم.
+                        if (role == 'waiter' && waiterSupervisorId != null) {
+                          await DBHelper.assignWaiterToSupervisor(
+                            waiterId: userId,
+                            supervisorId: waiterSupervisorId,
+                          );
+                        }
+
+                        if (dialogContext.mounted) {
+                          Navigator.pop(dialogContext);
+                        }
                         _load();
                       },
                       child: Text('حفظ'.tr()),
@@ -298,7 +312,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder:
-          (_) => AppDialog(
+          (dialogContext) => AppDialog(
             title: Text('تأكيد الحذف'.tr()),
             content: Text(
               'هل أنت متأكد من حذف المستخدم "{username}"؟'.tr({
@@ -307,11 +321,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.pop(dialogContext, false),
                 child: Text('إلغاء'.tr()),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => Navigator.pop(dialogContext, true),
                 child: Text('حذف'.tr()),
               ),
             ],
@@ -327,6 +341,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         where: 'user_id=?',
         whereArgs: [userId],
       );
+      // 🌿 تنظيف فروع التعيين بتاعته كويتر أو كمشرف — عشان ما يفضلش
+      // ويتر معلّق عند كاشير اتحذف أو العكس.
+      await DBHelper.deleteUserAssignments(userId);
 
       AppToast.show('تم حذف المستخدم "{username}"'.tr({'username': username}));
       _load(); // إعادة تحميل قائمة المستخدمين

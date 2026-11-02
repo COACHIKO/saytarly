@@ -29,6 +29,7 @@ class _CustomersReportScreenState extends State<CustomersReportScreen> {
   Future<void> _loadCustomers() async {
     setState(() => _loading = true);
     final result = await DBHelper.getMonthlyCustomerTotals(_month);
+    if (!mounted) return;
     setState(() {
       _customers = result;
       _loading = false;
@@ -39,6 +40,7 @@ class _CustomersReportScreenState extends State<CustomersReportScreen> {
     final invoices =
         await DBHelper.getCustomerInvoicesWithDetails(name, _month);
 
+    if (!mounted) return; // الشاشة قفلت أثناء التحميل — ما نلمس contextش
     showDialog(
       context: context,
       builder: (_) => AppDialog(

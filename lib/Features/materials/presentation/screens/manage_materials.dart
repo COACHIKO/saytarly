@@ -29,9 +29,12 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
     await DBHelper.cleanupAllMaterialQuantities(); // ✅ ينضف الأول
     final db = await DBHelper.database;
     // 🆕 الخامات مشتركة — بتتعرض كلها مهما كان القسم
-    materials = await db.query('raw_materials', orderBy: 'name');
+    final rows = await db.query('raw_materials', orderBy: 'name');
 
-    setState(() {});
+    if (!mounted) return;
+    setState(() {
+      materials = rows;
+    });
   }
 
   Future<void> exportMaterials(BuildContext context) async {
@@ -186,10 +189,11 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
             ? savedUnit
             : unitNames.first;
 
+    if (!mounted) return; // الشاشة قفلت أثناء تحميل الوحدات — ما نلمس contextش
     await showDialog(
       context: context,
       builder:
-          (_) => AppDialog(
+          (dialogContext) => AppDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -281,7 +285,7 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
             actionsPadding: const EdgeInsets.all(15),
             actions: [
               OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 icon: const Icon(Icons.close),
                 label: Text('إلغاء'.tr()),
               ),
@@ -297,15 +301,63 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
                 onPressed: () async {
                   final db = await DBHelper.database;
 
+                  final newQty = double.tryParse(qty.text) ?? 0;
+                  final newMinQty = double.tryParse(minQty.text) ?? 0;
+                  final newCost = double.tryParse(cost.text) ?? 0;
                   final Map<String, dynamic> data = {
-                    'name': name.text,
-                    'qty': double.tryParse(qty.text) ?? 0,
+                    'name': name.text.trim(),
+                    'qty': newQty,
                     'unit': selectedUnit,
-                    'min_qty': double.tryParse(minQty.text) ?? 0,
-                    'cost': double.tryParse(cost.text) ?? 0,
+                    'min_qty': newMinQty,
+                    'cost': newCost,
                   };
 
                   if (material == null) {
+                    // 🧠 منع تكرار الخامات: لو الاسم موجود (عربي/إنجليزي،
+                    // مع تجاهل التشكيل والمسافات) بنضيف الكمية على الخامة
+                    // القديمة بدل تسجيل خامة منفصلة بنفس الاسم.
+                    final existing = await DBHelper.findMaterialByName(
+                      data['name'] as String,
+                    );
+                    if (existing != null) {
+                      final oldQty =
+                          (existing['qty'] as num?)?.toDouble() ?? 0;
+                      final mergedQty = oldQty + newQty;
+                      final updates = <String, dynamic>{
+                        'qty': mergedQty,
+                        // بنحافظ على إعدادات الخامة القديمة؛ القيم الجديدة
+                        // بتتحفظ بس لو القديمة كانت فاضية (صفر) والجديدة
+                        // فيها قيمة — عشان ما نضيّعش إعدادات متظبطة.
+                        if (((existing['min_qty'] as num?)?.toDouble() ?? 0) ==
+                                0 &&
+                            newMinQty > 0)
+                          'min_qty': newMinQty,
+                        if (((existing['cost'] as num?)?.toDouble() ?? 0) ==
+                                0 &&
+                            newCost > 0)
+                          'cost': newCost,
+                      };
+                      await db.update(
+                        'raw_materials',
+                        updates,
+                        where: 'id=?',
+                        whereArgs: [existing['id']],
+                      );
+
+                      if (dialogContext.mounted) {
+                        Navigator.pop(dialogContext);
+                      }
+                      load();
+                      AppToast.show(
+                        'تمت إضافة الكمية إلى الخامة «{v1}» المضافة مسبقًا — الكمية الحالية: {v2} {v3}'
+                            .tr({
+                              'v1': existing['name'],
+                              'v2': mergedQty,
+                              'v3': existing['unit'] ?? selectedUnit,
+                            }),
+                      );
+                      return;
+                    }
                     await db.insert('raw_materials', data);
                   } else {
                     await db.update(
@@ -316,7 +368,9 @@ class _ManageMaterialsScreenState extends State<ManageMaterialsScreen> {
                     );
                   }
 
-                  Navigator.pop(context);
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
                   load();
                 },
               ),

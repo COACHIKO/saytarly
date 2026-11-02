@@ -39,6 +39,9 @@ class DBHelper {
     await ensureAppSettingsTable();
     await ensureSuperAdminSupport();
     await ensureAppModules();
+    // 🌿 جدول فروع التعيين (الموظف الفرعي عند أكتر من كاشير) — مضمن
+    // (idempotent): بيتعمل لو مش موجود وبيرحّل القديم مرة واحدة بس.
+    await ensureSubStaffAssignments();
     await addShishaCostColumnToInvoices();
     await cleanupAllMaterialQuantities();
     await healInvoiceStaffNames();
@@ -279,6 +282,15 @@ inventory_date TEXT
         shift_end TEXT,
         salary_per_hour REAL,
         advance REAL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sub_staff_assignments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        waiter_id INTEGER NOT NULL,
+        supervisor_id INTEGER NOT NULL,
+        created_at TEXT,
+        UNIQUE(waiter_id, supervisor_id)
       )
     ''');
     await db.execute('''
@@ -1565,6 +1577,16 @@ shift_id INTEGER
         whereArgs: [oldShiftId],
       );
 
+      // 3️⃣ب شيفتات الموظفين الفرعيين المفتوحة في النظام الجديد
+      // (staff_shifts.supervisor_shift_id) — بتتنقل لنفس الشيفت الجديد
+      // عشان اللي هيكمل الشيفت يشوفهم ويقدر يقفلهم.
+      await txn.update(
+        'staff_shifts',
+        {'supervisor_shift_id': newShiftId},
+        where: 'supervisor_shift_id = ? AND end_time IS NULL',
+        whereArgs: [oldShiftId],
+      );
+
       // 4️⃣ هيل اتساق تاريخي (idempotent): أي فاتورة اسم الكاشير بتاعها
       // مش مطابق لمالك الشيفت اللي مسجلة عليه — نتيجة تسليم قديم اتعمل
       // قبل الفكس ده — بتترجع لصاحبها الحقيقي هنا. الفواتير اللي شيفتها
@@ -2352,11 +2374,24 @@ shift_id INTEGER
     });
   }
 
-  static Future<int> closeAllOpenSubStaffShifts() async {
+  /// إغلاق شيفتات الموظفين الفرعيين المفتوحة.
+  ///
+  /// 🌿 بنسخة الفروع: لما الكاشير يقفل شيفته، بنقفل شيفتات الفروع اللي كانت
+  /// شغالة تحت شيفت الكاشير ده **بس** — الشيفتات الشغالة عند كاشير تاني في
+  /// نفس الوقت ما بتتقفلش بالغلط ولا بيتحاسب عليها كاشير تاني.
+  /// هنا فروع قديمة من غير مشرف بالمقابلة (supervisor_shift_id IS NULL)
+  /// بتترجع للكاشير اللي قفل زي النظام القديم.
+  static Future<int> closeAllOpenSubStaffShifts({int? supervisorShiftId}) async {
     final db = await DBHelper.database;
-    final count = await db.update('staff_shifts', {
-      'end_time': DateTime.now().toIso8601String(),
-    }, where: 'end_time IS NULL');
+    final count = await db.update(
+      'staff_shifts',
+      {'end_time': DateTime.now().toIso8601String()},
+      where:
+          supervisorShiftId != null
+              ? 'end_time IS NULL AND (supervisor_shift_id = ? OR supervisor_shift_id IS NULL)'
+              : 'end_time IS NULL',
+      whereArgs: supervisorShiftId != null ? [supervisorShiftId] : null,
+    );
     return count;
   }
 
@@ -2599,35 +2634,161 @@ shift_id INTEGER
     }
   }
 
+  /// 🌿 علاقة كثير-لكثير: الموظف الفرعي (الويتر) يقدر يتعيّن عند أكتر من
+  /// كاشير في نفس الوقت — التعيين من شاشة كاشير ما بيشيلوش من كاشير تاني.
+  ///
+  /// الجدول ده هو مرجع التعيين بقالب مضمن (idempotent):
+  /// بيتعمل لو مش موجود، وبيرحّل تاريخيًا أي ويتر كان ليه مشرف واحد في
+  /// العمود القديم users.supervisor_id (من غير ما نلمس العمود نفسه).
+  static Future<void> ensureSubStaffAssignments() async {
+    final db = await database;
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sub_staff_assignments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        waiter_id INTEGER NOT NULL,
+        supervisor_id INTEGER NOT NULL,
+        created_at TEXT,
+        UNIQUE(waiter_id, supervisor_id)
+      )
+    ''');
+    // ترحيل تاريخي: الويترات اللي ليه مشرف واحد في العمود القديم → فرع تعيين.
+    await db.execute('''
+      INSERT OR IGNORE INTO sub_staff_assignments (waiter_id, supervisor_id, created_at)
+      SELECT u.id, u.supervisor_id, datetime('now')
+      FROM users u
+      WHERE u.role = 'waiter' AND u.supervisor_id IS NOT NULL
+    ''');
+  }
+
+  /// ➕ تعيين ويتر عند كاشير — إضافة فرع جديدة بدل النقل:
+  /// لو هو متعيين عند كاشير تاني بيفضل متعيين عنده برضه.
+  /// الكاشير ده كمان بيبقى المشرف "الأولي" لو كان الويتر من غير مشرف أصلاً
+  /// (عشان شرائح إدارة المستخدمين وشاشات الإدارة تفضل شغالة زي ما هي).
+  static Future<void> assignWaiterToSupervisor({
+    required int waiterId,
+    required int supervisorId,
+  }) async {
+    final db = await database;
+    // 🌿 فرع التعيين الجديد — التكرار ما بيتسجلش مرتين (UNIQUE pair).
+    await db.insert('sub_staff_assignments', {
+      'waiter_id': waiterId,
+      'supervisor_id': supervisorId,
+      'created_at': DateTime.now().toIso8601String(),
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+    // المشرف الأولي بيتسجل بس لو الويتر كان لسه من غير مشرف —
+    // كده ما بنشيلش فرع المشرف اللي أنشئ تحته في إدارة المستخدمين.
+    await db.execute('''
+      UPDATE users SET supervisor_id = ?
+      WHERE id = ? AND supervisor_id IS NULL
+    ''', [supervisorId, waiterId]);
+  }
+
+  /// ➖ شيل الويتر من عند الكاشير ده بس — فروع تانية عند كاشيرات تانيين ما بتتأثرش.
+  static Future<void> unassignWaiterFromSupervisor({
+    required int waiterId,
+    required int supervisorId,
+  }) async {
+    final db = await database;
+    await db.delete(
+      'sub_staff_assignments',
+      where: 'waiter_id = ? AND supervisor_id = ?',
+      whereArgs: [waiterId, supervisorId],
+    );
+  }
+
+  /// شيل كل فروع التعيين بتاعة الويتر (بتُستخدم لما الأدمن يظبطه
+  /// «ويتر مستقل بدون مشرف» من إدارة المستخدمين).
+  static Future<void> unassignAllWaiters(int waiterId) async {
+    final db = await database;
+    await db.delete(
+      'sub_staff_assignments',
+      where: 'waiter_id = ?',
+      whereArgs: [waiterId],
+    );
+  }
+
+  /// تنظيف فروع التعيين عند حذف مستخدم — سواء كان ويتر (فروع من ناحية
+  /// waiter_id) أو كاشير/مشرف (فروع من ناحية supervisor_id).
+  static Future<void> deleteUserAssignments(int userId) async {
+    final db = await database;
+    await db.delete(
+      'sub_staff_assignments',
+      where: 'waiter_id = ? OR supervisor_id = ?',
+      whereArgs: [userId, userId],
+    );
+  }
+
+  /// آخر شيفت مفتوح لليوزر من جدول shifts (شيفت الكاشير نفسه) — أو null.
+  static Future<int?> getOpenShiftId(int userId) async {
+    final db = await database;
+    final res = await db.query(
+      'shifts',
+      where: 'user_id = ? AND check_out IS NULL',
+      whereArgs: [userId],
+      orderBy: 'id DESC',
+      limit: 1,
+    );
+    return res.isNotEmpty ? res.first['id'] as int : null;
+  }
+
   static Future<List<Map<String, dynamic>>> getSubStaff(
     int supervisorId,
   ) async {
     final db = await database;
+    // 🌿 التعيين بيرجع من جدول الفروع sub_staff_assignments — فالويتر يقدر
+    // يظهر عند أكتر من كاشير في نفس الوقت. سجل الشيفت المفتوح بيتنسب
+    // للكاشير ده بس (supervisor_shift_id = شيفت الكاشير ده المفتوح)
+    // — عشان صفوف فروع كاشيرات تانيين ما تظهرش هنا وتتحسب غلط.
+    //
+    // بنختار أحدث صف شيفت مفتوح «متاح للفرع ده» (مرتبط بشيفت الكاشير ده
+    // أو صف قديم غير مرتبط) — من غير ما نتأثر بشيفتات فروع كاشيرات تانيين.
     return await db.rawQuery(
       '''
     SELECT u.*, s.salary_per_hour, s.work_hours_per_day,
-      sh.start_time as shift_start, sh.end_time as shift_end
-    FROM users u
+      sh.start_time as shift_start, sh.end_time as shift_end,
+      (SELECT COUNT(*) FROM sub_staff_assignments c WHERE c.waiter_id = u.id)
+        AS assign_count
+    FROM sub_staff_assignments a
+    JOIN users u ON u.id = a.waiter_id
     LEFT JOIN staff_settings s ON s.user_id = u.id
-    LEFT JOIN staff_shifts sh ON sh.staff_id = u.id AND sh.end_time IS NULL
-    WHERE u.supervisor_id = ?
+    LEFT JOIN staff_shifts sh ON sh.id = (
+      SELECT sh2.id FROM staff_shifts sh2
+      WHERE sh2.staff_id = u.id
+        AND sh2.end_time IS NULL
+        AND (sh2.supervisor_shift_id IS NULL OR sh2.supervisor_shift_id = (
+              SELECT MAX(sh0.id) FROM shifts sh0
+              WHERE sh0.user_id = a.supervisor_id AND sh0.check_out IS NULL))
+      ORDER BY sh2.id DESC
+      LIMIT 1
+    )
+    WHERE a.supervisor_id = ?
+    ORDER BY u.username
   ''',
       [supervisorId],
     );
   }
 
   /// موظفو الطلبات (الويترات) المتاحين للتعيين كموظفين فرعيين عند الكاشير —
-  /// اللي لسه ملوش مشرف أو يكون تابع لمشرف تاني (التعيين بينقله).
+  /// كل الويترات اللي مش متعيينين عند الكاشير ده (حتى لو متعيينين عند
+  /// غيره — التعيين إضافي مش نقلي: بيتضاف للكاشير ده بدون ما يتشال
+  /// من غيره). assign_count = عدد الكاشيرات المتعيين عندهم أصلاً.
   static Future<List<Map<String, dynamic>>> getAssignableWaiters(
     int supervisorId,
   ) async {
     final db = await database;
-    return await db.query(
-      'users',
-      where:
-          "role = 'waiter' AND (supervisor_id IS NULL OR supervisor_id != ?)",
-      whereArgs: [supervisorId],
-      orderBy: 'username',
+    return await db.rawQuery(
+      '''
+    SELECT u.*,
+      (SELECT COUNT(*) FROM sub_staff_assignments a2 WHERE a2.waiter_id = u.id)
+        AS assign_count
+    FROM users u
+    WHERE u.role = 'waiter'
+      AND u.id NOT IN (
+        SELECT waiter_id FROM sub_staff_assignments WHERE supervisor_id = ?
+      )
+    ORDER BY u.username
+  ''',
+      [supervisorId],
     );
   }
 
@@ -2635,13 +2796,26 @@ shift_id INTEGER
   static Future<void> endShiftForSubStaff({
     required int staffId,
     required String endTime,
+    int? supervisorShiftId,
   }) async {
     final db = await DBHelper.database;
     await db.update(
       'staff_shifts',
       {'end_time': endTime},
-      where: 'staff_id = ? AND end_time IS NULL',
-      whereArgs: [staffId],
+      where:
+          supervisorShiftId == null
+              ? 'staff_id = ? AND end_time IS NULL'
+              : supervisorShiftId == 0
+              ? // 🌿 مشرف صفر = صفوف قديمة مش مربوطة بمشرف، بس (إدارة بدون شيفت كاشير مفتوح).
+                'staff_id = ? AND end_time IS NULL AND supervisor_shift_id IS NULL'
+              : // 🌿 ملزمة مشرف: بنقفل شيفت الموظف تحت الكاشير ده بس —
+                // صفوف فروع كاشيرات تانيين (supervisor_shift_id مختلف) ما بتتقفلش غلط.
+                // حماية: صفوف قديمة من غير مشرف بتقفل مع الكاشير ده احتياطي.
+                'staff_id = ? AND end_time IS NULL AND (supervisor_shift_id = ? OR supervisor_shift_id IS NULL)',
+      whereArgs:
+          supervisorShiftId != null && supervisorShiftId > 0
+              ? [staffId, supervisorShiftId]
+              : [staffId],
     );
   }
 
@@ -2778,6 +2952,43 @@ shift_id INTEGER
     return db.query('raw_materials', orderBy: 'name');
   }
 
+  /// 🧠 توحيد اسم الخامة للمقارنة: بيشيل المسافات الزيادة والتشكيل
+  /// والتطويل، ويوحّد الحروف العربية (أ/إ/آ→ا، ى→ي، ة→ه، ؤ→و، ئ→ي)
+  /// ويحوّل الإنجليزي لحروف صغيرة — عشان «سكر» و«سكّر» و«Sugar»/«sugar»
+  /// يتعاملوا كخامة واحدة.
+  static String normalizeMaterialName(String name) {
+    var s = name.trim().toLowerCase();
+    // تشكيل عربي + تطويل
+    s = s.replaceAll(RegExp(r'[\u064B-\u0652\u0670\u0640]'), '');
+    const arabicMap = {
+      'أ': 'ا',
+      'إ': 'ا',
+      'آ': 'ا',
+      'ٱ': 'ا',
+      'ى': 'ي',
+      'ة': 'ه',
+      'ؤ': 'و',
+      'ئ': 'ي',
+    };
+    arabicMap.forEach((from, to) => s = s.replaceAll(from, to));
+    s = s.replaceAll(RegExp(r'\s+'), ' ');
+    return s;
+  }
+
+  /// 🔎 يدوّر على خامة مسجّلة بنفس الاسم (عربي/إنجليزي، مع تجاهل
+  /// التشكيل والمسافات وحالة الحروف) — بيرجع الصف الموجود أو null.
+  static Future<Map<String, dynamic>?> findMaterialByName(String name) async {
+    final db = await database;
+    final rows = await db.query('raw_materials', orderBy: 'id ASC');
+    final target = normalizeMaterialName(name);
+    if (target.isEmpty) return null;
+    for (final row in rows) {
+      final rowName = (row['name'] ?? '').toString();
+      if (normalizeMaterialName(rowName) == target) return row;
+    }
+    return null;
+  }
+
   static Future<void> addMaterialStock(int materialId, double qty) async {
     final db = await database;
 
@@ -2875,13 +3086,27 @@ shift_id INTEGER
   }
   //////////////////////////////
 
-  static Future<void> endStaffShift(int staffId, DateTime endTime) async {
+  static Future<void> endStaffShift(
+    int staffId,
+    DateTime endTime, {
+    int? supervisorShiftId,
+  }) async {
     final db = await database;
     await db.update(
       'staff_shifts',
       {'end_time': endTime.toIso8601String()},
-      where: 'staff_id = ? AND end_time IS NULL',
-      whereArgs: [staffId],
+      // 🌿 ملزمة مشرف: بنقفل شيفت الموظف تحت الكاشير ده بس.
+      // مشرف صفر = صفوف قديمة مش مربوطة بمشرف، بس. null = بدون فلتر (نظام قديم).
+      where:
+          supervisorShiftId == null
+              ? 'staff_id = ? AND end_time IS NULL'
+              : supervisorShiftId == 0
+              ? 'staff_id = ? AND end_time IS NULL AND supervisor_shift_id IS NULL'
+              : 'staff_id = ? AND end_time IS NULL AND (supervisor_shift_id = ? OR supervisor_shift_id IS NULL)',
+      whereArgs:
+          supervisorShiftId != null && supervisorShiftId > 0
+              ? [staffId, supervisorShiftId]
+              : [staffId],
     );
   }
 
