@@ -367,10 +367,14 @@ extension _ManageDrinksScreenWindowsBody on _ManageDrinksScreenState {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: hovering ? palette.surfaceSoft : Colors.transparent,
+                color: hovering
+                    ? palette.surfaceSoft
+                    : palette.surfaceSoft.withValues(alpha: 0),
                 borderRadius: BorderRadius.circular(DesktopTokens.radiusSm - 2),
                 border: Border.all(
-                  color: hovering ? palette.border : Colors.transparent,
+                  color: hovering
+                      ? palette.border
+                      : palette.border.withValues(alpha: 0),
                 ),
               ),
               child: Icon(

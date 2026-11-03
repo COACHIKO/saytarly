@@ -279,7 +279,6 @@ extension _ManageUsersScreenWindowsBody on _ManageUsersScreenState {
   ) {
     final theme = Theme.of(context);
     final role = root['role'] as String? ?? '';
-    final rootId = _userId(root);
     final children = _childrenForBranch(root);
 
     final roleColor = role == 'admin' ? palette.accent : palette.success;

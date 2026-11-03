@@ -361,25 +361,29 @@ extension _SettingsWindowsBody on _SettingsScreenState {
       );
     }
 
-    return HoverBuilder(
-      builder:
-          (context, hovering) => GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: AnimatedContainer(
-              duration: DesktopTokens.fast,
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesktopTokens.gapMd,
-                vertical: 10,
+    final restColor = palette.surfaceSoft.withValues(alpha: 0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: HoverBuilder(
+        builder:
+            (context, hovering) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: AnimatedContainer(
+                duration: DesktopTokens.fast,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesktopTokens.gapMd,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: hovering ? palette.surfaceSoft : restColor,
+                  borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
+                ),
+                child: row,
               ),
-              decoration: BoxDecoration(
-                color: hovering ? palette.surfaceSoft : Colors.transparent,
-                borderRadius: BorderRadius.circular(DesktopTokens.radiusMd),
-              ),
-              child: row,
             ),
-          ),
+      ),
     );
   }
 

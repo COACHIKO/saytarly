@@ -135,7 +135,7 @@ class _OrderRowState extends State<_OrderRow> {
           duration: DesktopTokens.fast,
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
           decoration: BoxDecoration(
-            color: _hover ? palette.surfaceSoft : Colors.transparent,
+            color: _hover ? palette.surfaceSoft : palette.surfaceSoft.withValues(alpha: 0),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -357,7 +357,7 @@ class _StockRowState extends State<_StockRow> {
           duration: DesktopTokens.fast,
           padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 6),
           decoration: BoxDecoration(
-            color: _hover ? palette.surfaceSoft : Colors.transparent,
+            color: _hover ? palette.surfaceSoft : palette.surfaceSoft.withValues(alpha: 0),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(

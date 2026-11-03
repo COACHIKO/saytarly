@@ -28,8 +28,29 @@ class DesktopToolbarIconButton extends StatefulWidget {
       _DesktopToolbarIconButtonState();
 }
 
-class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
+class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton>
+    with WidgetsBindingObserver {
   bool _hovering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 🪟 تصفير الهوفر عند فقدان الفوكس — أزرار الشجرة/الهيدر ما تفضلش رمادية.
+    if (state != AppLifecycleState.resumed && _hovering) {
+      setState(() => _hovering = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +70,14 @@ class _DesktopToolbarIconButtonState extends State<DesktopToolbarIconButton> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: _hovering ? palette.surfaceSoft : Colors.transparent,
+              color: _hovering
+                  ? palette.surfaceSoft
+                  : palette.surfaceSoft.withValues(alpha: 0),
               borderRadius: BorderRadius.circular(DesktopTokens.radiusSm + 2),
               border: Border.all(
-                color: _hovering ? palette.border : Colors.transparent,
+                color: _hovering
+                    ? palette.border
+                    : palette.border.withValues(alpha: 0),
               ),
             ),
             child: Stack(

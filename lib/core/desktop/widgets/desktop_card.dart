@@ -40,8 +40,30 @@ class DesktopCard extends StatefulWidget {
   State<DesktopCard> createState() => _DesktopCardState();
 }
 
-class _DesktopCardState extends State<DesktopCard> {
+class _DesktopCardState extends State<DesktopCard>
+    with WidgetsBindingObserver {
   bool _hovering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 🪟 لو النافذة فقدت الفوكس أثناء الهوفر، ويندوز ممكن يفوّت onExit —
+    // نصفّر الحالة بنفسنا عشان الكارت ما يفضلش مرفوع/متظلل.
+    if (state != AppLifecycleState.resumed && _hovering) {
+      setState(() => _hovering = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
