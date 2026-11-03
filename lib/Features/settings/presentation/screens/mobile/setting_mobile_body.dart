@@ -68,43 +68,6 @@ extension _SettingsMobileBody on _SettingsScreenState {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _sectionTitle(context, 'منتجات إضافية'.tr()),
-                  Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    child: Column(
-                      children: [
-                        SwitchListTile(
-                          secondary: const Icon(Icons.smoking_rooms_outlined),
-                          title: Text('بيع السجائر'.tr()),
-                          subtitle: Text(
-                            _cigarettesEnabled
-                                ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
-                                    .tr()
-                                : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
-                          ),
-                          value: _cigarettesEnabled,
-                          onChanged: _changeCigarettesEnabled,
-                        ),
-                        const Divider(height: 1),
-                        SwitchListTile(
-                          secondary: const Icon(Icons.blur_on_rounded),
-                          title: Text('بيع الشيشة'.tr()),
-                          subtitle: Text(
-                            _shishaEnabled
-                                ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
-                                    .tr()
-                                : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
-                          ),
-                          value: _shishaEnabled,
-                          onChanged: _changeShishaEnabled,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   _sectionTitle(context, 'تخصيص النظام لنشاطك'.tr()),
                   Card(
                     margin: const EdgeInsets.symmetric(

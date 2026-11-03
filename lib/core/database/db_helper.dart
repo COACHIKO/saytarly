@@ -1679,6 +1679,19 @@ shift_id INTEGER
     return await _db!.query('users');
   }
 
+  /// 🌿 شجرة التعيينات كاملة — بتفرض إن جدول الفروع موجود وبترجع لكل ويتر
+  /// كل المشرفين اللي اشتغل تحتهم (صف لكل تعيين). بستخدمها في شاشة إدارة
+  /// المستخدمين عشان الشجرة تبنى من سطر واحد.
+  static Future<List<Map<String, dynamic>>> getAllStaffAssignments() async {
+    final db = _db!;
+    await ensureSubStaffAssignments();
+    return db.query(
+      'sub_staff_assignments',
+      columns: ['waiter_id', 'supervisor_id'],
+      orderBy: 'created_at ASC',
+    );
+  }
+
   // ---------- Consoles ----------
   static Future<int> insertConsole(ConsoleModel c) async {
     return await _db!.insert('consoles', c.toMap());

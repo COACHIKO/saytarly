@@ -36,8 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   DashStyle _dashStyle = DashStyle.current;
   ReportDesign _reportDesign = ReportDesign.classic;
   bool _loading = true;
-  bool _cigarettesEnabled = false;
-  bool _shishaEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -48,8 +47,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final pos = await AppSettings.getDrinksScreenPosMode();
     final savedDashStyle = await AppSettings.getAdminDashStyle();
     final savedReportDesign = await AppSettings.getShiftsReportDesign();
-    final cig = await AppSettings.getCigarettesEnabled();
-    final shisha = await AppSettings.getShishaEnabled();
 
     final matchedDashStyle = DashStyle.values.where(
       (d) => d.name == savedDashStyle,
@@ -65,28 +62,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (matchedReportDesign.isNotEmpty) {
         _reportDesign = matchedReportDesign.first;
       }
-      _cigarettesEnabled = cig;
-      _shishaEnabled = shisha;
       _loading = false;
     });
-  }
-
-  Future<void> _changeCigarettesEnabled(bool value) async {
-    setState(() => _cigarettesEnabled = value);
-    await AppSettings.setCigarettesEnabled(value);
-    if (!mounted) return;
-    AppToast.show(
-      value ? '✅ تم تفعيل بيع السجائر'.tr() : '✅ تم إيقاف بيع السجائر'.tr(),
-    );
-  }
-
-  Future<void> _changeShishaEnabled(bool value) async {
-    setState(() => _shishaEnabled = value);
-    await AppSettings.setShishaEnabled(value);
-    if (!mounted) return;
-    AppToast.show(
-      value ? '✅ تم تفعيل بيع الشيشة'.tr() : '✅ تم إيقاف بيع الشيشة'.tr(),
-    );
   }
 
   /// Changes the app locale immediately and persists it for the next launch.

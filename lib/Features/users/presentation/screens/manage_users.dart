@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:saytarly/core/desktop/desktop.dart';
 import 'package:saytarly/core/database/db_helper.dart';
-import 'package:saytarly/Features/staff/presentation/screens/SubStaffScreen.dart';
-import 'package:saytarly/core/utils/money.dart';
 import 'package:saytarly/core/localization/messages.dart';
 
 // جسم الموبايل وجسم الويندوز في ملفين منفصلين — نفس الـ State ونفس المنطق.
 part 'mobile/manage_users_mobile_body.dart';
 part 'desktop/manage_users_windows_body.dart';
 
+/// إدارة المستخدمين — شجرة الفريق 🌿
+///
+/// الفكرة: الكاشير (والأدمن) جذور، وموظف الطلبات بيظهر كورقة تتفرع من
+/// الجذر اللي بيشتغل تحته. الويتر الواحد يقدر يشتغل تحت أكتر من كاشير
+/// في نفس الوقت — فبيرجع كورقة تحت كل واحد فيهم عادي جدًا.
 class ManageUsersScreen extends StatefulWidget {
+  const ManageUsersScreen({super.key});
+
   @override
   State<ManageUsersScreen> createState() => _ManageUsersScreenState();
 }
@@ -18,8 +23,15 @@ class ManageUsersScreen extends StatefulWidget {
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
   List<Map<String, dynamic>> users = [];
 
-  /// 🆕 بحث المستخدمين — لوحة الويندوز بس (الموبايل مش بيتأثر بيه).
+  /// 🌿 فروع التعيين: waiterId → كل المشرفين اللي بيشتغل تحتهم.
+  /// خريطة الشجرة نفسها — بيتحدث من الجدول sub_staff_assignments.
+  final Map<int, List<int>> assignments = {};
+
+  /// بحث المستخدمين — لوحة الويندوز بس (الموبايل مش بيتأثر بيه).
   String _searchQuery = '';
+
+  /// 👆 أي جذور موسّعة في الموبايل (الويندوز بيدايق التفاصيل دايمًا).
+  final Set<int> _expandedSupervisors = {};
 
   /// إعادة بناء الشاشة من ملفات الجسم المنفصلة (mobile / windows).
   void _refresh(VoidCallback fn) => setState(fn);
@@ -32,13 +44,22 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   Future<void> _load() async {
     final rows = await DBHelper.getAllUsers();
+    final assignmentRows = await DBHelper.getAllStaffAssignments();
+
     final List<Map<String, dynamic>> enriched = [];
+    final Map<int, List<int>> branches = {};
+
+    for (final row in assignmentRows) {
+      final waiterId = (row['waiter_id'] as num?)?.toInt();
+      final supervisorId = (row['supervisor_id'] as num?)?.toInt();
+      if (waiterId == null || supervisorId == null) continue;
+      branches.putIfAbsent(waiterId, () => []).add(supervisorId);
+    }
 
     for (final userRow in rows) {
-      // اعمل نسخة قابلة للتعديل
       final user = Map<String, dynamic>.from(userRow);
 
-      // 🆕 حساب السوبر ادمن مبيظهرش هنا — بيتدار من لوحة السوبر ادمن
+      // السوبر ادمن مبيظهرش هنا — بيتدار من لوحة السوبر ادمن
       if (user['role'] == 'superadmin') continue;
 
       if (user['role'] == 'cashier' || user['role'] == 'waiter') {
@@ -52,19 +73,57 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     }
 
     if (!mounted) return;
-    setState(() => users = enriched);
+    setState(() {
+      users = _sortUsers(enriched);
+      assignments
+        ..clear()
+        ..addAll(branches);
+      // تأكد إن كاشيرات الشجرة مفتوحين بشكل افتراضي في الموبايل
+      _expandedSupervisors.addAll(
+        users
+            .where(
+              (u) => u['role'] == 'cashier' && _childrenOfUser(u).isNotEmpty,
+            )
+            .map((u) => (u['id'] as num).toInt()),
+      );
+    });
   }
 
-  /// الأدوار اللي بتاخد إعدادات راتب (staff_settings) — كاشير وموظف طلبات.
+  /// الترتيب: أدمن → كاشير → ويتر، وكل مجموعة بأسماء أبجدية.
+  List<Map<String, dynamic>> _sortUsers(
+    List<Map<String, dynamic>> input,
+  ) {
+    int weight(Map<String, dynamic> u) => switch (u['role'] as String? ?? '') {
+      'admin' => 0,
+      'cashier' => 1,
+      'waiter' => 2,
+      _ => 3,
+    };
+    final list = [...input];
+    list.sort((a, b) {
+      final w = weight(a).compareTo(weight(b));
+      if (w != 0) return w;
+      return (a['username'] as String? ?? '').compareTo(
+        b['username'] as String? ?? '',
+      );
+    });
+    return list;
+  }
+
+  // ============================ علاقات الشجرة ============================
+
+  bool _isBranchRole(dynamic role) => role == 'admin' || role == 'cashier';
+
+  /// أدوار بتاخد إعدادات راتب (staff_settings) — كاشير وموظف طلبات.
   bool _roleHasSalary(dynamic role) => role == 'cashier' || role == 'waiter';
 
-  /// تسمية الدور بالعربي — بتستخدمها جسم الموبايل وجسم الويندوز.
+  /// تسمية الدور بالعربي — بتستخدم جسم الموبايل وجسم الويندوز.
   String _roleLabel(dynamic role) {
     switch (role) {
       case 'superadmin':
         return 'سوبر أدمن'.tr();
       case 'admin':
-        return 'أدمن'.tr();
+        return 'أدمن — مدير النظام'.tr();
       case 'cashier':
         return 'كاشير — مدير الصالة'.tr();
       case 'waiter':
@@ -74,24 +133,79 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     }
   }
 
+  int _userId(Map<String, dynamic> u) => (u['id'] as num).toInt();
+
+  /// أطفال الجذر ده — الويترات اللي بيشتغلوا تحته مباشرة.
+  /// ترتيبهم: المشرف الأساسي الأول (supervisor_id) وبعده الباقي.
+  List<Map<String, dynamic>> _childrenOfUser(Map<String, dynamic> root) {
+    final rootId = _userId(root);
+    final children =
+        users
+            .where((u) => u['role'] == 'waiter')
+            .where((u) => _supervisorIdsOf(u).contains(rootId))
+            .toList();
+    children.sort((a, b) {
+      final primaryA = a['supervisor_id'] == rootId;
+      final primaryB = b['supervisor_id'] == rootId;
+      if (primaryA != primaryB) return primaryA ? -1 : 1;
+      return (a['username'] as String? ?? '').compareTo(
+        b['username'] as String? ?? '',
+      );
+    });
+    return children;
+  }
+
+  /// كل المشرفين اللي الموظف بيشتغل تحتهم.
+  List<int> _supervisorIdsOf(Map<String, dynamic> user) {
+    return assignments[_userId(user)] ?? const <int>[];
+  }
+
+  /// الويترات اللي مالهمش أي جذر — بيتجمعوا في عقدة جانبية مستقلة.
+  List<Map<String, dynamic>> get _independentStaff =>
+      users
+          .where((u) => u['role'] == 'waiter')
+          .where((u) => _supervisorIdsOf(u).isEmpty)
+          .toList();
+
+  /// أسماء المشرفين اللي ويتر معلّق عندهم (لعرض chip «شغال تحت …»).
+  List<String> _supervisorNamesOf(Map<String, dynamic> user) {
+    final names = users
+        .where((u) => _isBranchRole(u['role']))
+        .where((u) => _supervisorIdsOf(user).contains(_userId(u)))
+        .map((u) => u['username'] as String? ?? '')
+        .where((n) => n.isNotEmpty)
+        .toList();
+    return names;
+  }
+
+  /// من غير حرف «فرعي» في كل النص — الشجرة هي اللي بتوصف العلاقة.
+  String _underLabel(Map<String, dynamic> user) {
+    final names = _supervisorNamesOf(user);
+    if (names.isEmpty) return 'فريق مستقل'.tr();
+    if (names.length == 1) return 'شغال تحت {n}'.tr({'n': names.first});
+    return 'شغال تحت {n} كاشير'.tr({'n': names.join('، '.tr())});
+  }
+
+  // ============================ التعديل والحفظ ============================
+
   void _showForm({Map<String, dynamic>? edit}) async {
     final userCtl = TextEditingController(text: edit?['username'] ?? '');
     final passCtl = TextEditingController(text: edit?['password'] ?? '');
-    String role = edit?['role'] ?? 'cashier';
+    final initialRole = edit?['role'];
+    String role = (initialRole == 'admin' ||
+            initialRole == 'cashier' ||
+            initialRole == 'waiter')
+        ? initialRole as String
+        : 'cashier';
 
-    // المشرف/الكاشير المسؤول — بيظهر لما الدور يكون «موظف طلبات (ويتر)».
-    // الويتر بيتضاف كموظف فرعي مباشرة، وتقدر تضيف أكثر من ويتر لنفس المشرف.
-    final supervisorOptions =
-        users
-            .where((u) => u['role'] == 'admin' || u['role'] == 'cashier')
-            .toList();
-    final supervisorIds =
-        supervisorOptions.map((u) => (u['id'] as num).toInt()).toSet();
-    final initialSupervisorId = (edit?['supervisor_id'] as num?)?.toInt();
-    int? selectedSupervisorId =
-        supervisorIds.contains(initialSupervisorId)
-            ? initialSupervisorId
-            : null;
+    // الخطوط الرأسية 🌿: الويتر يقدر يتسجّل تحت أكتر من كاشير بنفس الوقت.
+    // الكاشير والأدمن هوما الجذور المتاحة للموظف الجديد.
+    final branchOptions =
+        users.where((u) => _isBranchRole(u['role'])).toList();
+    final branchIds = branchOptions.map(_userId).toSet();
+    final Set<int> branchSelection = edit == null
+        ? <int>{}
+        : _supervisorIdsOf(edit).where(branchIds.contains).toSet();
 
     // إعدادات الموظف
     final settings =
@@ -133,7 +247,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         ),
                         SizedBox(height: 10),
                         DropdownButtonFormField<String>(
-                          value: role,
+                          initialValue: role,
                           isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'الدور'.tr(),
@@ -151,7 +265,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             ),
                             DropdownMenuItem(
                               value: 'waiter',
-                              child: Text('موظف طلبات (ويتر)'.tr()),
+                              child: Text('موظف طلبات'.tr()),
                             ),
                           ],
                           onChanged: (v) {
@@ -159,36 +273,54 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                           },
                         ),
                         if (role == 'waiter') ...[
-                          SizedBox(height: 10),
-                          DropdownButtonFormField<int>(
-                            value: selectedSupervisorId ?? 0,
-                            isExpanded: true,
-                            decoration: InputDecoration(
-                              labelText: 'المشرف / الكاشير المسؤول'.tr(),
-                              helperText:
-                                  'الويتر هيتضاف كموظف فرعي تحت المشرف ده. تقدر تضيف أكثر من ويتر — كل واحد حساب مستقل.'
-                                      .tr(),
+                          SizedBox(height: 14),
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
+                              'يشتغل تحت مين؟'.tr(),
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            items: [
-                              DropdownMenuItem(
-                                value: 0,
-                                child: Text('بدون مشرف — ويتر مستقل'.tr()),
-                              ),
-                              for (final s in supervisorOptions)
-                                DropdownMenuItem(
-                                  value: (s['id'] as num).toInt(),
-                                  child: Text(
-                                    '${s['username']} • ${_roleLabel(s['role'])}',
-                                  ),
-                                ),
-                            ],
-                            onChanged: (v) {
-                              setDialogState(() {
-                                selectedSupervisorId =
-                                    (v == null || v == 0) ? null : v;
-                              });
-                            },
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            'اختار أكتر من كاشير لو الموظف هيغطي أكتر من شيفت في نفس الوقت.'
+                                .tr(),
+                            style: Theme.of(dialogContext).textTheme.bodySmall,
+                          ),
+                          SizedBox(height: 8),
+                          if (branchOptions.isEmpty)
+                            Text(
+                              'ضيف كاشير الأول — الموظف شغاله تابيع ليه.'
+                                  .tr(),
+                              style: TextStyle(
+                                color: Theme.of(dialogContext).colorScheme.error,
+                              ),
+                            )
+                          else
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                for (final s in branchOptions)
+                                  FilterChip(
+                                    label: Text(
+                                      '${s['username']} • ${_roleLabel(s['role'])}',
+                                    ),
+                                    selected: branchSelection.contains(
+                                      _userId(s),
+                                    ),
+                                    onSelected: (on) => setDialogState(() {
+                                      on
+                                          ? branchSelection.add(
+                                            _userId(s),
+                                          )
+                                          : branchSelection.remove(
+                                            _userId(s),
+                                          );
+                                    }),
+                                  ),
+                              ],
+                            ),
                         ],
                         SizedBox(height: 5),
                         if (_roleHasSalary(role)) ...[
@@ -220,7 +352,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(dialogContext),
                       child: Text('إلغاء'.tr()),
                     ),
                     ElevatedButton(
@@ -230,8 +362,12 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         if (u.isEmpty || p.isEmpty) return;
 
                         final db = await DBHelper.database;
-                        final waiterSupervisorId =
-                            role == 'waiter' ? selectedSupervisorId : null;
+                        final waiterSupervisors =
+                            role == 'waiter' ? branchSelection : <int>{};
+                        // المشرف الأساسي — أول واحد متعين عنده (للتوافق مع
+                        // الشاشات القديمة اللي بتقرأ supervisor_id).
+                        final primarySupervisorId =
+                            waiterSupervisors.isEmpty ? null : waiterSupervisors.first;
                         int userId;
 
                         if (edit == null) {
@@ -239,7 +375,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             'username': u,
                             'password': p,
                             'role': role,
-                            'supervisor_id': waiterSupervisorId,
+                            'supervisor_id': primarySupervisorId,
                           });
                         } else {
                           userId = edit['id'];
@@ -248,7 +384,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             {
                               'password': p,
                               'role': role,
-                              'supervisor_id': waiterSupervisorId,
+                              'supervisor_id': primarySupervisorId,
                             },
                             where: 'id=?',
                             whereArgs: [userId],
@@ -285,14 +421,27 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                           }
                         }
 
-                        // 🌿 مزامنة فروع التعيين: الويتر اللي ليه مشرف في
-                        // إدارة المستخدمين بيضاف عند المشرف ده من غير ما
-                        // يتشال من كاشيرات تانيين هو متعيّن عندهم.
-                        if (role == 'waiter' && waiterSupervisorId != null) {
-                          await DBHelper.assignWaiterToSupervisor(
-                            waiterId: userId,
-                            supervisorId: waiterSupervisorId,
+                        // 🌿 مزامنة فروع التعيين: نمسح المصدوف ونزرع الجديد —
+                        // كده الويتر قادر يتحط تحت كاشيرين وبيدخل تحت الاتنين
+                        // في نفس الوقت، والشجرة تعيد رسم نفسها.
+                        if (role == 'waiter') {
+                          await DBHelper.unassignAllWaiters(userId);
+                          for (final supId in waiterSupervisors) {
+                            await DBHelper.assignWaiterToSupervisor(
+                              waiterId: userId,
+                              supervisorId: supId,
+                            );
+                          }
+                          // المشرف الأساسي يتسجل صريحًا حتى لو كان قبل كده
+                          // عنده مشرف تاني.
+                          await db.update(
+                            'users',
+                            {'supervisor_id': primarySupervisorId},
+                            where: 'id=?',
+                            whereArgs: [userId],
                           );
+                        } else {
+                          await DBHelper.unassignAllWaiters(userId);
                         }
 
                         if (dialogContext.mounted) {
@@ -306,6 +455,84 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 ),
           ),
     );
+  }
+
+  /// 🌿 فصل الموظف من جذر واحد بس — فرعه عند كاشيرات تانيين بيفضل شغال.
+  Future<void> _detachFromSupervisor(
+    Map<String, dynamic> waiter,
+    Map<String, dynamic> supervisor,
+  ) async {
+    final waiterId = _userId(waiter);
+    final supervisorId = _userId(supervisor);
+
+    await DBHelper.unassignWaiterFromSupervisor(
+      waiterId: waiterId,
+      supervisorId: supervisorId,
+    );
+
+    // لو المشرف المفصول ده كان الأساسي، نمرر الدور لأي مشرف تاني موجود،
+    // وإلا الموظف بيرجع مستقل.
+    final remaining = _supervisorIdsOf(waiter).where((id) => id != supervisorId).toList();
+    final nextPrimary =
+        waiter['supervisor_id'] == supervisorId
+            ? (remaining.isEmpty ? null : remaining.first)
+            : (waiter['supervisor_id'] as num?)?.toInt();
+    final db = await DBHelper.database;
+    await db.update(
+      'users',
+      {'supervisor_id': nextPrimary},
+      where: 'id=?',
+      whereArgs: [waiterId],
+    );
+
+    AppToast.show(
+      remaining.isEmpty
+          ? '«{n}» بقى فريق مستقل'.tr({'n': waiter['username']})
+          : 'تم الفصل من عند {n} — ولسه شغال تحت مشرفين تانيين'.tr({
+            'n': supervisor['username'],
+          }),
+    );
+    _load();
+  }
+
+  /// 🌿 إسقاط ورقة على جذر — بيربط الموظف بالكاشير ده زيادة على مشرفينه
+  /// الحاليين (يعني ممكن يكون متفرّع تحت أكتر من كاشير في نفس الوقت،
+  /// والإسقاط على جذر تاني بيعمل جذر إضافي — التحرير بيقدّر مسألة كاملة).
+  Future<void> _attachWaiterToSupervisor(
+    Map<String, dynamic> waiter,
+    Map<String, dynamic> supervisor,
+  ) async {
+    final waiterId = _userId(waiter);
+    final supId = _userId(supervisor);
+    if (waiterId == supId) return;
+
+    if (_supervisorIdsOf(waiter).contains(supId)) {
+      AppToast.show(
+        '«{n}» شغال تحت {u} من قبل'.tr({
+          'n': waiter['username'] ?? '',
+          'u': supervisor['username'] ?? '',
+        }),
+      );
+      _load();
+      return;
+    }
+
+    await DBHelper.assignWaiterToSupervisor(
+      waiterId: waiterId,
+      supervisorId: supId,
+    );
+
+    // بعد السقوط نفتوح فرع الجذر ده — الويتر يبان قدامك فورًا (المطوي
+    // ممكن يحس إن السحب أهمل) — على الديسكتوب المجموعة المفتوحة بلا أثر.
+    _expandedSupervisors.add(supId);
+
+    AppToast.show(
+      '«{n}» بقى متفرّع تحت {u} 🌿'.tr({
+        'n': waiter['username'] ?? '',
+        'u': supervisor['username'] ?? '',
+      }),
+    );
+    _load();
   }
 
   void _confirmDeleteUser(int userId, String username) async {

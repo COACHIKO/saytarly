@@ -115,7 +115,9 @@ extension _SuperAdminWindowsBody on _SuperAdminDashboardState {
                   icon: Icons.storefront_outlined,
                   color: palette.warning,
                   hint: _placeName,
-                  onTap: () => _push(const BusinessProfileScreen()),
+                  onTap: () => _push(
+                    const SetupWizardScreen(fromDashboard: true),
+                  ),
                 ),
               ],
             ),

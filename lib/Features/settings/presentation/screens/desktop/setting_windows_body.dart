@@ -70,34 +70,6 @@ extension _SettingsWindowsBody on _SettingsScreenState {
                     ),
                   ]),
 
-                  // ==================== منتجات إضافية ====================
-                  _windowsSection('منتجات إضافية'.tr(), [
-                    _windowsSwitchRow(
-                      icon: Icons.smoking_rooms_outlined,
-                      iconColor: palette.warning,
-                      title: 'بيع السجائر'.tr(),
-                      subtitle:
-                          _cigarettesEnabled
-                              ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
-                                  .tr()
-                              : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
-                      value: _cigarettesEnabled,
-                      onChanged: _changeCigarettesEnabled,
-                    ),
-                    _windowsSwitchRow(
-                      icon: Icons.blur_on_rounded,
-                      iconColor: palette.info,
-                      title: 'بيع الشيشة'.tr(),
-                      subtitle:
-                          _shishaEnabled
-                              ? 'مفعّل — هتظهر في شاشة البيع وإدارة المشروبات'
-                                  .tr()
-                              : 'متوقف — مش هتظهر في شاشة البيع'.tr(),
-                      value: _shishaEnabled,
-                      onChanged: _changeShishaEnabled,
-                    ),
-                  ]),
-
                   // ==================== شاشة إضافة المشروبات ====================
                   _windowsSection('شاشة إضافة المشروبات'.tr(), [
                     _windowsOptionRow(

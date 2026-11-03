@@ -10,7 +10,6 @@ import 'package:saytarly/Features/users/presentation/screens/manage_users.dart';
 import 'package:saytarly/Features/activation/presentation/screens/license_generator_screen.dart';
 import 'package:saytarly/Features/auth/viewmodel/current_user.dart';
 import 'package:saytarly/Features/settings/presentation/screens/setting.dart';
-import 'package:saytarly/Features/superadmin/presentation/screens/business_profile_screen.dart';
 import 'package:saytarly/Features/sections/presentation/screens/modules_manager_screen.dart';
 import 'package:saytarly/Features/superadmin/presentation/screens/setup_wizard.dart';
 import 'package:saytarly/core/localization/messages.dart';
@@ -158,15 +157,6 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
 
   List<Map<String, dynamic>> get _actions => [
     {
-      'title': 'الملف التجاري'.tr(),
-      'subtitle': '$_placeName • $_typeLabel',
-      'group': 'التخصيص'.tr(),
-      'icon': Icons.storefront,
-      'color': Colors.teal,
-      'page': (BuildContext _) => const BusinessProfileScreen(),
-      'onTap': () => _push(const BusinessProfileScreen()),
-    },
-    {
       'title': 'أقسام المنتجات'.tr(),
       'subtitle': '{v1} قسم • {v2} منتج'.tr({
         'v1': _modulesCount,
@@ -179,13 +169,13 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'onTap': () => _push(const ModulesManagerScreen()),
     },
     {
-      'title': 'معالج التهيئة'.tr(),
+      'title': 'بيانات المكان'.tr(),
       'subtitle':
           _setupCompleted
-              ? 'إعادة تشغيل خطوات التهيئة'.tr()
-              : '⚠️ لسه فيه خطوات تهيئة مطلوبة'.tr(),
+              ? '{_placeName} • {_typeLabel} — عدّل أي حاجة'.tr({'_placeName': _placeName, '_typeLabel': _typeLabel})
+              : '⚠️ كمّل بيانات المكان الأول'.tr(),
       'group': 'التخصيص'.tr(),
-      'icon': Icons.rocket_launch,
+      'icon': Icons.storefront,
       'color': Colors.deepPurple,
       'page': (BuildContext _) => const SetupWizardScreen(fromDashboard: true),
       'onTap': () => _push(const SetupWizardScreen(fromDashboard: true)),
