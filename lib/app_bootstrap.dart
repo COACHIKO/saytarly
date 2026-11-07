@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:saytarly/core/database/db_helper.dart';
 import 'package:saytarly/core/design/saytarly_theme.dart';
+import 'package:saytarly/core/desktop/windows_tray.dart';
 import 'package:saytarly/core/services/lan_backup_server.dart';
 import 'package:saytarly/core/utils/DeviceFingerprint.dart';
 import 'package:saytarly/core/utils/money.dart';
@@ -32,6 +33,15 @@ abstract class AppBootstrap {
   /// Runs all init steps. Returns `true` when the normal app [SaytarlyApp]
   /// should run, or `false` when the activation gate widget is pending.
   static Future<bool> init() async {
+    // ── Windows: keep running in the system tray when the window is closed ──
+    if (Platform.isWindows) {
+      try {
+        await WindowsTray.instance.prepareWindow();
+      } catch (e) {
+        debugPrint('Windows tray window notice: $e');
+      }
+    }
+
     // ── Desktop SQLite FFI ───────────────────────────────────────────────────
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();

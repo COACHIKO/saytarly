@@ -114,15 +114,13 @@ String _typeBlurb(String type) {
 }
 
 /// أسماء الأقسام بتتخزن عربي (بيانات) وبتتعرض بلغة الواجهة.
+/// المقترحات أقسام عامة بس — السخن والبارد وغيره بيتضافوا كقوائم فرعية
+/// من إدارة الأقسام بعد التهيئة.
 const Map<String, String> _moduleNames = {
-  'hot': 'مشروبات ساخنة',
-  'cold': 'مشروبات باردة',
-  'desserts': 'حلويات',
-  'snacks': 'سناكس',
-  'appetizers': 'مقبلات',
-  'mains': 'أطباق رئيسية',
-  'grills': 'مشويات',
+  'foods': 'ماكولات',
   'drinks': 'مشروبات',
+  'desserts': 'حلويات',
+  'appetizers': 'مقبلات',
 };
 
 class _TeamDraft {
@@ -167,34 +165,19 @@ class _ModulePreset {
   String get label => name.tr();
 }
 
-const Map<String, List<_ModulePreset>> _modulePresetMap = {
-  'cafe': [
-    _ModulePreset('hot', 'local_cafe', Icons.local_cafe_rounded, 0xFFE07A5F),
-    _ModulePreset('cold', 'local_drink', Icons.local_drink_rounded, 0xFF3D9BE9),
-    _ModulePreset('desserts', 'cake', Icons.cake_rounded, 0xFFD98BA7),
-    _ModulePreset('snacks', 'fastfood', Icons.fastfood_rounded, 0xFFF2A65A),
-  ],
-  'restaurant': [
-    _ModulePreset('appetizers', 'lunch_dining', Icons.lunch_dining_rounded, 0xFF7BB661),
-    _ModulePreset('mains', 'dinner_dining', Icons.dinner_dining_rounded, 0xFFE07A5F),
-    _ModulePreset('grills', 'restaurant', Icons.outdoor_grill_rounded, 0xFFC0563B),
-    _ModulePreset('drinks', 'local_drink', Icons.local_drink_rounded, 0xFF3D9BE9),
-    _ModulePreset('desserts', 'cake', Icons.cake_rounded, 0xFFD98BA7),
-  ],
-  'restaurant_cafe': [
-    _ModulePreset('hot', 'local_cafe', Icons.local_cafe_rounded, 0xFFE07A5F),
-    _ModulePreset('cold', 'local_drink', Icons.local_drink_rounded, 0xFF3D9BE9),
-    _ModulePreset('appetizers', 'lunch_dining', Icons.lunch_dining_rounded, 0xFF7BB661),
-    _ModulePreset('mains', 'dinner_dining', Icons.dinner_dining_rounded, 0xFFC0563B),
-    _ModulePreset('desserts', 'cake', Icons.cake_rounded, 0xFFD98BA7),
-  ],
-  'playstation_cafe': [
-    _ModulePreset('hot', 'local_cafe', Icons.local_cafe_rounded, 0xFFE07A5F),
-    _ModulePreset('cold', 'local_drink', Icons.local_drink_rounded, 0xFF3D9BE9),
-    _ModulePreset('snacks', 'fastfood', Icons.fastfood_rounded, 0xFFF2A65A),
-    _ModulePreset('desserts', 'cake', Icons.cake_rounded, 0xFFD98BA7),
-  ],
-};
+/// الأقسام المقترحة في رحلة التهيئة — أقسام عامة بس لكل أنواع الأنشطة.
+/// مفيش اقتراح للسخن/البارد/غيره: دي قوائم فرعية بتتضاف من إدارة الأقسام.
+const List<_ModulePreset> _modulePresets = [
+  _ModulePreset('foods', 'restaurant', Icons.restaurant_rounded, 0xFFE07A5F),
+  _ModulePreset('drinks', 'local_drink', Icons.local_drink_rounded, 0xFF3D9BE9),
+  _ModulePreset('desserts', 'cake', Icons.cake_rounded, 0xFFD98BA7),
+  _ModulePreset(
+    'appetizers',
+    'lunch_dining',
+    Icons.lunch_dining_rounded,
+    0xFF7BB661,
+  ),
+];
 
 // ============================ سكين التصميم ============================
 
@@ -280,9 +263,6 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
         return _wizReviewStep(context);
     }
   }
-
-  List<_ModulePreset> _presetsForType() =>
-      _modulePresetMap[_businessType] ?? _modulePresetMap['cafe']!;
 
   // ---------------------------- 1) الترحيب ----------------------------
 
@@ -792,6 +772,7 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
     final skin = _WizSkin.of(context);
     final pass = _adminPassCtl.text;
     final score = _passwordScore(pass);
+    final editingExisting = _isExistingAdmin;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -808,6 +789,55 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
           password: pass,
           typeLabel: _wizardTypeLabel(_businessType),
         ),
+        if (_existingAdmins.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          _GlassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SectionLabel('حسابات الأدمن الموجودة'.tr()),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final admin in _existingAdmins)
+                      _ChoicePill(
+                        label: (admin['username'] ?? '').toString(),
+                        selected:
+                            editingExisting &&
+                            ((admin['username'] ?? '') as String)
+                                    .toLowerCase() ==
+                                _adminUserCtl.text.trim().toLowerCase(),
+                        onTap:
+                            () => _selectExistingAdmin(
+                              (admin['username'] ?? '').toString(),
+                            ),
+                      ),
+                    _ChoicePill(
+                      label: 'حساب جديد +'.tr(),
+                      selected: !editingExisting,
+                      onTap: _startNewAdmin,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  editingExisting
+                      ? 'هتعدّل حساب «{u}» — سيب كلمة السر فاضية وهي هتفضل زي ما هي.'.tr({
+                          'u': _adminUserCtl.text.trim(),
+                        })
+                      : 'هيتعمل حساب أدمن جديد — كلمة السر مطلوبة.'.tr(),
+                  style: TextStyle(
+                    color: skin.faint,
+                    fontSize: 11.5,
+                    height: 1.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: 14),
         _GlassCard(
           child: Column(
@@ -826,8 +856,14 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
               const SizedBox(height: 10),
               _WizField(
                 controller: _adminPassCtl,
-                label: 'كلمة المرور'.tr(),
-                hint: '••••••',
+                label:
+                    editingExisting
+                        ? 'كلمة مرور جديدة (اختياري)'.tr()
+                        : 'كلمة المرور'.tr(),
+                hint:
+                    editingExisting
+                        ? 'سيبها فاضية عشان تفضل زي ما هي'.tr()
+                        : '••••••',
                 icon: Icons.lock_outline_rounded,
                 obscure: !_showAdminPass,
                 onChanged: (_) => _refresh(() {}),
@@ -855,7 +891,9 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
                   ),
                   const Spacer(),
                   Text(
-                    pass.isEmpty
+                    editingExisting && pass.isEmpty
+                        ? 'هتفضل زي ما هي'.tr()
+                        : pass.isEmpty
                         ? 'محتاجة 4 حروف'.tr()
                         : (pass.length >= 4 ? 'تمام ✓'.tr() : 'لسه قصيرة'),
                     style: TextStyle(
@@ -869,13 +907,6 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
             ],
           ),
         ),
-        if (_existingAdminUser != null) ...[
-          const SizedBox(height: 10),
-          Text(
-            'الأدمن الحالي: «{_existingAdminUser}» — لو سيبت الاسم زي ما هو مش هنعمل حساب جديد.'.tr({'_existingAdminUser': _existingAdminUser}),
-            style: TextStyle(color: skin.faint, fontSize: 11.5, height: 1.6),
-          ),
-        ],
       ],
     );
   }
@@ -1044,7 +1075,7 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
 
   Widget _wizModulesStep(BuildContext context) {
     final skin = _WizSkin.of(context);
-    final presets = _presetsForType();
+    final presets = _modulePresets;
     final presetNames = presets.map((p) => p.name).toSet();
     final custom =
         _selectedModules.where((n) => !presetNames.contains(n)).toList();
@@ -1057,14 +1088,14 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
           kicker: 'MENU BUILDER',
           title: 'منيو جاهز في ضغطة واحدة'.tr(),
           subtitle:
-              'اخترنا لك أقسام مناسبة لنوع نشاطك. كل قسم بيفتح له تلقائي: إدارة + تقرير في لوحة الأدمن.'.tr(),
+              'أقسام عامة تختار منها اللي يناسبك — السخن والبارد وغيره بتتضاف كقوائم فرعية من إدارة الأقسام. كل قسم بيفتح له تلقائي: إدارة + تقرير في لوحة الأدمن.'.tr(),
         ),
         const SizedBox(height: 18),
         Row(
           children: [
             Expanded(
               child: Text(
-                'مقترحة لـ {v1}'.tr({'v1': _wizardTypeLabel(_businessType)}),
+                'أقسام مقترحة'.tr(),
                 style: TextStyle(
                   color: skin.text,
                   fontSize: 12.5,
@@ -1208,9 +1239,7 @@ extension _SetupWizardSteps on _SetupWizardScreenState {
     final skin = _WizSkin.of(context);
     final type = _wizardTypeLabel(_businessType);
     final hasName = _nameCtl.text.trim().isNotEmpty;
-    final adminReady =
-        _adminUserCtl.text.trim().isNotEmpty &&
-        _adminPassCtl.text.trim().length >= 4;
+    final adminReady = _adminFormReady;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

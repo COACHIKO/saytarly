@@ -1,20 +1,33 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:saytarly/core/database/db_helper.dart';
 import 'package:saytarly/core/localization/messages.dart';
 
 /// رمز العملة — بيتحمّل مرة في أول التشغيل من إعدادات الملف التجاري،
-/// وبينفع يتعاد تحميله بعد أي تعديل من شاشة الإعدادات.
+/// وبيتحدّث فورًا بعد أي تعديل من الإعدادات أو معالج التهيئة.
 ///
 /// الكود كله بواسطة [txt] بدل نص «ج.م» المكتوب بالكود — فالتغيير بيشتغل
-/// فورًا في الشاشات والتقارير والفواتير بعد إعادة التشغيل (أو بعد [load])
-/// من غير أي تعديل كود.
+/// فورًا في الشاشات والتقارير والفواتير من غير إعادة تشغيل.
 class Money {
   Money._();
 
   /// Default when the super admin has not set a custom currency symbol.
   /// Resolved at access time so it follows the current UI language.
-  static String get fallback => 'ج.م'.tr();
+  /// (The Arabic literal sits in the ternary's else branch so the l10n
+  /// extractor never wraps it with `.tr()` — that would recurse into [symbol].)
+  static String get fallback => !Str.isRtl ? 'EGP' : 'ج.م';
 
   static String _customSymbol = '';
+
+  /// بيتغيّر كل ما رمز العملة يتحدّث — الشاشات المفتوحة بتسمع عليه
+  /// وبتعيد رسم نفسها فورًا.
+  static final ValueNotifier<int> changes = ValueNotifier<int>(0);
+
+  /// بيسجّل مزوّد العملة في طبقة الترجمة عشان أي نص فيه «ج» أو «EGP»
+  /// يتعرض بالرمز الحالي تلقائيًا. النداء آمن ومتكرر.
+  static void _installResolver() {
+    Str.setCurrencyResolver(() => Money.symbol);
+  }
 
   /// Current symbol. A custom business symbol wins; otherwise the localized
   /// default is resolved on every read, so switching to English shows “EGP”.
@@ -25,8 +38,19 @@ class Money {
 
   /// Loads the custom symbol from the business settings.
   static Future<void> load() async {
+    _installResolver();
     final v = await DBHelper.getSetting(DBHelper.kCurrencySymbolKey);
-    _customSymbol = (v == null || v.trim().isEmpty) ? '' : v.trim();
+    setCustomSymbol(v ?? '');
+  }
+
+  /// Updates the in-memory symbol immediately (after saving the setting) and
+  /// notifies every listener so open screens refresh without a restart.
+  static void setCustomSymbol(String value) {
+    _installResolver();
+    final next = value.trim();
+    if (next == _customSymbol) return;
+    _customSymbol = next;
+    changes.value++;
   }
 
   /// تنسيق مبلغ مع الرمز — للمواضع الجديدة بدل النصوص المكتوبة يدويًا.

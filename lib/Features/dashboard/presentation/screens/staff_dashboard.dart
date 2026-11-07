@@ -3714,7 +3714,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                   }),
               SizedBox(height: 10),
               Text(
-                'الإجمالي بعد الخصم: ${(drinksCost - discount).clamp(0, double.infinity).toStringAsFixed(2)} ج',
+                'الإجمالي بعد الخصم: ${(drinksCost - discount).clamp(0, double.infinity).toStringAsFixed(2)} ${Money.txt}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

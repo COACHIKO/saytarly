@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:saytarly/core/database/db_helper.dart';
 import 'package:saytarly/core/models/material_unit.dart';
 import 'package:saytarly/core/localization/messages.dart';
+import 'package:saytarly/core/utils/money.dart';
 
 /// الملف التجاري للنظام — بيتظبط من السوبر ادمن وبيتخزن في جدول app_settings
 class BusinessProfile {
@@ -167,7 +168,10 @@ class BusinessProfile {
       await DBHelper.getSetting(DBHelper.kCurrencySymbolKey) ?? '';
 
   static Future<void> setCurrencySymbol(String symbol) async {
-    await DBHelper.setSetting(DBHelper.kCurrencySymbolKey, symbol.trim());
+    final value = symbol.trim();
+    await DBHelper.setSetting(DBHelper.kCurrencySymbolKey, value);
+    // تحديث فوري للرمز في الذاكرة — من الإعدادات أو معالج التهيئة.
+    Money.setCustomSymbol(value);
   }
 
   // ===================== نصوص الفاتورة المخصصة =====================

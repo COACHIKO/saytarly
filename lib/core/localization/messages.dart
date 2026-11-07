@@ -16,16 +16,14 @@
 import 'package:flutter/material.dart';
 
 import 'generated/app_messages.dart';
+import 'package:saytarly/core/localization/messages.dart';
 
 /// Global locale + translation entry point (usable without a BuildContext).
 class Str {
   Str._();
 
   /// Supported locales, Arabic first (default language of the template).
-  static const List<Locale> supportedLocales = [
-    Locale('ar'),
-    Locale('en'),
-  ];
+  static const List<Locale> supportedLocales = [Locale('ar'), Locale('en')];
 
   static Locale _locale = const Locale('ar');
 
@@ -65,9 +63,35 @@ class Str {
   static Map<String, String> _dataFor(String languageCode) =>
       languageCode == 'en' ? kMessagesEn : kMessagesAr;
 
+  /// Resolves the live currency marker used inside translated texts.
+  ///
+  /// The money layer installs the real resolver at startup; this default keeps
+  /// strings readable before the first [Money] load.
+  static String Function() _currencyResolver = () => !Str.isRtl ? 'EGP' : 'ج.م';
+
+  /// Lets [Money] plug the configured business currency into translations
+  /// without making the localization layer depend on the database.
+  static void setCurrencyResolver(String Function() resolver) {
+    _currencyResolver = resolver;
+  }
+
+  /// Standalone currency markers inside Arabic/English translations:
+  /// "الإجمالي: {v1} ج" / "Total: {v1} EGP". The marker must be surrounded by
+  /// whitespace or punctuation so words that merely contain "ج" stay intact.
+  static final RegExp _currencyToken = RegExp(
+    r'(\s)(?:ج|EGP)(?=\s|$|[،,;:!?)\]<>])',
+  );
+
   /// Translates [key] into the current language; unknown keys fall back to
   /// Arabic, then to the key itself.
-  static String tr(String key, [Map<String, Object?>? args]) {
+  static String tr(String key, [Map<String, Object?>? args]) =>
+      _translate(key, args, localizeCurrency: true);
+
+  static String _translate(
+    String key,
+    Map<String, Object?>? args, {
+    required bool localizeCurrency,
+  }) {
     final code = _locale.languageCode;
     var value = _dataFor(code)[key];
     if (value == null && code != 'ar') {
@@ -77,7 +101,20 @@ class Str {
     if (args != null && args.isNotEmpty) {
       value = applyArgs(value, args);
     }
+    if (localizeCurrency) value = _withCurrency(value);
     return value;
+  }
+
+  /// Swaps hardcoded "ج"/"EGP" tokens for the configured business currency,
+  /// so every invoice, report, dialog and printed document follows the symbol
+  /// saved in settings immediately.
+  static String _withCurrency(String value) {
+    if (!value.contains('ج') && !value.contains('EGP')) return value;
+    final symbol = _currencyResolver();
+    return value.replaceAllMapped(
+      _currencyToken,
+      (match) => '${match[1]}$symbol',
+    );
   }
 
   /// Substitutes `{name}` placeholders that have an entry in [args]. Literal

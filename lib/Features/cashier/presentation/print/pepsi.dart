@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:saytarly/core/localization/messages.dart';
+import 'package:saytarly/core/utils/money.dart';
 
 class PepsiStaticInvoice {
   static Future<void> printStaticInvoice() async {
@@ -829,7 +830,7 @@ class PepsiStaticInvoice {
                   ),
 
                   pw.Center(
-                    child: pw.Text("Amounts are in EGP",
+                    child: pw.Text("Amounts are in ${Money.txt}",
                         style: pw.TextStyle(font: font, fontSize: 8)),
                   ),
 

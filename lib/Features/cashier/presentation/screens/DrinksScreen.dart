@@ -802,7 +802,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
                   }),
               SizedBox(height: 10),
               Text(
-                'الإجمالي بعد الخصم: ${totalAfterDiscount(discount).toStringAsFixed(2)} ج',
+                'الإجمالي بعد الخصم: ${totalAfterDiscount(discount).toStringAsFixed(2)} ${Money.txt}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text('تكلفة المشروبات: ${drinksCost.toStringAsFixed(2)}'),
@@ -1224,7 +1224,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
               ),
               SizedBox(height: 10),
               Text(
-                'الإجمالي بعد الخصم: ${(drinksCost - discount).clamp(0, double.infinity).toStringAsFixed(2)} ج',
+                'الإجمالي بعد الخصم: ${(drinksCost - discount).clamp(0, double.infinity).toStringAsFixed(2)} ${Money.txt}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

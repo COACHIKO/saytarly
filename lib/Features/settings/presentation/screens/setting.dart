@@ -168,6 +168,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final done = await BackupHelper.restoreDatabase(password);
       if (!mounted || !done) return;
+      // النسخة المسترجعة ممكن تكون بعملة مختلفة — نحدّثها فورًا.
+      try {
+        await Money.load();
+      } catch (_) {}
       AppToast.show(
         '✅ تم استرجاع النسخة بنجاح، يفضل إعادة تشغيل البرنامج'.tr(),
       );
@@ -375,6 +379,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final bytes = await LanBackupClient.fetchLatestBackup(ip);
       await BackupHelper.restoreFromNetworkBytes(bytes, password);
+      try {
+        await Money.load();
+      } catch (_) {}
       if (!mounted) return;
       AppToast.show('✅ تم استيراد النسخة من الكاشير بنجاح'.tr());
     } catch (e) {
@@ -495,6 +502,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) return;
       Navigator.pop(context);
       if (ok) {
+        try {
+          await Money.load();
+        } catch (_) {}
         debugPrint('✅ الاسترجاع نجح');
         AppToast.show(
           '✅ تم استرجاع النسخة من السيرفر بنجاح، يفضل إعادة تشغيل البرنامج'

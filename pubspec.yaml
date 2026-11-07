@@ -67,6 +67,10 @@ dependencies:
   android_id: ^0.4.0
   device_info_plus: ^11.2.0
 
+  # Windows window + system tray
+  window_manager: ^0.5.2
+  tray_manager: ^0.5.3
+
   # Utilities
   file_picker: ^10.3.10
   json_annotation: ^4.9.0

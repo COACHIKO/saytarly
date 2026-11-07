@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/app/bloc_observer.dart';
 import 'core/app/connectivity_controller.dart';
+import 'core/desktop/windows_tray.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/services/shared_pref/shared_pref.dart';
 import 'app_bootstrap.dart';
@@ -69,4 +70,10 @@ Future<void> _bootstrap() async {
   final gate = AppBootstrap.gateWidget;
 
   runApp(gate ?? const SaytarlyApp());
+
+  // The tray icon is created after the first frame so the native plugins and
+  // the saved language are fully ready.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(WindowsTray.instance.setupTray());
+  });
 }

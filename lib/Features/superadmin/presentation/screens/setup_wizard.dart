@@ -79,7 +79,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
   /// كل الفريق (الموجود + الجديد) في قائمة واحدة قابلة للتعديل.
   final List<_TeamDraft> _team = [];
   final List<String> _existingModules = [];
-  String? _existingAdminUser;
+
+  /// حسابات الأدمن الموجودة بالفعل — بتظهر في خطوة الأدمن عشان تقدر
+  /// تعدّل واحد منها من غير ما تكتب كلمة سر جديدة.
+  final List<Map<String, dynamic>> _existingAdmins = [];
 
   /// الأقسام الجديدة اللي اختارها المستخدم في خطوة المنيو.
   final List<String> _selectedModules = [];
@@ -225,9 +228,13 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
                 .map((m) => (m['name'] ?? '').toString().trim())
                 .where((n) => n.isNotEmpty),
           );
-        _existingAdminUser =
-            admins.isEmpty ? null : admins.first['username'] as String?;
-        _adminUserCtl.text = _existingAdminUser ?? '';
+        _existingAdmins
+          ..clear()
+          ..addAll(admins);
+        _adminUserCtl.text =
+            admins.isEmpty
+                ? ''
+                : (admins.first['username'] ?? '').toString();
         _team
           ..clear()
           ..addAll(
@@ -243,7 +250,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
               );
             }),
           );
-        if (draft != null) _applyDraft(draft);
+        // المسودة بتستخدم بس وإحنا لسه في التهيئة الأولى. لو المكان
+        // متظبط خلاص، بنعتمد على البيانات المحفوظة ونطنّش أي مسودة قديمة.
+        if (draft != null && !setupDone) _applyDraft(draft);
+        _setupCompleted = setupDone;
         _loading = false;
       });
       // مسودة قديمة اتسابت بعد ما التهيئة خلصت — مش محتاجينها.
@@ -410,16 +420,39 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
 
   // ============================ حسابات ============================
 
+  /// بيرجع حساب الأدمن الموجود بنفس الاسم (مش حساس لحالة الحروف).
+  Map<String, dynamic>? _findExistingAdmin(String username) {
+    final lower = username.trim().toLowerCase();
+    if (lower.isEmpty) return null;
+    for (final admin in _existingAdmins) {
+      if (((admin['username'] ?? '') as String).toLowerCase() == lower) {
+        return admin;
+      }
+    }
+    return null;
+  }
+
+  /// هل الاسم المكتوب حاليًا بيطابق حساب أدمن موجود؟
+  bool get _isExistingAdmin =>
+      _findExistingAdmin(_adminUserCtl.text) != null;
+
+  /// خطوة الأدمن جاهزة؟ الحساب الموجود مش محتاج كلمة سر جديدة،
+  /// إنما الحساب الجديد لازم يكون معاه كلمة سر.
+  bool get _adminFormReady {
+    final user = _adminUserCtl.text.trim();
+    final pass = _adminPassCtl.text.trim();
+    if (user.isEmpty) return false;
+    if (_isExistingAdmin) return pass.isEmpty || pass.length >= 4;
+    return pass.length >= 4;
+  }
+
   int get _readiness {
     var score = 0;
     if (_nameCtl.text.trim().isNotEmpty) score += 22;
     if (_logoPath != null) score += 8;
     if (_phoneCtl.text.trim().isNotEmpty) score += 8;
     if (_addressCtl.text.trim().isNotEmpty) score += 6;
-    if (_adminUserCtl.text.trim().isNotEmpty &&
-        _adminPassCtl.text.trim().length >= 4) {
-      score += 26;
-    }
+    if (_adminFormReady) score += 26;
     if (_team.isNotEmpty) score += 10;
     if (_moduleCount > 0) score += 20;
     return math.min(100, score);
@@ -465,6 +498,25 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
         '${rnd.nextInt(90) + 10}'
         '${tails[rnd.nextInt(tails.length)]}';
     setState(() => _adminPassCtl.text = password);
+  }
+
+  /// اختيار حساب أدمن موجود للتعديل — كلمة السر بتفضل فاضية
+  /// عشان تفضل زي ما هي إلا لو المستخدم كتب واحدة جديدة.
+  void _selectExistingAdmin(String username) {
+    _refresh(() {
+      _adminUserCtl.text = username;
+      _adminPassCtl.clear();
+      _showAdminPass = false;
+    });
+  }
+
+  /// التحويل لوضع إنشاء حساب أدمن جديد.
+  void _startNewAdmin() {
+    _refresh(() {
+      _adminUserCtl.clear();
+      _adminPassCtl.clear();
+      _showAdminPass = false;
+    });
   }
 
   // ============================ لوجو ============================
@@ -532,6 +584,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
   Future<void> _validateAdminStep() async {
     final user = _adminUserCtl.text.trim();
     final pass = _adminPassCtl.text.trim();
+    final existingAdmin = _findExistingAdmin(user);
 
     if (user.isEmpty) {
       _snack('اكتب اسم مستخدم الأدمن'.tr(), error: true);
@@ -541,11 +594,17 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
       _snack('الاسم ده محجوز للسوبر ادمن'.tr(), error: true);
       return;
     }
-    if (pass.length < 4) {
+    // الحساب الموجود مش محتاج كلمة سر جديدة — لو اكتبت واحدة لازم تكون ٤ حروف.
+    if (existingAdmin == null) {
+      if (pass.length < 4) {
+        _snack('كلمة السر لازم ٤ حروف على الأقل'.tr(), error: true);
+        return;
+      }
+    } else if (pass.isNotEmpty && pass.length < 4) {
       _snack('كلمة السر لازم ٤ حروف على الأقل'.tr(), error: true);
       return;
     }
-    if (user != _existingAdminUser) {
+    if (existingAdmin == null) {
       final users = await DBHelper.getAllUsers();
       final taken = users.any(
         (u) =>
@@ -747,7 +806,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
 
   void _selectAllModules() {
     setState(() {
-      for (final preset in _presetsForType()) {
+      for (final preset in _modulePresets) {
         if (!_existingModules.contains(preset.name) &&
             !_selectedModules.contains(preset.name)) {
           _selectedModules.add(preset.name);
@@ -784,8 +843,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
       _snack('اكتب اسم المكان الأول'.tr(), error: true);
       return;
     }
-    if (_adminUserCtl.text.trim().isEmpty ||
-        _adminPassCtl.text.trim().length < 4) {
+    if (!_adminFormReady) {
       setState(() => _step = 3);
       _snack('كمّل بيانات حساب الأدمن الأول'.tr(), error: true);
       return;
@@ -813,10 +871,18 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
       await AppSettings.setCigarettesEnabled(_cigarettesEnabled);
 
       final adminUser = _adminUserCtl.text.trim();
-      if (adminUser.isNotEmpty && adminUser != _existingAdminUser) {
+      final adminPass = _adminPassCtl.text.trim();
+      final existingAdmin = _findExistingAdmin(adminUser);
+      if (existingAdmin != null) {
+        // حساب موجود — بنحدّث كلمة السر بس لو المستخدم كتب واحدة جديدة.
+        final adminId = (existingAdmin['id'] as num?)?.toInt();
+        if (adminId != null && adminPass.isNotEmpty) {
+          await DBHelper.updateUserPassword(adminId, adminPass);
+        }
+      } else if (adminUser.isNotEmpty) {
         await DBHelper.insertUser({
           'username': adminUser,
-          'password': _adminPassCtl.text.trim(),
+          'password': adminPass,
           'role': 'admin',
         });
       }
@@ -827,7 +893,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen>
         if (_existingModules.contains(moduleName)) continue;
         var iconKey = 'category';
         var colorValue = 0xFF14B8A6;
-        for (final preset in _presetsForType()) {
+        for (final preset in _modulePresets) {
           if (preset.name == moduleName) {
             iconKey = preset.iconKey;
             colorValue = preset.colorValue;
