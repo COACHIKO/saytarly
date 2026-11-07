@@ -16,7 +16,6 @@
 import 'package:flutter/material.dart';
 
 import 'generated/app_messages.dart';
-import 'package:saytarly/core/localization/messages.dart';
 
 /// Global locale + translation entry point (usable without a BuildContext).
 class Str {
