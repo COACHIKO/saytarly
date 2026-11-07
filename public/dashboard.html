@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لوحة الأجهزة — Saytarly</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="/assets/logoSVG.svg" />
+  <style>
+    body { font-family: var(--font-ar); background: var(--navy-900); color: var(--text-1); min-height: 100vh; display: flex; flex-direction: column; }
+    .site-nav { flex-shrink: 0; }
+    .wrap { flex: 1; padding: var(--sp-8) 0 var(--sp-14); }
+    .nav-links a { color: var(--text-3); }
+    .nav-links a:hover { color: var(--text-1); }
+    .nav-links a.active { color: #fff; background: rgba(22, 119, 255, 0.16); }
+    .hero { padding: var(--sp-10) 0 0; }
+    .hero .container { max-width: var(--container); }
+    .hero h1 { font-size: clamp(26px, 4vw, 40px); font-weight: 900; line-height: 1.35; }
+    .hero .lead { color: var(--text-2); font-size: 15px; max-width: 560px; }
+    .hero .sub { color: var(--text-3); font-size: 13px; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; margin-top: var(--sp-5); }
+    .status-live { display: inline-flex; align-items: center; gap: 8px; color: var(--text-2); font-size: 12.5px; font-weight: 600; }
+    .status-live .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 12px var(--success); animation: blink 1.6s infinite; }
+    @keyframes blink { 50% { opacity: 0.35; } }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--sp-4); margin-top: var(--sp-8); }
+    .stat { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); padding: var(--sp-5); position: relative; overflow: hidden; }
+    .stat .num { font-family: var(--font-en); font-size: 30px; font-weight: 800; color: #fff; letter-spacing: .02em; }
+    .stat .lbl { color: var(--text-3); font-size: 12px; margin-top: 4px; }
+    .stat .bar { position: absolute; inset-inline: 0; bottom: 0; height: 3px; background: var(--bar-c, var(--accent)); opacity: .8; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; margin-top: var(--sp-8); }
+    .search { flex: 1 1 260px; display: flex; align-items: center; gap: var(--sp-2); background: var(--surface); border: 1px solid var(--border); border-radius: 13px; padding: 10px 14px; }
+    .search input { flex: 1; background: none; border: none; outline: none; color: var(--text-1); font-family: inherit; font-size: 13.5px; }
+    .search input::placeholder { color: var(--text-3); }
+    .search svg { width: 17px; height: 17px; stroke: var(--text-3); flex-shrink: 0; }
+    .filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+    .chip-btn { padding: 9px 16px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text-2); font-size: 12.5px; font-weight: 700; transition: all .18s ease; }
+    .chip-btn:hover { color: #fff; border-color: var(--border-strong); }
+    .chip-btn.on { background: rgba(22,119,255,.16); border-color: rgba(22,119,255,.55); color: #fff; }
+    .chip-btn.on.all { background: var(--grad-brand); border-color: transparent; box-shadow: var(--shadow-blue); }
+    .sort { margin-inline-start: auto; }
+    select { background: var(--surface); border: 1px solid var(--border); color: var(--text-1); border-radius: 13px; padding: 9px 12px; font-family: inherit; font-size: 13px; outline: none; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-4); margin-top: var(--sp-6); }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius-lg); padding: var(--sp-5); cursor: pointer; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; position: relative; overflow: hidden; }
+    .card:hover { transform: translateY(-4px); border-color: var(--border-strong); box-shadow: var(--shadow-float); }
+    .card.is-blocked { border-color: rgba(255, 59, 59, 0.4); }
+    .card.is-blocked:hover { border-color: rgba(255, 59, 59, 0.6); }
+    .card.is-blocked .name .av { background: rgba(255, 59, 59, 0.14); color: #ff8a8a; }
+    .card .top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+    .card .name { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+    .card .name .av { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; background: rgba(22,119,255,.14); color: var(--accent-soft); }
+    .card .name .av svg { width: 21px; height: 21px; }
+    .card .name b { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card .name small { display: block; color: var(--text-3); font-size: 11px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 800; flex-shrink: 0; }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .badge.active { color: var(--success); background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.35); }
+    .badge.unlimited { color: var(--info); background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.35); }
+    .badge.pending { color: var(--warning); background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.35); }
+    .badge.expired { color: var(--danger); background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.35); }
+    .badge.blocked { color: #ff6b6b; background: rgba(255,59,59,.14); border: 1px solid rgba(255,59,59,.45); }
+    .badge.blocked .dot { animation: blink 1s infinite; }
+    .code { display: flex; align-items: center; gap: var(--sp-2); margin-top: var(--sp-4); background: var(--sunken); border: 1px solid var(--border); border-radius: 11px; padding: 9px 12px; }
+    .code span { font-family: var(--font-en); font-size: 11.5px; color: var(--text-2); letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; direction: ltr; text-align: left; }
+    .code button { color: var(--text-3); display: grid; place-items: center; padding: 2px; }
+    .code button:hover { color: var(--accent-soft); }
+    .code button svg { width: 14px; height: 14px; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin-top: var(--sp-4); }
+    .meta .box { background: rgba(255,255,255,.03); border-radius: 11px; padding: 9px 12px; }
+    .meta .box small { display: block; color: var(--text-3); font-size: 10.5px; margin-bottom: 2px; }
+    .meta .box b { font-size: 12px; font-weight: 700; color: var(--text-1); }
+    .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); margin-top: var(--sp-4); color: var(--text-3); font-size: 11.5px; }
+    .foot .seen { display: flex; align-items: center; gap: 6px; }
+    .foot .seen svg { width: 13px; height: 13px; }
+    .empty, .error { text-align: center; padding: var(--sp-20) var(--sp-6); color: var(--text-2); }
+    .empty .ic, .error .ic { width: 72px; height: 72px; margin: 0 auto var(--sp-4); display: grid; place-items: center; border-radius: 22px; background: rgba(255,255,255,.05); border: 1px solid var(--border); }
+    .empty .ic svg, .error .ic svg { width: 32px; height: 32px; stroke: var(--text-3); }
+    .empty h3, .error h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+    .empty p, .error p { font-size: 13px; color: var(--text-3); }
+    .skeleton { border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,.06); padding: var(--sp-5); background: rgba(255,255,255,.02); }
+    .sk { background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.05) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    /* ── Device dialog (modal) ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 8, 16, 0.66);
+      backdrop-filter: blur(6px);
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .modal-backdrop.open { opacity: 1; visibility: visible; }
+    .modal {
+      width: min(600px, 100%);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--navy-850);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      box-shadow: var(--shadow-float), 0 0 80px rgba(22, 119, 255, 0.12);
+      overflow: hidden;
+      transform: translateY(18px) scale(0.96);
+      transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .modal-backdrop.open .modal { transform: none; }
+    .modal-head {
+      padding: var(--sp-5) var(--sp-6);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+      flex-shrink: 0;
+    }
+    .modal-head b { font-size: 15px; font-weight: 800; }
+    .modal-close {
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      color: var(--text-2);
+      flex-shrink: 0;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .modal-close:hover { color: #fff; border-color: var(--border-strong); }
+    .modal-body { padding: var(--sp-6); overflow-y: auto; display: grid; gap: var(--sp-4); }
+
+    .d-id { text-align: center; }
+    .d-id .av {
+      width: 68px; height: 68px; margin: 0 auto var(--sp-3);
+      border-radius: 20px; display: grid; place-items: center;
+      background: var(--grad-brand);
+      box-shadow: var(--shadow-blue);
+      color: #fff;
+    }
+    .d-id .av svg { width: 30px; height: 30px; }
+    .d-id h2 { font-size: 18px; font-weight: 900; }
+    .d-id .pc { color: var(--text-3); font-size: 12px; margin-top: 2px; direction: ltr; font-family: var(--font-en); word-break: break-all; }
+
+    .blocked-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      background: rgba(255, 59, 59, 0.1);
+      border: 1px solid rgba(255, 59, 59, 0.4);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: #ffb4b4;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .blocked-banner svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+    }
+    .row .k { color: var(--text-3); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .row .k svg { width: 15px; height: 15px; stroke: var(--text-3); }
+    .row .v { font-size: 12.5px; font-weight: 700; color: var(--text-1); text-align: end; direction: ltr; font-family: var(--font-en); word-break: break-all; }
+    .row .v.ar { font-family: var(--font-ar); }
+
+    .editor { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--sp-4); }
+    .editor h4 { font-size: 13.5px; font-weight: 800; margin-bottom: var(--sp-3); }
+    .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .seg button { padding: 9px 4px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,.03); color: var(--text-2); font-size: 12px; font-weight: 700; transition: all .15s ease; }
+    .seg button.on { background: rgba(22,119,255,.16); border-color: rgba(22,119,255,.6); color: #fff; }
+    .val-row { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+    .val-row input { flex: 1; background: var(--sunken); border: 1px solid var(--border); border-radius: 11px; padding: 10px 12px; color: var(--text-1); font-family: var(--font-en); font-size: 14px; outline: none; }
+    .val-row input:focus { border-color: var(--accent); }
+    .val-row label { color: var(--text-2); font-size: 12.5px; white-space: nowrap; }
+    .preview { margin-top: var(--sp-3); font-size: 12.5px; color: var(--accent-soft); font-weight: 700; min-height: 19px; }
+    .d-actions { display: grid; gap: var(--sp-2); margin-top: var(--sp-3); }
+    .btn { justify-content: center; }
+    .btn-block {
+      background: rgba(255, 59, 59, 0.12);
+      border: 1px solid rgba(255, 59, 59, 0.45);
+      color: #ff8a8a;
+    }
+    .btn-block:hover { background: rgba(255, 59, 59, 0.22); }
+    .btn-unblock {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+    .btn-unblock:hover { background: rgba(34, 197, 94, 0.22); }
+    .btn-blocking { opacity: 0.55; pointer-events: none; }
+    .toast-wrap { position: fixed; bottom: 22px; inset-inline: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 120; pointer-events: none; }
+    .toast { background: var(--navy-700); border: 1px solid var(--border-strong); color: var(--text-1); padding: 11px 20px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 700; box-shadow: var(--shadow-float); animation: toastIn .3s cubic-bezier(.22,.61,.36,1); display: flex; align-items: center; gap: 8px; }
+    .toast.ok { border-color: rgba(34,197,94,.5); color: #a7f3c9; }
+    .toast.err { border-color: rgba(248,113,113,.5); color: #fecaca; }
+    .toast.hide { animation: toastOut .3s ease forwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
+    @media (max-width: 860px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: 1fr; }
+      .sort { margin-inline-start: 0; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+
+  <!-- ── Nav ── -->
+  <header class="site-nav">
+    <div class="container">
+      <a href="/" class="brand">
+        <span class="logo-tile" style="width:38px;height:38px;border-radius:12px">
+          <svg viewBox="0 0 1440 1196" fill="#fff" aria-hidden="true"><path d="M 442,0 L 1386,0 L 1386,4 L 1248,210 L 1226,233 L 1213,243 L 1176,262 L 1151,268 L 1129,270 L 441,270 L 408,274 L 380,282 L 351,295 L 326,311 L 299,337 L 276,371 L 262,405 L 255,444 L 255,471 L 258,492 L 263,514 L 272,538 L 294,575 L 326,609 L 350,626 L 374,639 L 399,648 L 429,654 L 801,655 L 804,657 L 806,685 L 812,707 L 822,729 L 837,751 L 852,767 L 876,785 L 893,794 L 921,803 L 921,805 L 342,804 L 303,800 L 273,794 L 250,788 L 212,774 L 168,751 L 139,731 L 115,711 L 82,676 L 63,651 L 40,613 L 25,579 L 16,552 L 5,506 L 1,476 L 0,427 L 2,403 L 8,367 L 17,331 L 33,286 L 54,242 L 70,215 L 94,181 L 111,160 L 144,126 L 173,101 L 217,70 L 244,54 L 283,35 L 327,19 L 361,10 L 403,3 Z M 445,454 L 1126,454 L 1162,458 L 1202,467 L 1239,480 L 1275,497 L 1326,531 L 1376,580 L 1407,624 L 1420,650 L 1431,682 L 1440,751 L 1440,804 L 1438,825 L 1422,901 L 1410,935 L 1392,973 L 1365,1016 L 1334,1053 L 1297,1089 L 1260,1118 L 1211,1148 L 1165,1169 L 1121,1183 L 1072,1193 L 1032,1196 L 22,1195 L 22,1192 L 39,1166 L 73,1118 L 126,1036 L 162,986 L 175,973 L 197,957 L 236,940 L 274,934 L 1065,934 L 1104,927 L 1139,912 L 1154,902 L 1176,880 L 1189,862 L 1201,835 L 1206,810 L 1205,773 L 1201,755 L 1194,737 L 1178,711 L 1157,690 L 1138,677 L 1099,661 L 1098,634 L 1095,617 L 1080,579 L 1065,557 L 1048,540 L 1026,524 L 993,510 L 968,505 L 935,505 L 911,510 L 880,523 L 858,538 L 841,555 L 827,574 L 445,574 L 427,569 L 416,562 L 403,547 L 395,525 L 395,503 L 400,487 L 407,476 L 424,461 Z M 937,546 L 967,546 L 982,549 L 1004,558 L 1019,568 L 1033,582 L 1046,601 L 1058,637 L 1059,662 L 1056,680 L 1050,698 L 1039,718 L 1027,732 L 1011,745 L 989,756 L 969,761 L 945,762 L 926,759 L 911,754 L 892,744 L 884,738 L 864,716 L 853,695 L 846,669 L 845,651 L 849,624 L 853,612 L 867,587 L 880,573 L 899,559 L 914,552 Z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+          <span class="sheen"></span>
+        </span>
+        <span class="word">SAYTARLY</span>
+      </a>
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="/">الرئيسية</a></li>
+          <li><a href="/saytarly/dashboard" class="active">لوحة الأجهزة</a></li>
+          <li><a href="https://saytarly.com/contact" target="_blank" rel="noopener">تواصل معنا</a></li>
+        </ul>
+      </nav>
+      <button class="nav-burger" id="burger" aria-label="القائمة">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Content ── -->
+  <main class="wrap">
+    <div class="hero">
+      <div class="container">
+        <span class="chip" style="color:var(--accent-soft);background:rgba(22,119,255,.12);border:1px solid rgba(22,119,255,.3)">
+          <span class="dot"></span> Live — بيتحدث كل 30 ثانية
+        </span>
+        <h1 style="margin-top:var(--sp-4)">لوحة الأجهزة والتراخيص</h1>
+        <p class="lead" style="margin-top:var(--sp-2)">كل جهاز شغّل Saytarly بيسجل نفسه هنا تلقائيًا — شوف حالته، انسخ كوده، وفعّل أو أوقف ترخيصه.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" id="refreshBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            تحديث الآن
+          </button>
+          <span class="status-live"><span class="dot"></span> آخر تحديث: <span id="lastUpdated">—</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Stats -->
+      <div class="stats" id="stats"></div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="searchInput" type="text" placeholder="دوّر باسم الجهاز أو الكود…" />
+        </div>
+        <div class="filters" id="filters">
+          <button class="chip-btn on all" data-f="all">الكل</button>
+          <button class="chip-btn" data-f="active">مفعّل</button>
+          <button class="chip-btn" data-f="unlimited">مدى الحياة</button>
+          <button class="chip-btn" data-f="pending">بانتظار التفعيل</button>
+          <button class="chip-btn" data-f="expired">منتهي</button>
+          <button class="chip-btn" data-f="blocked">محظور</button>
+        </div>
+        <select class="sort" id="sort">
+          <option value="lastSeen">الأحدث ظهورًا</option>
+          <option value="name">الاسم أبجديًا</option>
+          <option value="oldest">الأقدم ظهورًا</option>
+          <option value="version">النسخة</option>
+        </select>
+      </div>
+
+      <!-- Devices -->
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+
+  <!-- ── Device dialog ── -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <b id="modalTitle">تفاصيل الجهاز</b>
+        <button class="modal-close" id="modalClose" aria-label="إغلاق">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <script src="/js/site.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

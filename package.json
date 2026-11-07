@@ -1,0 +1,18 @@
+{
+  "name": "saytarly-website",
+  "version": "1.0.0",
+  "description": "Saytarly — restaurant & cafe management website with a live devices/licenses dashboard.",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  }
+}
