@@ -1,8 +1,19 @@
-/* Saytarly — لوحة الأجهزة والتراخيص */
+/* Saytarly — لوحة الأجهزة والتراخيص (GitHub Pages version)
+ *
+ * البيانات بتتقرا وتتكتب مباشرة من GitHub API باستخدام توكن (PAT)
+ * بتدخله مرة واحدة وبيتخزن في المتصفح بتاعك بس — مش بيتنشر في الموقع.
+ */
 
 (() => {
   'use strict';
 
+  // ── Config ─────────────────────────────────────────────────
+  const REPO = 'COACHIKO/saytarly_releases'; // ريبو الأجهزة (خاص)
+  const ALLOWED_USERS = ['COACHIKO']; // الحسابات المسموح ليها بالدخول
+  const API = 'https://api.github.com';
+  const TOKEN_KEY = 'saytarly_gh_token';
+
+  // ── State ──────────────────────────────────────────────────
   const state = {
     devices: [],
     filter: 'all',
@@ -11,6 +22,7 @@
     loading: true,
     error: null,
     opened: null, // الجهاز المفتوح في الحوار
+    user: null,   // { login } بعد التحقق من التوكن
   };
 
   const $ = (id) => document.getElementById(id);
@@ -19,6 +31,8 @@
   const searchInput = $('searchInput');
   const sortSel = $('sort');
   const refreshBtn = $('refreshBtn');
+  const logoutBtn = $('logoutBtn');
+  const toolbar = $('toolbar');
   const modalBackdrop = $('modalBackdrop');
   const modalBody = $('modalBody');
   const modalTitle = $('modalTitle');
@@ -97,27 +111,281 @@
       .replaceAll('>', '&gt;');
   }
 
-  /* ── Fetch ── */
+  /* ── GitHub API client ───────────────────────────────────── */
+  function token() {
+    return (localStorage.getItem(TOKEN_KEY) || '').trim();
+  }
+
+  function ghHeaders(extra = {}) {
+    return {
+      Authorization: `Bearer ${token()}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...extra,
+    };
+  }
+
+  async function gh(pathname, options = {}) {
+    const res = await fetch(`${API}${pathname}`, {
+      ...options,
+      headers: ghHeaders(options.headers || {}),
+    });
+    const text = await res.text();
+    let data = null;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      /* non-JSON body */
+    }
+    if (!res.ok) {
+      const msg = (data && data.message) || text.slice(0, 200) || res.statusText;
+      const err = new Error(`GitHub API ${res.status}: ${msg}`);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  function decodeBase64(value) {
+    const bin = atob(value.replace(/\s/g, ''));
+    return new TextDecoder().decode(
+      Uint8Array.from(bin, (c) => c.charCodeAt(0)),
+    );
+  }
+
+  function encodeBase64(value) {
+    const bytes = new TextEncoder().encode(value);
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin);
+  }
+
+  // حالة الجهاز — نفس منطق التطبيق (DeviceLicense.statusAt)
+  function computeStatus(record, now = new Date()) {
+    if (record && record.blocked) return 'blocked';
+    const license = record && record.license;
+    if (!license) return 'pending';
+    if (license.type === 'unlimited') return 'unlimited';
+    const expires = license.expiresAt ? new Date(license.expiresAt) : null;
+    if (!expires || Number.isNaN(expires.getTime())) return 'pending';
+    return now.getTime() < expires.getTime() ? 'active' : 'expired';
+  }
+
+  function computeExpiry(type, value, from = new Date()) {
+    if (type === 'unlimited') return null;
+    const d = new Date(from);
+    if (type === 'days') d.setUTCDate(d.getUTCDate() + value);
+    else if (type === 'months') d.setUTCMonth(d.getUTCMonth() + value);
+    else if (type === 'years') d.setUTCFullYear(d.getUTCFullYear() + value);
+    else return null;
+    return d;
+  }
+
+  /* ── Auth ── */
+  async function verifyUser() {
+    const user = await gh('/user');
+    if (!user || !user.login) throw new Error('استجابة غير متوقعة من GitHub');
+    if (!ALLOWED_USERS.includes(user.login)) {
+      throw new Error(`الحساب ${user.login} مش مصرّح له بالدخول للوحة`);
+    }
+    return user;
+  }
+
+  function setAuthView(loggedIn) {
+    if (toolbar) toolbar.style.display = loggedIn ? '' : 'none';
+    if (statsEl) statsEl.style.display = loggedIn ? '' : 'none';
+    if (logoutBtn) {
+      logoutBtn.style.display = loggedIn ? '' : 'none';
+      logoutBtn.textContent = loggedIn && state.user
+        ? `تسجيل الخروج (${state.user.login})`
+        : 'تسجيل الخروج';
+    }
+  }
+
+  function renderLogin(message = '') {
+    state.loading = false;
+    setAuthView(false);
+    grid.innerHTML = `
+      <div class="error" style="grid-column: 1 / -1">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M15.5 8.5a3.5 3.5 0 1 0-1 6.9 3.5 3.5 0 0 0 1-6.9Z"/><rect x="4" y="17" width="16" height="4" rx="2"/><path d="M12 3v3M5.5 5.5l2 2M18.5 5.5l-2 2"/></svg></span>
+        <h3>الدخول للوحة الأجهزة</h3>
+        <p style="max-width:520px;margin:0 auto">
+          اللوحة بتقرا وتكتب في الريبو الخاص
+          <b style="font-family:var(--font-en)" dir="ltr">${REPO}</b>.
+          الصق توكن GitHub (Fine-grained PAT) له صلاحية
+          <b>Contents: Read and write</b> على الريبو ده — التوكن بيتخزن في متصفحك بس
+          ومش بيتنشر في أي مكان.
+        </p>
+        <p style="margin-top:10px;font-size:12px">
+          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:var(--accent-soft)">إنشاء توكن جديد ↗</a>
+          — اختار الريبو <b style="font-family:var(--font-en)" dir="ltr">saytarly_releases</b> بس،
+          وPermission: <b>Contents → Read and write</b>.
+        </p>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+          <input id="tokenInput" type="password" placeholder="ghp_…" autocomplete="off"
+            style="flex:1 1 260px;max-width:380px;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:10px 12px;color:var(--text-1);font-family:var(--font-en);font-size:13px;outline:none" />
+          <button class="btn btn-primary" id="loginBtn">دخول</button>
+        </div>
+        ${message ? `<p style="margin-top:14px;color:#fecaca;font-weight:700">⚠️ ${escapeHtml(message)}</p>` : ''}
+      </div>`;
+
+    const input = $('tokenInput');
+    const btn = $('loginBtn');
+    const doLogin = async () => {
+      const t = input.value.trim();
+      if (!t) return toast('اكتب التوكن الأول', 'err');
+      btn.disabled = true;
+      btn.textContent = 'بيتحقق…';
+      try {
+        localStorage.setItem(TOKEN_KEY, t);
+        const user = await verifyUser();
+        state.user = user;
+        toast(`أهلاً ${user.login} ✓`);
+        boot();
+      } catch (error) {
+        localStorage.removeItem(TOKEN_KEY);
+        renderLogin(loginErrorMessage(error));
+      }
+    };
+    btn.addEventListener('click', doLogin);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doLogin();
+    });
+    input.focus();
+  }
+
+  function loginErrorMessage(error) {
+    if (error.status === 401) return 'التوكن غير صالح أو منتهي — اتأكد إنك لصقته صح';
+    if (error.status === 403) return 'التوكن مش عليه صلاحية — لازم Contents: Read and write على saytarly_releases';
+    if (error.message.includes('مصرّح')) return error.message;
+    return error.message;
+  }
+
+  function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    state.user = null;
+    state.devices = [];
+    renderLogin();
+    toast('تم تسجيل الخروج — التوكن اتمسح من المتصفح');
+  }
+
+  /* ── Fetch devices ── */
   async function load() {
     state.loading = true;
     state.error = null;
     render();
     try {
-      const res = await fetch('/api/devices');
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || 'فشل جلب الأجهزة');
-      state.devices = data.devices;
+      state.devices = await listDevices();
       $('lastUpdated').textContent = new Intl.DateTimeFormat('ar-EG', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
       }).format(new Date());
     } catch (error) {
+      if (error.status === 401 || error.status === 403 || error.status === 404) {
+        localStorage.removeItem(TOKEN_KEY);
+        renderLogin(loginErrorMessage(error));
+        return;
+      }
       state.error = error.message;
     } finally {
       state.loading = false;
-      render();
+      if (state.user) render();
     }
+  }
+
+  async function listDevices() {
+    const entries = await gh(`/repos/${REPO}/contents/devices`);
+    const files = (Array.isArray(entries) ? entries : []).filter(
+      (e) => e.type === 'file' && e.name.endsWith('.json'),
+    );
+    const devices = [];
+    for (const file of files) {
+      try {
+        const raw = await gh(`/repos/${REPO}/contents/${file.path}`);
+        const record = JSON.parse(decodeBase64(raw.content));
+        devices.push({
+          ...record,
+          status: computeStatus(record),
+          sha: raw.sha,
+          path: file.path,
+        });
+      } catch (error) {
+        console.warn(`[github] skip ${file.path}: ${error.message}`);
+      }
+    }
+    devices.sort(
+      (a, b) =>
+        new Date(b.lastSeenAt || 0).getTime() -
+        new Date(a.lastSeenAt || 0).getTime(),
+    );
+    return devices;
+  }
+
+  async function getDevice(code) {
+    const raw = await gh(`/repos/${REPO}/contents/devices/${code}.json`);
+    const record = JSON.parse(decodeBase64(raw.content));
+    return {
+      ...record,
+      status: computeStatus(record),
+      sha: raw.sha,
+      path: `devices/${code}.json`,
+    };
+  }
+
+  async function putDevice(code, record, message) {
+    await gh(`/repos/${REPO}/contents/devices/${code}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        content: encodeBase64(JSON.stringify(record, null, 2)),
+        sha: record.sha,
+      }),
+    });
+  }
+
+  // تفعيل / تعديل ترخيص جهاز: type ∈ days | months | years | unlimited
+  async function setLicense(code, type, value) {
+    const allowed = ['days', 'months', 'years', 'unlimited'];
+    if (!allowed.includes(type)) {
+      throw new Error(`نوع ترخيص غير صالح: ${type}`);
+    }
+    const num = Number(value);
+    if (type !== 'unlimited' && (!Number.isInteger(num) || num < 0)) {
+      throw new Error('قيمة الترخيص لازم تكون رقم صحيح موجب');
+    }
+    const record = await getDevice(code);
+    const now = new Date();
+    // value === 0 مع نوع مؤقت => ترخيص مبدئي (pending) من غير تاريخ انتهاء.
+    const pending = type !== 'unlimited' && num === 0;
+    record.license = {
+      type,
+      value: type === 'unlimited' ? 0 : num,
+      issuedAt: pending ? null : now.toISOString(),
+      expiresAt: pending ? null : (computeExpiry(type, num, now)?.toISOString() ?? null),
+    };
+    const message = pending
+      ? `License: ${record.pcName || code} -> pending (revoked)`
+      : `License: ${record.pcName || code} -> ${type}${type === 'unlimited' ? '' : ` ${num}`}`;
+    await putDevice(code, record, message);
+    return { ...record, status: computeStatus(record) };
+  }
+
+  // حظر الجهاز أو فك الحظر
+  async function setBlocked(code, blocked) {
+    const record = await getDevice(code);
+    record.blocked = blocked === true;
+    if (record.blocked) {
+      record.blockedAt = new Date().toISOString();
+    } else {
+      delete record.blockedAt;
+    }
+    const message = record.blocked
+      ? `Block device: ${record.pcName || code}`
+      : `Unblock device: ${record.pcName || code}`;
+    await putDevice(code, record, message);
+    return { ...record, status: computeStatus(record) };
   }
 
   /* ── Stats ── */
@@ -282,7 +550,7 @@
     }
     if (!list.length) {
       grid.innerHTML = `<div class="empty">
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
         <h3>مفيش نتايج مطابقة</h3>
         <p>جرّب تغيّر البحث أو الفلتر.</p>
       </div>`;
@@ -421,7 +689,7 @@
       await saveLicense(device.deviceCode, 'days', 0);
     });
     $('blockBtn').addEventListener('click', async () => {
-      await setBlocked(device.deviceCode, !isBlocked);
+      await toggleBlocked(device.deviceCode, !isBlocked);
     });
 
     modalBackdrop.classList.add('open');
@@ -440,39 +708,38 @@
     btn.classList.add('btn-blocking');
   }
 
+  function handleApiError(error) {
+    if (error.status === 401 || error.status === 403) {
+      localStorage.removeItem(TOKEN_KEY);
+      renderLogin(loginErrorMessage(error));
+      closeModal();
+      return true;
+    }
+    toast(error.message, 'err');
+    return false;
+  }
+
   async function saveLicense(code, type, value) {
     busy($('saveBtn'));
     try {
-      const res = await fetch(`/api/devices/${encodeURIComponent(code)}/license`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, value }),
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || 'فشل حفظ الترخيص');
+      const device = await setLicense(code, type, value);
       toast(type === 'unlimited' ? 'تم تفعيل الترخيص مدى الحياة ✓' : 'تم حفظ الترخيص ✓');
       closeModal();
       await load();
     } catch (error) {
-      toast(error.message, 'err');
+      handleApiError(error);
     }
   }
 
-  async function setBlocked(code, blocked) {
+  async function toggleBlocked(code, blocked) {
     busy($('blockBtn'));
     try {
-      const res = await fetch(`/api/devices/${encodeURIComponent(code)}/block`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blocked }),
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || 'فشل العملية');
+      await setBlocked(code, blocked);
       toast(blocked ? 'تم حظر الجهاز ⛔ — التطبيق هيتقفل عليه' : 'تم فك الحظر ✓');
       closeModal();
       await load();
     } catch (error) {
-      toast(error.message, 'err');
+      handleApiError(error);
     }
   }
 
@@ -530,8 +797,11 @@
   });
 
   refreshBtn.addEventListener('click', () => {
+    if (!token()) return renderLogin();
     load();
   });
+
+  logoutBtn.addEventListener('click', logout);
 
   $('modalClose').addEventListener('click', closeModal);
   modalBackdrop.addEventListener('click', (e) => {
@@ -542,8 +812,25 @@
   });
 
   /* ── Boot ── */
-  load();
-  setInterval(() => {
-    if (document.visibilityState === 'visible') load();
-  }, 30000);
+  async function boot() {
+    setAuthView(true);
+    await load();
+    setInterval(() => {
+      if (document.visibilityState === 'visible' && token()) load();
+    }, 30000);
+  }
+
+  if (token()) {
+    (async () => {
+      try {
+        state.user = await verifyUser();
+        boot();
+      } catch (error) {
+        localStorage.removeItem(TOKEN_KEY);
+        renderLogin(loginErrorMessage(error));
+      }
+    })();
+  } else {
+    renderLogin();
+  }
 })();
