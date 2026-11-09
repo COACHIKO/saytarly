@@ -185,6 +185,11 @@ app.get('/api/auth/session', (req, res) => {
 
 app.get('/', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
 
+// Contact page (also served directly by express.static as /contact.html).
+app.get('/contact', (req, res) =>
+  res.sendFile(path.join(PUBLIC_DIR, 'contact.html')),
+);
+
 // The dashboard is served only after a valid admin session. Unauthenticated
 // visitors get the login page (no dashboard markup is ever sent to them).
 app.get('/dashboard', (req, res) => {
