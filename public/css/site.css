@@ -178,6 +178,9 @@ img, svg { display: block; max-width: 100%; }
   gap: var(--sp-2);
   list-style: none;
 }
+/* Keep <a> links and the lang-switch button on the same optical line —
+   inline links don't count vertical padding in the line box, the button does. */
+.nav-links > li { display: flex; align-items: center; }
 .nav-links a {
   padding: 8px 14px;
   border-radius: var(--radius-pill);
