@@ -27,6 +27,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Guard — no private dashboard files in public/
+        run: |
+          test ! -f public/dashboard.html || { echo "public/dashboard.html must not be published"; exit 1; }
+          test ! -d public/admin    || { echo "public/admin/ folder must not be published"; exit 1; }
+          test ! -d public/views    || { echo "public/views/ folder must not be published"; exit 1; }
+          ! grep -rqE "dashboard\.html" public --include='*.html' || { echo "Found a link to dashboard.html in public/"; exit 1; }
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:

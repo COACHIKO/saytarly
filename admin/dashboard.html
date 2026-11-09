@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>لوحة الأجهزة — Saytarly</title>
+  <title data-i18n="dash.pageTitle">لوحة الأجهزة — Saytarly</title>
   <meta name="robots" content="noindex" />
-  <link rel="icon" type="image/svg+xml" href="./assets/logoSVG.svg" />
+  <script src="/js/lang-boot.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/assets/logoSVG.svg" />
   <style>
     body { font-family: var(--font-ar); background: var(--navy-900); color: var(--text-1); min-height: 100vh; display: flex; flex-direction: column; }
     .site-nav { flex-shrink: 0; }
@@ -212,14 +213,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/site.css" />
+  <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
 
   <!-- ── Nav ── -->
   <header class="site-nav">
     <div class="container">
-      <a href="./index.html" class="brand">
+      <a href="/" class="brand">
         <span class="logo-tile" style="width:38px;height:38px;border-radius:12px">
           <svg viewBox="0 0 1440 1196" fill="#fff" aria-hidden="true"><path d="M 442,0 L 1386,0 L 1386,4 L 1248,210 L 1226,233 L 1213,243 L 1176,262 L 1151,268 L 1129,270 L 441,270 L 408,274 L 380,282 L 351,295 L 326,311 L 299,337 L 276,371 L 262,405 L 255,444 L 255,471 L 258,492 L 263,514 L 272,538 L 294,575 L 326,609 L 350,626 L 374,639 L 399,648 L 429,654 L 801,655 L 804,657 L 806,685 L 812,707 L 822,729 L 837,751 L 852,767 L 876,785 L 893,794 L 921,803 L 921,805 L 342,804 L 303,800 L 273,794 L 250,788 L 212,774 L 168,751 L 139,731 L 115,711 L 82,676 L 63,651 L 40,613 L 25,579 L 16,552 L 5,506 L 1,476 L 0,427 L 2,403 L 8,367 L 17,331 L 33,286 L 54,242 L 70,215 L 94,181 L 111,160 L 144,126 L 173,101 L 217,70 L 244,54 L 283,35 L 327,19 L 361,10 L 403,3 Z M 445,454 L 1126,454 L 1162,458 L 1202,467 L 1239,480 L 1275,497 L 1326,531 L 1376,580 L 1407,624 L 1420,650 L 1431,682 L 1440,751 L 1440,804 L 1438,825 L 1422,901 L 1410,935 L 1392,973 L 1365,1016 L 1334,1053 L 1297,1089 L 1260,1118 L 1211,1148 L 1165,1169 L 1121,1183 L 1072,1193 L 1032,1196 L 22,1195 L 22,1192 L 39,1166 L 73,1118 L 126,1036 L 162,986 L 175,973 L 197,957 L 236,940 L 274,934 L 1065,934 L 1104,927 L 1139,912 L 1154,902 L 1176,880 L 1189,862 L 1201,835 L 1206,810 L 1205,773 L 1201,755 L 1194,737 L 1178,711 L 1157,690 L 1138,677 L 1099,661 L 1098,634 L 1095,617 L 1080,579 L 1065,557 L 1048,540 L 1026,524 L 993,510 L 968,505 L 935,505 L 911,510 L 880,523 L 858,538 L 841,555 L 827,574 L 445,574 L 427,569 L 416,562 L 403,547 L 395,525 L 395,503 L 400,487 L 407,476 L 424,461 Z M 937,546 L 967,546 L 982,549 L 1004,558 L 1019,568 L 1033,582 L 1046,601 L 1058,637 L 1059,662 L 1056,680 L 1050,698 L 1039,718 L 1027,732 L 1011,745 L 989,756 L 969,761 L 945,762 L 926,759 L 911,754 L 892,744 L 884,738 L 864,716 L 853,695 L 846,669 L 845,651 L 849,624 L 853,612 L 867,587 L 880,573 L 899,559 L 914,552 Z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
           <span class="sheen"></span>
@@ -228,12 +229,17 @@
       </a>
       <nav>
         <ul class="nav-links" id="navLinks">
-          <li><a href="./index.html">الرئيسية</a></li>
-          <li><a href="./dashboard.html" class="active">لوحة الأجهزة</a></li>
-          <li><a href="https://saytarly.com/contact" target="_blank" rel="noopener">تواصل معنا</a></li>
+          <li><a href="/" data-i18n="dash.navHome">الرئيسية</a></li>
+          <li><a href="https://saytarly.com/contact" target="_blank" rel="noopener" data-i18n="nav.contact">تواصل معنا</a></li>
+          <li>
+            <button class="lang-switch" type="button" data-lang-switch aria-label="تغيير اللغة">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z"/></svg>
+              <span data-lang-label>EN</span>
+            </button>
+          </li>
         </ul>
       </nav>
-      <button class="nav-burger" id="burger" aria-label="القائمة">
+      <button class="nav-burger" id="burger" data-i18n-aria-label="nav.menu" aria-label="القائمة">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
     </div>
@@ -244,19 +250,19 @@
     <div class="hero">
       <div class="container">
         <span class="chip" style="color:var(--accent-soft);background:rgba(22,119,255,.12);border:1px solid rgba(22,119,255,.3)">
-          <span class="dot"></span> Live — بيتحدث كل 30 ثانية
+          <span class="dot"></span> <span data-i18n="dash.live">Live — بيتحدث كل 30 ثانية</span>
         </span>
-        <h1 style="margin-top:var(--sp-4)">لوحة الأجهزة والتراخيص</h1>
-        <p class="lead" style="margin-top:var(--sp-2)">كل جهاز شغّل Saytarly بيسجل نفسه هنا تلقائيًا — شوف حالته، انسخ كوده، وفعّل أو أوقف ترخيصه.</p>
+        <h1 style="margin-top:var(--sp-4)" data-i18n="dash.title">لوحة الأجهزة والتراخيص</h1>
+        <p class="lead" style="margin-top:var(--sp-2)" data-i18n="dash.lead">كل جهاز شغّل Saytarly بيسجل نفسه هنا تلقائيًا — شوف حالته، انسخ كوده، وفعّل أو أوقف ترخيصه.</p>
         <div class="hero-ctas">
           <button class="btn btn-primary" id="refreshBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
-            تحديث الآن
+            <span data-i18n="dash.refresh">تحديث الآن</span>
           </button>
-          <span class="status-live"><span class="dot"></span> آخر تحديث: <span id="lastUpdated">—</span></span>
-          <button class="btn" id="logoutBtn" style="display:none" title="تسجيل الخروج — مسح التوكن من المتصفح">
+          <span class="status-live"><span class="dot"></span> <span data-i18n="dash.lastUpdatedLabel">آخر تحديث:</span> <span id="lastUpdated">—</span></span>
+          <button class="btn" id="logoutBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
-            تسجيل الخروج
+            <span data-i18n="dash.logout">تسجيل الخروج</span>
           </button>
         </div>
       </div>
@@ -270,21 +276,21 @@
       <div class="toolbar" id="toolbar">
         <div class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="searchInput" type="text" placeholder="دوّر باسم الجهاز أو الكود…" />
+          <input id="searchInput" type="text" data-i18n-placeholder="dash.searchPlaceholder" placeholder="دوّر باسم الجهاز أو الكود…" />
         </div>
         <div class="filters" id="filters">
-          <button class="chip-btn on all" data-f="all">الكل</button>
-          <button class="chip-btn" data-f="active">مفعّل</button>
-          <button class="chip-btn" data-f="unlimited">مدى الحياة</button>
-          <button class="chip-btn" data-f="pending">بانتظار التفعيل</button>
-          <button class="chip-btn" data-f="expired">منتهي</button>
-          <button class="chip-btn" data-f="blocked">محظور</button>
+          <button class="chip-btn on all" data-f="all" data-i18n="dash.filter.all">الكل</button>
+          <button class="chip-btn" data-f="active" data-i18n="dash.filter.active">مفعّل</button>
+          <button class="chip-btn" data-f="unlimited" data-i18n="dash.filter.unlimited">مدى الحياة</button>
+          <button class="chip-btn" data-f="pending" data-i18n="dash.filter.pending">بانتظار التفعيل</button>
+          <button class="chip-btn" data-f="expired" data-i18n="dash.filter.expired">منتهي</button>
+          <button class="chip-btn" data-f="blocked" data-i18n="dash.filter.blocked">محظور</button>
         </div>
         <select class="sort" id="sort">
-          <option value="lastSeen">الأحدث ظهورًا</option>
-          <option value="name">الاسم أبجديًا</option>
-          <option value="oldest">الأقدم ظهورًا</option>
-          <option value="version">النسخة</option>
+          <option value="lastSeen" data-i18n="dash.sort.lastSeen">الأحدث ظهورًا</option>
+          <option value="name" data-i18n="dash.sort.name">الاسم أبجديًا</option>
+          <option value="oldest" data-i18n="dash.sort.oldest">الأقدم ظهورًا</option>
+          <option value="version" data-i18n="dash.sort.version">النسخة</option>
         </select>
       </div>
 
@@ -297,8 +303,8 @@
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
-        <b id="modalTitle">تفاصيل الجهاز</b>
-        <button class="modal-close" id="modalClose" aria-label="إغلاق">
+        <b id="modalTitle" data-i18n="dash.modalTitle">تفاصيل الجهاز</b>
+        <button class="modal-close" id="modalClose" data-i18n-aria-label="dash.close" aria-label="إغلاق">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
       </div>
@@ -308,7 +314,8 @@
 
   <div class="toast-wrap" id="toasts"></div>
 
-  <script src="./js/site.js"></script>
-  <script src="./js/dashboard.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/site.js"></script>
+  <script src="/admin/dashboard.js"></script>
 </body>
 </html>
