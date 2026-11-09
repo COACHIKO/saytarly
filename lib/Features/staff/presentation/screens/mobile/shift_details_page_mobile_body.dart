@@ -100,7 +100,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                   _summaryRow(
                     cs,
                     Icons.price_check,
-                    'محصّل جزئيًا من ترابيزات لسه شغالة'.tr(),
+                    'محصّل جزئيًا من الترابيزات'.tr(),
                     totalOpenPartialCollected,
                     valueColor: Colors.white,
                   ),
@@ -185,12 +185,17 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
   }
 
   Widget _summaryContent(ColorScheme cs) {
+    // 💰 نسبة مساهمة كل فاتورة في الشيفت ده (shift_paid) — مش إجمالي
+    // المدفوع من أول الفاتورة، عشان الدفعات الجزئية اللي اتحصّلت في
+    // شيفتات تانية ما تتعدّش مرتين.
+    double shiftPaidOf(Map<String, dynamic> inv) =>
+        (inv['shift_paid']?.toDouble() ?? 0.0);
+
     final totalDevicesPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
       final deviceCost = (inv['device_cost']?.toDouble() ?? 0.0);
       final totalCost = (inv['total_cost']?.toDouble() ?? 0.0);
-      final paidPartial = (inv['paid_partial']?.toDouble() ?? 0.0);
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + deviceCost * fraction;
     });
 
@@ -198,8 +203,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
       if (inv['payment_type'] == 'ملغي') return sum;
       final drinksCost = (inv['drinks_cost']?.toDouble() ?? 0.0);
       final totalCost = (inv['total_cost']?.toDouble() ?? 0.0);
-      final paidPartial = (inv['paid_partial']?.toDouble() ?? 0.0);
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + drinksCost * fraction;
     });
 
@@ -207,8 +211,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
       if (inv['payment_type'] == 'ملغي') return sum;
       final prodCost = (inv['products_cost']?.toDouble() ?? 0.0);
       final totalCost = (inv['total_cost']?.toDouble() ?? 0.0);
-      final paidPartial = (inv['paid_partial']?.toDouble() ?? 0.0);
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + prodCost * fraction;
     });
 
@@ -216,16 +219,14 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
       if (inv['payment_type'] == 'ملغي') return sum;
       final cigCost = (inv['cigarettes_cost']?.toDouble() ?? 0.0);
       final totalCost = (inv['total_cost']?.toDouble() ?? 0.0);
-      final paidPartial = (inv['paid_partial']?.toDouble() ?? 0.0);
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + cigCost * fraction;
     });
     final totalShisha = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
       final shishaCost = (inv['shisha_cost']?.toDouble() ?? 0.0);
       final totalCost = (inv['total_cost']?.toDouble() ?? 0.0);
-      final paidPartial = (inv['paid_partial']?.toDouble() ?? 0.0);
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + shishaCost * fraction;
     });
     final totalOpenValue = invoices.fold<double>(0.0, (sum, inv) {
@@ -250,8 +251,7 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
       if (inv['payment_type'] == 'ملغي') return sum;
       final discount = (inv['discount'] as num?)?.toDouble() ?? 0.0;
       final totalCost = (inv['total_cost'] as num?)?.toDouble() ?? 0.0;
-      final paidPartial = (inv['paid_partial'] as double?) ?? 0.0;
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final fraction = totalCost > 0 ? shiftPaidOf(inv) / totalCost : 0.0;
       return sum + discount * fraction;
     });
     final grandTotaldis =
@@ -261,7 +261,8 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
         totalCigarettes +
         totalShisha +
         totalTransactions +
-        totalDebtCollected -
+        totalDebtCollected +
+        totalOpenPartialCollected -
         totalExpenses -
         totalDiscounts;
 
@@ -272,7 +273,8 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
         totalCigarettes +
         totalShisha +
         totalTransactions +
-        totalDebtCollected -
+        totalDebtCollected +
+        totalOpenPartialCollected -
         totalExpenses;
 
     return Container(
@@ -337,6 +339,14 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
             totalDebtCollected,
             valueColor: Colors.black,
           ),
+          if (totalOpenPartialCollected > 0)
+            _summaryRow(
+              cs,
+              Icons.table_restaurant,
+              'محصّل جزئيًا من الترابيزات'.tr(),
+              totalOpenPartialCollected,
+              valueColor: Colors.black,
+            ),
           if (totalOpenValue > 0)
             _summaryRow(
               cs,
@@ -820,6 +830,46 @@ extension _ShiftDetailsPageMobileBody on _ShiftDetailsPageState {
                           'v1': fmt(inv['paid_partial']),
                           'v2': Money.txt,
                         }),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: _ShiftDetailsPageState.collectedColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            // 💰 فاتورة عليها دفعات جزئية في شيفت تاني — نصيب الشيفت ده
+            if (!isOpen &&
+                !isCancelled &&
+                paymentType != 'علي الحساب' &&
+                paymentType != 'debt' &&
+                ((inv['prior_partials'] as double?) ?? 0.0) > 0.01) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: _ShiftDetailsPageState.collectedColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.subdirectory_arrow_right,
+                      size: 15,
+                      color: _ShiftDetailsPageState.collectedColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        ('↳ منها في هذا الشيفت:'.tr() +
+                            ' ${fmt(inv['shift_paid'])} ${Money.txt}'),
                         style: const TextStyle(
                           fontSize: 12,
                           color: _ShiftDetailsPageState.collectedColor,

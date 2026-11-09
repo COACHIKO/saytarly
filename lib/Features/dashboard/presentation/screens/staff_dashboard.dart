@@ -14,6 +14,7 @@ import 'package:saytarly/core/models/models.dart';
 import 'package:saytarly/Features/cashier/presentation/screens/DrinksScreen.dart';
 import 'package:saytarly/Features/playstation/presentation/screens/PS_Screen.dart';
 import 'package:saytarly/Features/debts/presentation/print/invoice_debet_print.dart';
+import 'package:saytarly/Features/debts/presentation/widgets/customer_picker_dialog.dart';
 import 'package:saytarly/Features/cashier/presentation/screens/add_drinks.dart';
 import 'package:saytarly/Features/staff/presentation/screens/ShiftDetailsPage.dart';
 import 'package:saytarly/Features/expenses/presentation/screens/cashier_expenses.dart';
@@ -74,11 +75,18 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
   double vodafoneCashTotal = 0.0;
   List<Map<String, dynamic>> vodafoneCashNotes = [];
+
+  /// 🎮 نظام البلايستيشن (الأجهزة/الشاشات) مفعّل ولا لأ — من التهيئة.
+  /// لو مقفول، البلايستيشن يختفي خالص من واجهة الكاشير.
+  bool _playstationEnabled = true;
+
   Future<void> _load() async {
+    final ps = await BusinessProfile.isPlaystationEnabled();
     final cs = await DBHelper.getAllConsoles();
     final inv = await DBHelper.getActiveInvoices();
     if (!mounted) return;
     setState(() {
+      _playstationEnabled = ps;
       consoles = cs.map((r) => ConsoleModel.fromMap(r)).toList();
       activeInvoices = inv;
     });
@@ -341,9 +349,45 @@ class _StaffDashboardState extends State<StaffDashboard> {
           };
         }).toList();
     /* ج, سلفة: ${s['advance'].toStringAsFixed(2)}*/
-    final shiftInvoices = await DBHelper.getInvoicesByShift(widget.shiftId);
+    // ⚠️ لازم ننسخ صفوف sqflite قبل التعديل عليها — الراجعة من
+    // rawQuery بتكون read-only (QueryRow) والتعديل عليها بيرمي
+    // Unsupported operation: read-only.
+    final shiftInvoices =
+        (await DBHelper.getInvoicesByShift(
+          widget.shiftId,
+        )).map((inv) => Map<String, dynamic>.from(inv)).toList();
     final productsSold = await DBHelper.getShiftProductsSummary(widget.shiftId);
     final shiftExpenses = await DBHelper.getExpensesByShift(widget.shiftId);
+
+    // 💰 الدفعات الجزئية اللي اتحصّلت خلال الشيفت ده على فواتير مش من
+    // فواتيره (اتحوّلت لشيفت تاني بتسليم شيفت) — فلوس دخلت هنا ولازم
+    // تظهر في التقفيل.
+    final shiftPartialRows = await DBHelper.getShiftPartialPayments(
+      widget.shiftId,
+    );
+    final shiftInvoiceIds =
+        shiftInvoices.map((i) => i['id']).whereType<int>().toSet();
+    // الدفعات الجزئية على الفواتير المفتوحة بتفضل على الشيفت ده حتى لو
+    // اتعمل تسليم شيفت، فبنحسبها في المعاينة — بنستبعد بس الفواتير
+    // المتسجلة هنا (مدفوعاتها جوّه الفواتير).
+    final settledShiftInvoiceIds = shiftInvoices
+        .where((i) => i['end_time'] != null)
+        .map((i) => i['id'])
+        .whereType<int>()
+        .toSet();
+    final openPartialCollected = _sumOpenPartialPayments(
+      shiftPartialRows,
+      settledShiftInvoiceIds,
+    );
+
+    // 💰 خصم اللي اتحصّل جزئيًا على فواتير الشيفت ده في شيفتات سابقة،
+    // عشان الفلوس ما تتعدّش مرتين على شيفتين.
+    final partialsByInvoice = await DBHelper.getPartialsByInvoice(
+      invoiceIds: shiftInvoiceIds.toList(),
+      excludeShiftId: widget.shiftId,
+    );
+    _applyShiftCollectionAttribution(shiftInvoices, partialsByInvoice);
+
     final totalExpenses = shiftExpenses.fold<double>(
       0.0,
       (sum, e) => sum + ((e['amount'] ?? 0) as num).toDouble(),
@@ -353,35 +397,35 @@ class _StaffDashboardState extends State<StaffDashboard> {
       (s, i) =>
           i['payment_type'] == 'ملغي'
               ? s
-              : s + ((i['device_cost'] ?? 0) as num).toDouble(),
+              : s + _shiftContribution(i, i['device_cost']),
     );
     final totalDrinks = shiftInvoices.fold<double>(
       0.0,
       (s, i) =>
           i['payment_type'] == 'ملغي'
               ? s
-              : s + ((i['drinks_cost'] ?? 0) as num).toDouble(),
+              : s + _shiftContribution(i, i['drinks_cost']),
     );
     final totalProducts = shiftInvoices.fold<double>(
       0.0,
       (s, i) =>
           i['payment_type'] == 'ملغي'
               ? s
-              : s + ((i['products_cost'] ?? 0) as num).toDouble(),
+              : s + _shiftContribution(i, i['products_cost']),
     );
     final totalCigarettes = shiftInvoices.fold<double>(
       0.0,
       (s, i) =>
           i['payment_type'] == 'ملغي'
               ? s
-              : s + ((i['cigarettes_cost'] ?? 0) as num).toDouble(),
+              : s + _shiftContribution(i, i['cigarettes_cost']),
     );
     final totalShisha = shiftInvoices.fold<double>(
       0.0,
       (s, i) =>
           i['payment_type'] == 'ملغي'
               ? s
-              : s + ((i['shisha_cost'] ?? 0) as num).toDouble(),
+              : s + _shiftContribution(i, i['shisha_cost']),
     );
     final totalItemsSoldQty = productsSold.fold<int>(
       0,
@@ -476,6 +520,17 @@ class _StaffDashboardState extends State<StaffDashboard> {
                       'v2': Money.txt,
                     }),
                   ),
+                  if (openPartialCollected > 0)
+                    Text(
+                      '• محصّل جزئيًا من الترابيزات: {v1} {v2}'.tr({
+                        'v1': openPartialCollected.toStringAsFixed(2),
+                        'v2': Money.txt,
+                      }),
+                      style: TextStyle(
+                        color: Colors.teal,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   Divider(height: 20),
                   Text(
                     '👥 أجور الموظفين:'.tr(),
@@ -910,6 +965,75 @@ class _StaffDashboardState extends State<StaffDashboard> {
     return true;
   }
 
+  /// 💰 مجموع الدفعات الجزئية اللي اتحصّلت خلال الشيفت على فواتير
+  /// لسه مش من فواتيره (اتحوّلت بتسليم شيفت أو لسه مفتوحة). الفلوس دي
+  /// بتظهر في تقفيل الشيفت ده ومش بتتكرر في شيفت الفاتورة النهائي.
+  double _sumOpenPartialPayments(
+    List<Map<String, dynamic>> partialRows,
+    Set<int> shiftInvoiceIds,
+  ) {
+    return partialRows
+        .where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !shiftInvoiceIds.contains((invId as num).toInt());
+        })
+        .fold<double>(
+          0.0,
+          (sum, p) => sum + ((p['amount'] ?? 0) as num).toDouble(),
+        );
+  }
+
+  /// 💰 توزيع التحصيل على الشيفتات: الفاتورة المدفوعة اللي كان عليها
+  /// دفعات جزئية في شيفتات سابقة بتساهم في إجماليات الشيفت ده بالباقي
+  /// اللي اتحصّل وقت التسليم بس. فواتير الآجل بتفضل كاملة (الباقي
+  /// بيتخصم من سطر الآجل)، والملغي صفر.
+  void _applyShiftCollectionAttribution(
+    List<Map<String, dynamic>> invoices,
+    Map<int, double> partialsByInvoice,
+  ) {
+    for (final inv in invoices) {
+      final type = (inv['payment_type'] ?? '').toString();
+      final isCredit = type == 'علي الحساب' || type == 'debt';
+      final isCancelled = type == 'ملغي';
+      final total =
+          (inv['total_cost'] as num?)?.toDouble() ??
+          ((inv['device_cost'] ?? 0) as num).toDouble() +
+              ((inv['drinks_cost'] ?? 0) as num).toDouble() -
+              ((inv['discount'] ?? 0) as num).toDouble();
+      final prior =
+          isCancelled
+              ? 0.0
+              : (partialsByInvoice[(inv['id'] as num?)?.toInt()] ?? 0.0);
+
+      double collectedNow = total;
+      double scale = 1.0;
+      if (isCancelled) {
+        collectedNow = 0.0;
+        scale = 0.0;
+      } else if (isCredit) {
+        // الآجل بيتحسب كامل في المبيعات، والباقي بيتخصم في سطر الآجل.
+        collectedNow = 0.0;
+      } else if (total > 0) {
+        collectedNow = (total - prior).clamp(0.0, double.infinity);
+        scale = collectedNow / total;
+      }
+
+      inv['prior_partials'] = prior;
+      inv['collected_now'] = collectedNow;
+      inv['contrib_scale'] = scale;
+    }
+  }
+
+  /// 💰 نصيب مكوّن من مكوّنات الفاتورة (أجهزة/مشروبات/...) في إجماليات
+  /// الشيفت الحالي بعد توزيع التحصيل.
+  double _shiftContribution(Map<String, dynamic> inv, Object? component) {
+    final raw = ((component ?? 0) as num).toDouble();
+    if (raw == 0) return 0.0;
+    final scale = (inv['contrib_scale'] as double?) ?? 1.0;
+    return raw * scale;
+  }
+
   Future<bool> _confirmCashierPassword(BuildContext context) async {
     final passController = TextEditingController();
     bool isValid = false;
@@ -1014,6 +1138,37 @@ class _StaffDashboardState extends State<StaffDashboard> {
       inv['paid_partial'] = paidPartial;
       inv['total_cost_calc'] = totalCost;
     }
+
+    // 💰 الدفعات الجزئية اللي اتحصّلت خلال الشيفت ده (فواتير اتحوّلت
+    // بتسليم شيفت) + خصم اللي اتحصّل على فواتير الشيفت ده في شيفتات
+    // سابقة عشان الفلوس ما تتعدّش مرتين على شيفتين.
+    final shiftPartialRows = await DBHelper.getShiftPartialPayments(shiftId);
+    final shiftInvoiceIdSet =
+        invoices.map((inv) => inv['id']).whereType<int>().toSet();
+    // الدفعات جزئية على فواتير لسه مفتوحة بتفضل على الشيفت ده حتى لو
+    // اتعمل تسليم — بنستبعد بس الفواتير المتسجلة هنا (محسوبة جوّاها).
+    final settledShiftInvoiceIds =
+        invoices
+            .where((inv) => inv['end_time'] != null)
+            .map((inv) => inv['id'])
+            .whereType<int>()
+            .toSet();
+    final openPartialPayments =
+        shiftPartialRows.where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !settledShiftInvoiceIds.contains((invId as num).toInt());
+        }).toList();
+    final totalPartialCollected = openPartialPayments.fold<double>(
+      0.0,
+      (sum, p) => sum + ((p['amount'] ?? 0) as num).toDouble(),
+    );
+    final partialsByInvoice = await DBHelper.getPartialsByInvoice(
+      invoiceIds: shiftInvoiceIdSet.toList(),
+      excludeShiftId: shiftId,
+    );
+    _applyShiftCollectionAttribution(invoices, partialsByInvoice);
+
     final expenses = await DBHelper.getExpensesByShift(shiftId);
     final rawDebts = await DBHelper.getDebtsByShift(shiftId);
     final debts = rawDebts.map((d) => Map<String, dynamic>.from(d)).toList();
@@ -1110,32 +1265,33 @@ class _StaffDashboardState extends State<StaffDashboard> {
 
     final totalDevicesPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + ((inv['device_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum + _shiftContribution(inv, inv['device_cost']);
     });
 
     final totalDrinksPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + ((inv['drinks_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum + _shiftContribution(inv, inv['drinks_cost']);
     });
 
     final totalProductsPaid = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + ((inv['products_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum + _shiftContribution(inv, inv['products_cost']);
     });
 
     final totalCigarettes = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + ((inv['cigarettes_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum + _shiftContribution(inv, inv['cigarettes_cost']);
     });
 
     final totalShisha = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
-      return sum + ((inv['shisha_cost'] as num?)?.toDouble() ?? 0.0);
+      return sum + _shiftContribution(inv, inv['shisha_cost']);
     });
     final totalDiscounts = invoices.fold<double>(0.0, (sum, inv) {
       if (inv['payment_type'] == 'ملغي') return sum;
       final discount = (inv['discount'] as num?)?.toDouble() ?? 0.0;
-      return sum + discount;
+      final scale = (inv['contrib_scale'] as double?) ?? 1.0;
+      return sum + (discount * scale);
     });
     final totalExpenses = expenses.fold(
       0.0,
@@ -1165,7 +1321,8 @@ class _StaffDashboardState extends State<StaffDashboard> {
         totalCigarettes +
         totalShisha +
         totalTransactions +
-        totalDebtCollected -
+        totalDebtCollected +
+        totalPartialCollected -
         totalExpenses;
 
     final grandTotal =
@@ -1414,6 +1571,34 @@ class _StaffDashboardState extends State<StaffDashboard> {
                               font: fontBold,
                               fontSize: 7,
                               color: PdfColors.red800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    // 💰 فاتورة كان عليها دفع جزئي في شيفت تاني قبل
+                    // التسليم — نوضّح نصيب الشيفت ده من المدفوع.
+                    if (!isOnCredit &&
+                        inv['payment_type'] != 'ملغي' &&
+                        ((inv['prior_partials'] as double?) ?? 0.0) > 0.01) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            '↳ منها في هذا الشيفت:'.tr(),
+                            style: pw.TextStyle(
+                              font: fontRegular,
+                              fontSize: 7,
+                              color: PdfColors.teal800,
+                            ),
+                          ),
+                          pw.Text(
+                            '${((inv['collected_now'] as double?) ?? 0.0).toStringAsFixed(2)} ${Money.txt}',
+                            style: pw.TextStyle(
+                              font: fontBold,
+                              fontSize: 7,
+                              color: PdfColors.teal800,
                             ),
                           ),
                         ],
@@ -1678,6 +1863,50 @@ class _StaffDashboardState extends State<StaffDashboard> {
                   );
                 }),
 
+              // 🆕 قسم الدفع الجزئي على فواتير مفتوحة (اتحصّلت خلال الشيفت)
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'دفع جزئي على فواتير مفتوحة:'.tr(),
+                style: pw.TextStyle(font: fontBold, fontSize: 9),
+              ),
+              if (openPartialPayments.isEmpty)
+                pw.Text(
+                  'لا يوجد تحصيل في هذا الشيفت'.tr(),
+                  style: pw.TextStyle(font: fontRegular, fontSize: 7),
+                )
+              else
+                ...openPartialPayments.map((p) {
+                  final rawCustomer =
+                      (p['customer_name'] ?? '').toString().trim();
+                  final invId = p['invoice_id'];
+                  final customer =
+                      rawCustomer.isEmpty
+                          ? (invId == null
+                              ? 'غير معروف'.tr()
+                              : 'فاتورة #{v1}'.tr({'v1': invId}))
+                          : rawCustomer;
+                  final amount = ((p['amount'] ?? 0) as num).toDouble();
+                  final time =
+                      p['date'] != null
+                          ? DateFormat(
+                            'HH:mm',
+                          ).format(DateTime.parse(p['date'] as String))
+                          : '-';
+                  return pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        '$customer ($time)',
+                        style: pw.TextStyle(fontSize: 7, font: fontRegular),
+                      ),
+                      pw.Text(
+                        '${amount.toStringAsFixed(2)} ${Money.txt}',
+                        style: pw.TextStyle(fontSize: 7, font: fontBold),
+                      ),
+                    ],
+                  );
+                }),
+
               // الملخص
               pw.SizedBox(height: 4),
               pw.Divider(thickness: 0.5),
@@ -1763,6 +1992,18 @@ class _StaffDashboardState extends State<StaffDashboard> {
                           'v2': Money.txt,
                         }),
                         style: pw.TextStyle(fontSize: 7, font: fontRegular),
+                      ),
+                    if (totalPartialCollected > 0)
+                      pw.Text(
+                        'محصّل جزئيًا من الترابيزات: {v1} {v2}'.tr({
+                          'v1': totalPartialCollected.toStringAsFixed(2),
+                          'v2': Money.txt,
+                        }),
+                        style: pw.TextStyle(
+                          fontSize: 8,
+                          font: fontBold,
+                          color: PdfColors.teal800,
+                        ),
                       ),
                     pw.SizedBox(height: 2),
 
@@ -3512,51 +3753,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
     if (paymentChoice == 'debt') {
       String? debtCustomerName = customerName;
 
-      // لو مفيش اسم، اسأل عنه
+      // لو مفيش اسم، اسأل عنه — بنفس ديالوج العملاء الموحّد.
       if (debtCustomerName == null || debtCustomerName.isEmpty) {
         if (!mounted) return; // الشاشة قفلت بعد الدايلوج الأول — ما نلمس contextش
-        debtCustomerName = await showDialog<String>(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) {
-            TextEditingController nameController = TextEditingController();
-            bool isButtonEnabled = false;
-
-            return StatefulBuilder(
-              builder:
-                  (context, setState) => AppDialog(
-                    title: Text('تسجيل الدين'.tr()),
-                    content: TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'اسم العميل'.tr(),
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          isButtonEnabled = value.trim().isNotEmpty;
-                        });
-                      },
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'cancel'),
-                        child: Text('إلغاء'.tr()),
-                      ),
-                      ElevatedButton(
-                        onPressed:
-                            isButtonEnabled
-                                ? () => Navigator.pop(
-                                  context,
-                                  nameController.text.trim(),
-                                )
-                                : null,
-                        child: Text('حفظ'.tr()),
-                      ),
-                    ],
-                  ),
-            );
-          },
+        debtCustomerName = await showCustomerPickerDialog(
+          context,
+          title: 'تسجيل الدين',
         );
       }
 

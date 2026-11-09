@@ -4,22 +4,23 @@ part of '../staff_dashboard.dart';
 extension _StaffDashboardMobileBody on _StaffDashboardState {
   Widget _buildMobileBody(BuildContext context) {
     final List<Map<String, dynamic>> cards = [
-      {
-        'svgPath': 'assets/images/game-console-svgrepo-com.svg',
-        'label': 'البلايستيشن',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (_) => PsScreen(
-                    staffName: widget.staffName,
-                    shiftId: widget.shiftId,
-                  ),
-            ),
-          );
+      if (_playstationEnabled)
+        {
+          'svgPath': 'assets/images/game-console-svgrepo-com.svg',
+          'label': 'البلايستيشن',
+          'onTap': () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => PsScreen(
+                      staffName: widget.staffName,
+                      shiftId: widget.shiftId,
+                    ),
+              ),
+            );
+          },
         },
-      },
       {
         'svgPath': 'assets/images/takeaway-coffee-svgrepo-com.svg',
         'label': 'تيك أواي',

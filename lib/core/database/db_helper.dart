@@ -1100,7 +1100,7 @@ shift_id INTEGER
       // إعدادات افتراضية للنظام المستعمل — عشان معالج التهيئة ما يظهرش
       if (isLegacyUsage) {
         if (await getSetting(kBusinessNameKey) == null) {
-          await setSetting(kBusinessNameKey, 'Hamza Cafe');
+          await setSetting(kBusinessNameKey, '');
         }
         if (await getSetting(kPlaystationEnabledKey) == null) {
           await setSetting(kPlaystationEnabledKey, '1');
@@ -1828,6 +1828,7 @@ shift_id INTEGER
         'type': 'income',
         'source': 'invoice',
         'invoice_id': invoiceId,
+        'shift_id': shiftId,
         'date': DateTime.now().toIso8601String(),
       });
     }
@@ -2264,11 +2265,64 @@ shift_id INTEGER
   }
 
   // ===================== إضافات العملاء =====================
-  static Future<int> addCustomer(String name) async {
+  /// يضمن وجود جدول العملاء — قواعد البيانات القديمة اللي اتعملت قبل
+  /// إضافة الجدول كانت بتفشل في تسجيل أي عميل جديد.
+  static Future<void> ensureCustomersTable() async {
     final db = await database;
+    await _ensureCustomersTableOn(db);
+  }
+
+  static Future<void> _ensureCustomersTableOn(DatabaseExecutor db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS customers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        balance REAL DEFAULT 0
+      )
+    ''');
+  }
+
+  /// تسجيل عميل — بيتنادى من ديالوج الدفع الآجل الجديد عشان أي اسم
+  /// يكتبه المستخدم يفضل محفوظ ويظهر في المرات الجاية.
+  static Future<int> addCustomer(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return 0;
+    // AdminCash حساب كاش داخلي — مش عميل.
+    if (trimmed.toLowerCase() == 'admincash') return 0;
+    final db = await database;
+    await _ensureCustomersTableOn(db);
     return await db.insert('customers', {
-      'name': name,
+      'name': trimmed,
     }, conflictAlgorithm: ConflictAlgorithm.ignore);
+  }
+
+  /// كل أسماء العملاء المسجّلين — من جدول العملاء + العملاء اللي عليهم
+  /// أجل + أي اسم اتسجل على فاتورة. ده اللي بيظهر في ديالوجات الدفع
+  /// الآجل، بدل ما القايمة كانت بتقرأ جدول الديون بس.
+  /// (AdminCash حساب كاش داخلي مش عميل حقيقي — مستبعد.)
+  static Future<List<String>> getAllCustomerNames() async {
+    final db = await database;
+    await _ensureCustomersTableOn(db);
+    final rows = await db.rawQuery('''
+      SELECT name AS n FROM customers
+        WHERE TRIM(COALESCE(name, '')) != ''
+          AND LOWER(TRIM(name)) != 'admincash'
+      UNION
+      SELECT customer_name AS n FROM debts
+        WHERE TRIM(COALESCE(customer_name, '')) != ''
+          AND LOWER(TRIM(customer_name)) != 'admincash'
+      UNION
+      SELECT customer_name AS n FROM invoices
+        WHERE TRIM(COALESCE(customer_name, '')) != ''
+          AND LOWER(TRIM(customer_name)) != 'admincash'
+      ORDER BY n COLLATE NOCASE ASC
+    ''');
+    final names = <String>[];
+    for (final row in rows) {
+      final name = (row['n'] ?? '').toString().trim();
+      if (name.isNotEmpty) names.add(name);
+    }
+    return names;
   }
 
   static Future<void> updateCustomerBalance(String name, double amount) async {
@@ -3427,19 +3481,10 @@ FROM transactions
   }
 */
   static Future<List<String>> getDebtorsNames() async {
-    final db = await database;
-
-    final rows = await db.rawQuery('''
-    SELECT DISTINCT customer_name
-    FROM debts
-    WHERE customer_name IS NOT NULL
-      AND TRIM(customer_name) != ''
-    ORDER BY customer_name ASC
-  ''');
-
-    print('🧾 Debtors names = $rows');
-
-    return rows.map((e) => e['customer_name'] as String).toList();
+    // 🔧 بنرجّع كل العملاء المسجّلين (عملاء + أجل + فواتير) مش اللي
+    // عليهم ديون بس — كانت دي أسباب إن العملاء المسجلين ما يظهرونش
+    // في ديالوجات الدفع الآجل.
+    return getAllCustomerNames();
   }
 
   // جلب تاريخ الرواتب المدفوعة
@@ -4283,6 +4328,67 @@ FROM transactions
       whereArgs: [invoiceId, 'partial_payment'],
       orderBy: 'date ASC',
     );
+  }
+
+  /// 💰 الدفعات الجزئية (تحصيل فاتورة مفتوحة) اللي اتحصّلت خلال شيفت
+  /// معيّن. الفاتورة نفسها ممكن تكون اتحوّلت لشيفت تاني بتسليم شيفت،
+  /// لكن الفلوس بتفضل محسوبة على الشيفت اللي اتحصّلت فيه فعلاً.
+  /// بنشمل الدفعات اللي اتحوّلت لدين كمان (partial_payment_migrated)
+  /// لأن التحويل بيتم وقت تسجيل الدين — بعد ما الفلوس دخلت الشيفت.
+  static Future<List<Map<String, dynamic>>> getShiftPartialPayments(
+    int shiftId,
+  ) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT cd.*, i.customer_name
+      FROM cash_drawer cd
+      LEFT JOIN invoices i ON i.id = cd.invoice_id
+      WHERE cd.source IN ('partial_payment', 'partial_payment_migrated')
+        AND cd.shift_id = ?
+      ORDER BY cd.date ASC
+    ''', [shiftId]);
+  }
+
+  /// 💰 إجمالي الدفعات الجزئية لكل فاتورة — من أي شيفت.
+  /// تقفيل الشيفت اللي استلم الفاتورة بيخصم اللي اتحصّل قبل كده عشان
+  /// الفلوس ما تتحسبش مرتين على شيفتين. [excludeShiftId] بيستثني دفعات
+  /// الشيفت اللي بنعمله تقفيله دلوقتي (دي بتتحسب في نفس الشيفت).
+  static Future<Map<int, double>> getPartialsByInvoice({
+    List<int>? invoiceIds,
+    int? excludeShiftId,
+  }) async {
+    final db = await database;
+    final conditions = <String>[
+      "source = 'partial_payment'",
+      'invoice_id IS NOT NULL',
+    ];
+    final args = <Object?>[];
+    if (excludeShiftId != null) {
+      conditions.add('(shift_id IS NULL OR shift_id != ?)');
+      args.add(excludeShiftId);
+    }
+    if (invoiceIds != null && invoiceIds.isNotEmpty) {
+      final placeholders = List.filled(invoiceIds.length, '?').join(', ');
+      conditions.add('invoice_id IN ($placeholders)');
+      args.addAll(invoiceIds);
+    }
+    final rows = await db.rawQuery(
+      '''
+      SELECT invoice_id, SUM(amount) AS total
+      FROM cash_drawer
+      WHERE ${conditions.join(' AND ')}
+      GROUP BY invoice_id
+      ''',
+      args,
+    );
+    final result = <int, double>{};
+    for (final row in rows) {
+      final id = row['invoice_id'];
+      if (id == null) continue;
+      result[(id as num).toInt()] =
+          (row['total'] as num?)?.toDouble() ?? 0.0;
+    }
+    return result;
   }
 
   static Future<void> migratePartialPaymentsToDebt({

@@ -8,6 +8,7 @@ import 'package:saytarly/Features/cashier/presentation/screens/DrinksInvoiceScre
 import 'package:saytarly/Features/cashier/presentation/print/pepsi.dart';
 import 'package:saytarly/Features/cashier/presentation/screens/add_drinks.dart';
 import 'package:saytarly/Features/cashier/presentation/print/drinks_invoice_print.dart';
+import 'package:saytarly/Features/debts/presentation/widgets/customer_picker_dialog.dart';
 import 'package:saytarly/core/widgets/BACKGROUND.dart';
 import 'package:saytarly/core/localization/messages.dart';
 import 'package:intl/intl.dart';
@@ -462,84 +463,14 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
 
     if (paymentChoice == 'debt') {
       if (!mounted) return 0.0; // الشاشة قفلت بعد الدايلوج — ما نلمس contextش
-      final nameController = TextEditingController();
-      String? selectedCustomer;
 
-      final customerName = await showDialog<String>(
-        context: context,
-        builder: (_) => AppDialog(
-          title:  Text('تسجيل الدين'.tr()),
-          content: FutureBuilder<List<String>>(
-            future: DBHelper.getDebtorsNames(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const SizedBox(
-                  height: 60,
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              final names = snapshot.data!;
-
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration:  InputDecoration(
-                      labelText: 'عميل جديد'.tr(),
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person_add),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Autocomplete<String>(
-                    optionsBuilder: (value) {
-                      if (value.text.isEmpty) {
-                        return names;
-                      }
-
-                      return names.where(
-                        (n) =>
-                            n.toLowerCase().contains(value.text.toLowerCase()),
-                      );
-                    },
-                    onSelected: (value) {
-                      selectedCustomer = value;
-                    },
-                    fieldViewBuilder: (context, textCtrl, focusNode, onSubmit) {
-                      return TextField(
-                        controller: textCtrl,
-                        focusNode: focusNode,
-                        decoration:  InputDecoration(
-                          labelText: 'بحث عن عميل موجود'.tr(),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child:  Text('إلغاء'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final result = nameController.text.trim().isNotEmpty
-                    ? nameController.text.trim()
-                    : selectedCustomer;
-
-                Navigator.pop(context, result);
-              },
-              child:  Text('حفظ'.tr()),
-            ),
-          ],
-        ),
+      // 🆕 ديالوج موحّد للعملاء: بيعرض كل العملاء المسجّلين (عملاء +
+      // أجل + فواتير)، وأي اسم جديد بيكتبه المستخدم بيتحفظ كعميل.
+      // الاسم اللي في الخانة هو اللي بيتحفظ فعلاً — مفيش حفظ صامت.
+      final customerName = await showCustomerPickerDialog(
+        context,
+        title: 'تسجيل الدين',
+        initialName: invoice['customer_name']?.toString(),
       );
       if (customerName == null || customerName.isEmpty) return discount;
       print('👤 customerName=$customerName');
@@ -693,6 +624,7 @@ class _DrinksscreenDashboardState extends State<DrinksscreenDashboard> {
           'invoice',
           invoiceId: invoiceId,
           cashier: widget.staffName,
+          shiftId: widget.shiftId,
         );
       }
     }

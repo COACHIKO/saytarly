@@ -11,6 +11,7 @@ class _ShiftSummaryNumbers {
     required this.expenses,
     required this.debt,
     required this.collected,
+    required this.partials,
     required this.openValue,
     required this.vodafone,
     required this.transactions,
@@ -27,6 +28,7 @@ class _ShiftSummaryNumbers {
   final double expenses;
   final double debt;
   final double collected;
+  final double partials;
   final double openValue;
   final double vodafone;
   final double transactions;
@@ -207,7 +209,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                         const SizedBox(width: DesktopTokens.gapSm),
                         Expanded(
                           child: Text(
-                            'محصّل جزئيًا من ترابيزات لسه شغالة'.tr(),
+                            'محصّل جزئيًا من الترابيزات'.tr(),
                             style: TextStyle(
                               color: palette.textSecondary,
                               fontWeight: FontWeight.w600,
@@ -370,6 +372,14 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
           color: palette.success,
           hint: '{v1} عملية'.tr({'v1': debtPayments.length}),
         ),
+        if (n.partials > 0)
+          DesktopStatCard(
+            label: 'محصّل جزئيًا من الترابيزات'.tr(),
+            value: _money(n.partials),
+            icon: Icons.table_restaurant_outlined,
+            color: palette.success,
+            hint: 'دفع جزئي'.tr(),
+          ),
         if (n.openValue > 0)
           DesktopStatCard(
             label: 'قيمة الترابيزات المفتوحة'.tr(),
@@ -403,11 +413,13 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
   }
 
   /// حساب أرقام الملخص — منقولة حرفيًا من `_summaryContent`.
+  /// 💰 نسبة مساهمة كل فاتورة بتيجي من `shift_paid` (نصيب الشيفت ده)،
+  /// مش إجمالي المدفوع من أول الفاتورة.
   _ShiftSummaryNumbers _windowsSummaryNumbers() {
     double paidFraction(Map<String, dynamic> inv, double cost) {
       final totalCost = (inv['total_cost'] as num?)?.toDouble() ?? 0.0;
-      final paidPartial = (inv['paid_partial'] as num?)?.toDouble() ?? 0.0;
-      final fraction = totalCost > 0 ? paidPartial / totalCost : 0.0;
+      final shiftPaid = (inv['shift_paid'] as num?)?.toDouble() ?? 0.0;
+      final fraction = totalCost > 0 ? shiftPaid / totalCost : 0.0;
       return cost * fraction;
     }
 
@@ -468,7 +480,8 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
         totalCigarettes +
         totalShisha +
         totalTransactions +
-        totalDebtCollected -
+        totalDebtCollected +
+        totalOpenPartialCollected -
         totalExpenses;
     final grandTotaldis = grandTotal - totalDiscounts;
 
@@ -481,6 +494,7 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
       expenses: totalExpenses,
       debt: totalDebts,
       collected: totalDebtCollected,
+      partials: totalOpenPartialCollected,
       openValue: totalOpenValue,
       vodafone: vodafoneCashTotal,
       transactions: totalTransactions,
@@ -826,6 +840,21 @@ extension _ShiftDetailsPageWindowsBody on _ShiftDetailsPageState {
                     'v1': _money(paidPartial),
                   }),
                   icon: Icons.price_check,
+                  color: _ShiftDetailsPageState.collectedColor,
+                ),
+              ],
+              // 💰 فاتورة عليها دفعات جزئية في شيفت تاني — نصيب الشيفت ده
+              if (!isOpen &&
+                  !isCancelled &&
+                  paymentType != 'علي الحساب' &&
+                  paymentType != 'debt' &&
+                  ((inv['prior_partials'] as num?)?.toDouble() ?? 0.0) > 0.01) ...[
+                const SizedBox(width: DesktopTokens.gapSm),
+                DesktopInfoChip(
+                  label:
+                      ('↳ منها في هذا الشيفت:'.tr() +
+                      ' ${_money(((inv['shift_paid'] ?? 0) as num).toDouble())}'),
+                  icon: Icons.subdirectory_arrow_right,
                   color: _ShiftDetailsPageState.collectedColor,
                 ),
               ],

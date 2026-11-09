@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:saytarly/core/database/db_helper.dart';
 import 'package:saytarly/core/desktop/desktop.dart';
 import 'package:saytarly/core/localization/messages.dart';
+import 'package:saytarly/Features/debts/presentation/widgets/customer_picker_dialog.dart';
 
 // جسم الموبايل وجسم الويندوز في ملفين منفصلين — نفس الـ State ونفس المنطق.
 part 'mobile/chargetopup_mobile_body.dart';
@@ -131,72 +132,11 @@ class _CashierScreenState extends State<chargetop> {
     //  🔶 1) شــحــن عــلــى الــحــســاب (دين)
     // ============================================================
     if (paymentChoice == "debt") {
-      String selectedName = '';
-
-      final customerName = await showDialog<String>(
-        context: context,
-        builder:
-            (_) => AppDialog(
-              title: Text('تسجيل الشحن كدين'.tr()),
-              content: FutureBuilder<List<String>>(
-                future: DBHelper.getDebtorsNames(), // 👈 أسماء مسجلة
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return SizedBox(
-                      height: 60,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  return Autocomplete<String>(
-                    optionsBuilder: (TextEditingValue textEditingValue) {
-                      if (textEditingValue.text.isEmpty) {
-                        return snapshot.data!;
-                      }
-                      return snapshot.data!.where(
-                        (name) => name.toLowerCase().contains(
-                          textEditingValue.text.toLowerCase(),
-                        ),
-                      );
-                    },
-                    onSelected: (selection) {
-                      selectedName = selection;
-                    },
-                    fieldViewBuilder: (
-                      context,
-                      textController,
-                      focusNode,
-                      onSubmit,
-                    ) {
-                      return TextField(
-                        controller: textController,
-                        focusNode: focusNode,
-                        decoration: InputDecoration(
-                          labelText: 'اسم العميل'.tr(),
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (val) {
-                          selectedName = val; // 👈 اسم جديد أو موجود
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, null),
-                  child: Text('إلغاء'.tr()),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (selectedName.trim().isEmpty) return;
-                    Navigator.pop(context, selectedName.trim());
-                  },
-                  child: Text('حفظ'.tr()),
-                ),
-              ],
-            ),
+      // 🆕 ديالوج العملاء الموحّد — بيعرض كل العملاء المسجّلين، وأي
+      // اسم جديد بيتحفظ كعميل وبيتسجل بيه الشحن على الحساب.
+      final customerName = await showCustomerPickerDialog(
+        context,
+        title: 'تسجيل الشحن كدين',
       );
 
       if (customerName == null || customerName.isEmpty) {

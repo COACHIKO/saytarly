@@ -13,8 +13,9 @@ import 'package:saytarly/core/utils/money.dart';
 
 /// الملف التجاري للنظام — بيتظبط من السوبر ادمن وبيتخزن في جدول app_settings
 class BusinessProfile {
-  /// الاسم الافتراضي لو مفيش اسم متسجل (للتوافق مع النظام القديم)
-  static const String fallbackName = 'Hamza Cafe';
+  /// الاسم الافتراضي لو مفيش اسم متسجل — فاضي (من غير اسم) لحد ما السوبر
+  /// ادمن يضبطه من معالج التهيئة.
+  static const String fallbackName = '';
 
   /// اللوجو الافتراضي المدمج في الأصول — بيظهر لو السوبر ادمن ما اختارش صورة
   static const String defaultLogoAsset = 'assets/images/logo_hamza.jpeg';

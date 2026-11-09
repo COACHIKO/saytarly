@@ -135,7 +135,7 @@ class BackupHelper {
         .replaceAll(':', '-')
         .split('.')
         .first;
-    final suggestedName = 'Hamza_cafe_backup_$timestamp.xocb';
+    final suggestedName = 'Saytarly_backup_$timestamp.xocb';
 
     String? savePath = await FilePicker.platform.saveFile(
       dialogTitle: 'اختر مكان حفظ النسخة الاحتياطية'.tr(),

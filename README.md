@@ -102,8 +102,33 @@ placeholder substitution, locale resolution) without booting the real app —
 `main.dart` runs DB migrations and an activation gate and must not do work
 inside tests.
 
-## Environment files
+## Release building & self-update
 
-`.env` / `.env.example` are leftovers from the original VoIP template
-(config + `flutter_dotenv`, which has been pruned). The cafe system does not
-read them; delete both if you don't plan to reintroduce env-file config.
+**SaytarlyMind** is the release control center — a local website (PowerShell server
++ web UI). Launch it by double-clicking `release.bat` (or
+`powershell -File tool\megaming.ps1`) — it opens the browser on
+`http://127.0.0.1:<port>` with the Megamind-styled dashboard.
+
+- Pick Mobile (Android) or Windows, edit the version, increment or set the
+  build number (`+1` button).
+- Outputs: APK (+ optional ZIP) for mobile; build / Inno Setup installer /
+  installer + ZIP for Windows. Artifacts land in `build_export\`.
+- Optional GitHub upload: creates or updates a release
+  (`windows-<version>` / `mobile-<version>` tags) in the repository from
+  `.env` (`RELEASES_REPO`), uploads the ZIP, and includes an inline release
+  manager (edit notes / delete releases / test connection) right in the page.
+- The underlying engine is still `tool\release.ps1` (WinForms GUI + CLI).
+
+The app checks `RELEASES_REPO` on startup (release builds) — Windows downloads
+and replaces itself from the release ZIP then relaunches; Android opens the
+release page in the browser.
+
+`.env` (not secret-safe — do not commit real tokens):
+
+- `MOBILE_VERSION_NUMBER`, `MOBILE_BUILD_NUMBER`
+- `WINDOWS_VERSION_NUMBER`, `WINDOWS_BUILD_NUMBER`
+- `GITHUB_TOKEN`, `RELEASES_REPO`, `RELEASES_TOKEN`
+
+The build script writes these values into `pubspec.yaml`,
+`windows/runner/Runner.rc`, `lib/core/updater/version_info.dart` and
+`lib/core/updater/update_config.dart` before every build.

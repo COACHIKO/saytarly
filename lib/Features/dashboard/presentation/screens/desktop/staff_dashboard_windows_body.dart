@@ -84,12 +84,13 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               label: 'الرئيسية'.tr(),
               icon: Icons.home_outlined,
             ),
-            DesktopNavItem(
-              id: 'staff-ps',
-              label: 'البلايستيشن'.tr(),
-              icon: Icons.sports_esports_outlined,
-              pageBuilder: _playstationPage,
-            ),
+            if (_playstationEnabled)
+              DesktopNavItem(
+                id: 'staff-ps',
+                label: 'البلايستيشن'.tr(),
+                icon: Icons.sports_esports_outlined,
+                pageBuilder: _playstationPage,
+              ),
             DesktopNavItem(
               id: 'staff-takeaway',
               label: 'تيك أواي'.tr(),
@@ -178,13 +179,14 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
               minTileWidth: 270,
               maxColumns: 4,
               children: [
-                DesktopActionTile(
-                  title: 'البلايستيشن'.tr(),
-                  subtitle: 'إدارة الأجهزة والجلسات'.tr(),
-                  icon: Icons.sports_esports_outlined,
-                  color: palette.info,
-                  onTap: _openPlaystation,
-                ),
+                if (_playstationEnabled)
+                  DesktopActionTile(
+                    title: 'البلايستيشن'.tr(),
+                    subtitle: 'إدارة الأجهزة والجلسات'.tr(),
+                    icon: Icons.sports_esports_outlined,
+                    color: palette.info,
+                    onTap: _openPlaystation,
+                  ),
                 DesktopActionTile(
                   title: 'تيك أواي'.tr(),
                   subtitle: 'فاتورة سريعة للسفري'.tr(),
@@ -319,8 +321,10 @@ extension _StaffDashboardWindowsBody on _StaffDashboardState {
           ),
           const SizedBox(width: DesktopTokens.gapLg),
           _heroStat(context, 'جلسات مفتوحة'.tr(), '${activeInvoices.length}'),
-          const SizedBox(width: DesktopTokens.gapSm + 2),
-          _heroStat(context, 'إجمالي الأجهزة'.tr(), '${consoles.length}'),
+          if (_playstationEnabled) ...[
+            const SizedBox(width: DesktopTokens.gapSm + 2),
+            _heroStat(context, 'إجمالي الأجهزة'.tr(), '${consoles.length}'),
+          ],
         ],
       ),
     );

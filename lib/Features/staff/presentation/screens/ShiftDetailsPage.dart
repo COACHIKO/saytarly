@@ -135,6 +135,30 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
 
       invoices.add(invoice);
     }
+
+    // 💰 نصيب الشيفت ده من كل فاتورة: الباقي اللي اتحصّل وقت التسليم هنا
+    // بعد خصم الدفعات الجزئية اللي اتحصّلت في شيفتات تانية (تسليم شيفت).
+    final priorPartialsByInvoice = await DBHelper.getPartialsByInvoice(
+      invoiceIds: invoices.map((inv) => inv['id']).whereType<int>().toList(),
+      excludeShiftId: widget.shiftId,
+    );
+    for (final inv in invoices) {
+      final type = (inv['payment_type'] ?? '').toString();
+      final total = (inv['total_cost'] as num?)?.toDouble() ?? 0.0;
+      final prior =
+          type == 'ملغي'
+              ? 0.0
+              : (priorPartialsByInvoice[(inv['id'] as num).toInt()] ?? 0.0);
+      if (type == 'ملغي') {
+        inv['shift_paid'] = 0.0;
+      } else if (type == 'علي الحساب' || type == 'debt') {
+        // هيتحدّد بعدين من دفعات الآجل اللي اتحصّلت في نطاق الشيفت.
+        inv['shift_paid'] = (inv['paid_partial'] as double?) ?? 0.0;
+      } else {
+        inv['shift_paid'] = (total - prior).clamp(0.0, double.infinity);
+      }
+      inv['prior_partials'] = prior;
+    }
     expenses = await DBHelper.getExpensesByShift(widget.shiftId);
 
     transactions = await DBHelper.getTransactionsByShift(widget.shiftId);
@@ -188,6 +212,24 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
           return !currentShiftInvoiceIds.contains(invId as int);
         }).toList();
 
+    // 💰 الآجل: نصيب الشيفت ده = الدفعات اللي اتحصّلت في نطاقه بس
+    // (الدفعة الجزئية المرحّلة لدين بتفضل على شيفت التحصيل الأصلي).
+    final debtPaidInRangeByInvoice = <int, double>{};
+    for (final p in debtPaymentsRowsRaw) {
+      final invId = p['invoice_id'];
+      if (invId == null) continue;
+      final id = (invId as num).toInt();
+      debtPaidInRangeByInvoice[id] =
+          (debtPaidInRangeByInvoice[id] ?? 0.0) +
+          ((p['amount'] ?? 0) as num).toDouble();
+    }
+    for (final inv in invoices) {
+      final type = (inv['payment_type'] ?? '').toString();
+      if (type != 'علي الحساب' && type != 'debt') continue;
+      inv['shift_paid'] =
+          debtPaidInRangeByInvoice[(inv['id'] as num).toInt()] ?? 0.0;
+    }
+
     totalDebtCollected = debtPayments.fold<double>(
       0.0,
       (sum, p) => sum + ((p['amount'] ?? 0) as num).toDouble(),
@@ -196,14 +238,25 @@ class _ShiftDetailsPageState extends State<ShiftDetailsPage> {
       0.0,
       (sum, p) => sum + ((p['discount'] ?? 0) as num).toDouble(),
     );
-    totalOpenPartialCollected = invoices.fold<double>(
-      0.0,
-      (sum, inv) =>
-          sum +
-          (inv['is_open'] == true
-              ? (inv['paid_partial'] as double? ?? 0.0)
-              : 0.0),
+    // 💰 كل الدفعات الجزئية اللي اتحصّلت خلال الشيفت ده — حتى لو الفاتورة
+    // نفسها اتحوّلت لشيفت تاني بتسليم شيفت (الفلوس دخلت هنا). بنستبعد
+    // الفواتير المتسجلة في الشيفت لأن مدفوعاتها محسوبة جوه الفواتير.
+    final shiftPartialRows = await DBHelper.getShiftPartialPayments(
+      widget.shiftId,
     );
+    final settledShiftInvoiceIds =
+        invoices
+            .where((inv) => inv['end_time'] != null)
+            .map((inv) => inv['id'])
+            .whereType<int>()
+            .toSet();
+    totalOpenPartialCollected = shiftPartialRows
+        .where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !settledShiftInvoiceIds.contains((invId as num).toInt());
+        })
+        .fold<double>(0.0, (sum, p) => sum + ((p['amount'] ?? 0) as num).toDouble());
     vodafoneCashTotal = await DBHelper.getVodafoneCashTotal(widget.shiftId);
     vodafoneCashNotes = await DBHelper.getVodafoneCashNotes(widget.shiftId);
   }

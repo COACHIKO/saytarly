@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:saytarly/core/desktop/desktop.dart';
 import 'package:saytarly/core/services/backup_helper.dart';
@@ -13,6 +14,10 @@ import 'package:saytarly/core/services/business_profile.dart';
 import 'package:saytarly/core/utils/money.dart';
 import 'package:saytarly/core/localization/cubit/locale_cubit.dart';
 import 'package:saytarly/core/utils/theme/cubit/theme_cubit.dart';
+import 'package:saytarly/core/updater/app_mode.dart';
+import 'package:saytarly/core/updater/device_registry.dart';
+import 'package:saytarly/core/updater/update_service.dart';
+import 'package:saytarly/core/updater/version_info.dart';
 import 'package:saytarly/Features/dashboard/presentation/screens/admin.dart';
 import 'package:saytarly/Features/staff/presentation/screens/shifts_report.dart';
 import 'package:saytarly/core/localization/messages.dart';
@@ -21,9 +26,8 @@ import 'package:saytarly/core/localization/messages.dart';
 part 'mobile/setting_mobile_body.dart';
 part 'desktop/setting_windows_body.dart';
 
-/// شاشة إعدادات موحّدة: الوضع الليلي/النهاري + شكل شاشة المشروبات.
-/// أي إعداد جديد تضيفه بعدين (زي شكل لوحة الأدمن أو شكل تقرير الشيفتات)
-/// يتحط هنا كقسم جديد بنفس الطريقة.
+/// شاشة إعدادات موحّدة منظمة في تبويبات (Tabs) وكل تبويب فيه تصنيفات:
+/// المظهر ← الشاشات ← النشاط ← النسخ والبيانات ← الجهاز.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -31,11 +35,96 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+/// تبويب إعدادات: أيقونة + اسم + وصف مختصر بيتغير تحت شريط التبويبات.
+class _SettingsTab {
+  const _SettingsTab({
+    required this.icon,
+    required this.label,
+    required this.description,
+  });
+
+  final IconData icon;
+  final String label;
+  final String description;
+}
+
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _posMode = false;
   DashStyle _dashStyle = DashStyle.current;
   ReportDesign _reportDesign = ReportDesign.classic;
   bool _loading = true;
+  int _tab = 0;
+
+  /// تبويبات الشاشة — تعريف واحد بيستخدمه جسم الموبايل وجسم الويندوز.
+  List<_SettingsTab> get _tabs => [
+    _SettingsTab(
+      icon: Icons.palette_outlined,
+      label: 'المظهر'.tr(),
+      description: 'اللغة، الوضع الليلي، وشكل الواجهة'.tr(),
+    ),
+    _SettingsTab(
+      icon: Icons.dashboard_customize_outlined,
+      label: 'الشاشات'.tr(),
+      description: 'شكل شاشة المشروبات ولوحة الأدمن وتقرير الشيفتات'.tr(),
+    ),
+    _SettingsTab(
+      icon: Icons.storefront_outlined,
+      label: 'النشاط'.tr(),
+      description: 'العملة، نصوص الفاتورة، ووحدات الخامات'.tr(),
+    ),
+    _SettingsTab(
+      icon: Icons.backup_outlined,
+      label: 'النسخ والبيانات'.tr(),
+      description: 'نسخ احتياطي، استرجاع، ومزامنة الشبكة والسيرفر'.tr(),
+    ),
+    _SettingsTab(
+      icon: Icons.perm_device_information_outlined,
+      label: 'الجهاز'.tr(),
+      description: 'مواصفات الجهاز ونسخة التطبيق'.tr(),
+    ),
+  ];
+
+  void _setTab(int index) {
+    if (index == _tab) return;
+    setState(() => _tab = index);
+  }
+
+  /// نص حالة الترخيص للعرض.
+  String _licenseStatusLabel(DeviceLicenseStatus status) {
+    switch (status) {
+      case DeviceLicenseStatus.unlimited:
+        return 'مدى الحياة'.tr();
+      case DeviceLicenseStatus.active:
+        return 'مفعّل'.tr();
+      case DeviceLicenseStatus.expired:
+        return 'منتهي'.tr();
+      case DeviceLicenseStatus.pending:
+        return 'بانتظار التفعيل'.tr();
+      case DeviceLicenseStatus.blocked:
+        return 'محظور'.tr();
+    }
+  }
+
+  /// نص صلاحية الترخيص (تاريخ الانتهاء أو null للـ lifetime).
+  String? _licenseExpiryText(DeviceRecord? record) {
+    final expires = record?.license.expiresAt;
+    if (record == null ||
+        record.license.type == DeviceLicenseType.unlimited ||
+        expires == null) {
+      return null;
+    }
+    final local = expires.toLocal();
+    final date = '${local.year}-${local.month.toString().padLeft(2, '0')}-${local.day.toString().padLeft(2, '0')}';
+    return 'ينتهي في {v1}'.tr({'v1': date});
+  }
+
+  Future<void> _copyDeviceCode() async {
+    final code = DeviceRegistry.deviceCode ?? '';
+    if (code.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: code));
+    if (!mounted) return;
+    AppToast.show('تم نسخ كود الجهاز'.tr(), kind: FeedbackKind.success);
+  }
 
   @override
   void initState() {
@@ -179,74 +268,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) return;
       AppToast.show('❌ فشل الاسترجاع: {e}'.tr({'e': e}));
     }
-  }
-
-  Future<String?> _askPassword({
-    required String title,
-    bool confirm = false,
-  }) async {
-    final pass1 = TextEditingController();
-    final pass2 = TextEditingController();
-
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) {
-        String? errorText;
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AppDialog(
-              title: Text(title),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: pass1,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: 'كلمة السر'.tr()),
-                  ),
-                  if (confirm) ...[
-                    SizedBox(height: 8),
-                    TextField(
-                      controller: pass2,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'تأكيد كلمة السر'.tr(),
-                      ),
-                    ),
-                  ],
-                  if (errorText != null) ...[
-                    const SizedBox(height: 8),
-                    Text(errorText!, style: const TextStyle(color: Colors.red)),
-                  ],
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, null),
-                  child: Text('إلغاء'.tr()),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    if (pass1.text.trim().isEmpty) {
-                      setDialogState(() => errorText = 'اكتب كلمة السر'.tr());
-                      return;
-                    }
-                    if (confirm && pass1.text != pass2.text) {
-                      setDialogState(
-                        () => errorText = 'كلمتا السر غير متطابقتين'.tr(),
-                      );
-                      return;
-                    }
-                    Navigator.pop(ctx, pass1.text);
-                  },
-                  child: Text('متابعة'.tr()),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 
   Future<void> _clearAllNow() async {

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAYTARLYMIND — Release Control Center</title>
+<style>
+  :root {
+    --bg: #05030f;
+    --bg2: #0d0722;
+    --panel: rgba(255,255,255,0.045);
+    --panel2: rgba(255,255,255,0.07);
+    --line: rgba(255,255,255,0.10);
+    --line2: rgba(255,255,255,0.20);
+    --text: #e9e6ff;
+    --muted: #9b93c4;
+    --cyan: #22d3ee;
+    --purple: #a855f7;
+    --blue: #4f7cff;
+    --pink: #f472b6;
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --glow: 0 0 24px rgba(168, 85, 247, 0.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(168,85,247,0.22), transparent 60%),
+      radial-gradient(800px 500px at -10% 20%, rgba(34,211,238,0.14), transparent 55%),
+      radial-gradient(700px 600px at 50% 110%, rgba(79,124,255,0.18), transparent 60%),
+      linear-gradient(160deg, var(--bg) 0%, var(--bg2) 60%, #0a0420 100%);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 18px; }
+
+  /* Header */
+  .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .brain {
+    width: 54px; height: 54px; border-radius: 16px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; box-shadow: var(--glow);
+  }
+  .brand h1 {
+    margin: 0; font-size: 30px; letter-spacing: 3px; font-weight: 900;
+    background: linear-gradient(90deg, #c4b5fd, #67e8f9, #93c5fd);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand .sub { color: var(--muted); font-size: 12.5px; letter-spacing: 1px; }
+  .tagline { color: var(--muted); font-size: 13px; margin: 4px 0 22px 68px; }
+
+  /* Cards */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(6px);
+  }
+  .card h2 {
+    margin: 0 0 14px; font-size: 14.5px; letter-spacing: 1.6px;
+    color: var(--cyan); text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--purple); box-shadow: 0 0 10px var(--purple); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* Platform cards */
+  .plat {
+    cursor: pointer; border: 1.5px solid var(--line); border-radius: 16px;
+    padding: 18px; text-align: center; transition: all .18s ease;
+    background: var(--panel2); user-select: none;
+  }
+  .plat:hover { border-color: var(--line2); }
+  .plat.active {
+    border-color: var(--purple);
+    box-shadow: var(--glow);
+    background: linear-gradient(160deg, rgba(168,85,247,0.14), rgba(79,124,255,0.10));
+  }
+  .plat .icon { font-size: 30px; }
+  .plat .name { font-weight: 800; margin-top: 6px; letter-spacing: 1px; }
+
+  /* Fields */
+  .field { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .field label { width: 130px; color: var(--muted); font-size: 13px; }
+  input[type=text], input[type=number], textarea {
+    flex: 1; background: #0b0620; color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 9px 12px; font-size: 14px; outline: none; font-family: inherit;
+  }
+  input:focus, textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34,211,238,0.12); }
+  .plus {
+    width: 40px; height: 38px; border-radius: 10px; border: 1px solid var(--line2);
+    background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(79,124,255,0.25));
+    color: #fff; font-weight: 900; font-size: 16px; cursor: pointer;
+  }
+  .plus:hover { box-shadow: var(--glow); }
+
+  /* Radios as chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    cursor: pointer; border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 10px 16px; font-size: 13px; color: var(--muted);
+    background: var(--panel2); transition: all .15s ease; user-select: none;
+  }
+  .chip.active { border-color: var(--cyan); color: var(--text); background: rgba(34,211,238,0.12); }
+
+  .hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+  .warn { color: var(--amber); font-size: 12px; margin: 8px 0 0; }
+
+  /* Buttons */
+  .btn {
+    cursor: pointer; border: none; border-radius: 12px; padding: 12px 20px;
+    font-size: 14px; font-weight: 800; letter-spacing: .6px; color: #fff;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    box-shadow: 0 6px 20px rgba(124,58,237,0.35); transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: var(--glow); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn.ghost { background: transparent; border: 1px solid var(--line2); box-shadow: none; color: var(--muted); }
+  .btn.danger { background: linear-gradient(135deg, #b91c1c, #7f1d1d); box-shadow: none; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  /* Terminal */
+  .term {
+    background: #030109; border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 12px; line-height: 1.6; color: #86efac; white-space: pre-wrap;
+    height: 320px; overflow-y: auto;
+  }
+  .term .err { color: var(--red); }
+  .term .dim { color: #6b7280; }
+
+  /* Releases */
+  .rel { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; background: var(--panel2); }
+  .rel .tag { font-family: Consolas, monospace; color: var(--cyan); font-size: 12.5px; min-width: 150px; }
+  .rel input { flex: 1; }
+  .rel .mini { padding: 6px 10px; font-size: 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--line2); background: transparent; color: var(--muted); }
+  .rel .mini:hover { color: #fff; border-color: var(--cyan); }
+  .rel .mini.del:hover { border-color: var(--red); color: var(--red); }
+
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 6px; box-shadow: 0 0 8px var(--green); }
+  .footer { text-align: center; color: #4b4468; font-size: 11.5px; margin-top: 26px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="brain">🧠</div>
+    <div>
+      <h1>SAYTARLYMIND</h1>
+      <div class="sub">RELEASE CONTROL CENTER</div>
+    </div>
+  </div>
+  <div class="tagline">⚡ Build · Installer · GitHub Updates — powered by SaytarlyMind</div>
+
+  <!-- Platform -->
+  <div class="card">
+    <h2>Target Platform</h2>
+    <div class="grid2">
+      <div class="plat active" id="platMobile" onclick="setPlatform('mobile')">
+        <div class="icon">📱</div>
+        <div class="name">MOBILE (ANDROID)</div>
+        <div class="hint">APK build · optional ZIP</div>
+      </div>
+      <div class="plat" id="platWindows" onclick="setPlatform('windows')">
+        <div class="icon">🖥️</div>
+        <div class="name">WINDOWS (DESKTOP)</div>
+        <div class="hint">EXE build · Inno installer · ZIP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Mode -->
+  <div class="card">
+    <h2>App Mode</h2>
+    <div class="chips" id="modeChips">
+      <div class="chip" data-mode="online" onclick="setMode('online')">☁️ ONLINE — GitHub updates + device licenses</div>
+      <div class="chip" data-mode="offline" onclick="setMode('offline')">📴 OFFLINE — no cloud services</div>
+    </div>
+    <div class="hint" id="modeHint"></div>
+  </div>
+
+  <!-- Versions -->
+  <div class="card">
+    <h2>Versions &amp; Build Numbers</h2>
+    <div class="grid2">
+      <div>
+        <div class="field"><label>📱 Mobile version</label><input type="text" id="mv"></div>
+        <div class="field"><label>📱 Mobile build</label><input type="number" id="mb"><button class="plus" onclick="bump('mb')">+1</button></div>
+      </div>
+      <div>
+        <div class="field"><label>🖥️ Windows version</label><input type="text" id="wv"></div>
+        <div class="field"><label>🖥️ Windows build</label><input type="number" id="wb"><button class="plus" onclick="bump('wb')">+1</button></div>
+      </div>
+    </div>
+    <div class="hint">Change the version or bump the build number — the values are saved into <b>.env</b> on build.</div>
+  </div>
+
+  <!-- Outputs -->
+  <div class="card">
+    <h2>Outputs</h2>
+    <div class="chips" id="chips">
+      <div class="chip active" data-action="build">Build only</div>
+      <div class="chip" data-action="installer">Build + Installer (Inno)</div>
+      <div class="chip" data-action="installerzip">Build + Installer + ZIP</div>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label>🧪 ISCC.exe (Inno)</label>
+      <input type="text" id="iscc" placeholder="Auto-detected">
+    </div>
+    <div class="warn" id="isccWarn" style="display:none">⚠️ Inno Setup not installed yet — SaytarlyMind will download &amp; install it automatically when you build with the Installer option (or paste the ISCC.exe path).</div>
+  </div>
+
+  <!-- GitHub -->
+  <div class="card">
+    <h2>GitHub Updates</h2>
+    <div class="field"><label>Repository</label><input type="text" id="repo" placeholder="owner/repo"></div>
+    <div class="field"><label>Token</label><input type="password" id="token" placeholder="RELEASES_TOKEN from .env"></div>
+    <div class="row" style="margin:12px 0">
+      <label style="cursor:pointer;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="upload"> Upload release to GitHub (optional)
+      </label>
+      <label style="cursor:pointer;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="replace" checked> Replace existing release with same tag
+      </label>
+      <button class="btn ghost" id="btnTest" onclick="testGithub()">Test connection</button>
+      <button class="btn ghost" onclick="loadReleases()">Manage releases</button>
+    </div>
+    <div class="field"><label>Release name</label><input type="text" id="relName"></div>
+    <div class="field" style="align-items:flex-start"><label>Notes</label><textarea id="notes" rows="3">New release — improvements and fixes.</textarea></div>
+    <div class="hint" id="tagPreview"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="row" style="margin:18px 0">
+    <button class="btn" id="btnStart" onclick="startBuild()">🚀 START BUILD</button>
+    <button class="btn ghost" onclick="shutdown()">⏻ Shutdown server</button>
+  </div>
+
+  <!-- Build monitor -->
+  <div class="card" id="monitorCard" style="display:none">
+    <h2>Build Monitor</h2>
+    <div class="warn" id="lockWarn" style="display:none;margin:0 0 10px">⏳ A build is already running (another tab / CLI). New builds will wait and start automatically.</div>
+    <div id="monitorList"></div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="card">
+    <h2>Console</h2>
+    <div class="term" id="term"><span class="dim">Waiting for your command…</span></div>
+  </div>
+
+  <!-- Releases -->
+  <div class="card" id="relCard" style="display:none">
+    <h2>GitHub Releases</h2>
+    <div id="relList"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost" onclick="loadReleases()">↻ Refresh</button>
+      <button class="btn ghost" onclick="document.getElementById('relCard').style.display='none'">Close</button>
+    </div>
+  </div>
+
+  <div class="footer">SAYTARLYMIND © 2026 — SAYTARLY 🧠</div>
+</div>
+
+<script>
+let platform = 'mobile';
+let action = 'build';
+let mode = 'online';
+let env = {};
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('#modeChips .chip').forEach(function (c) {
+    c.classList.toggle('active', c.dataset.mode === m);
+  });
+  $('modeHint').innerHTML = m === 'offline'
+    ? '⚠️ Offline build: GitHub updates and device registration will be disabled in the app.'
+    : '✅ Online build: updates, rollback and device licenses are active.';
+}
+
+function $(id) { return document.getElementById(id); }
+
+function termLine(text, cls) {
+  const t = $('term');
+  if (t.querySelector('.dim')) t.innerHTML = '';
+  const span = document.createElement('span');
+  span.textContent = text + '\n';
+  if (cls) span.className = cls;
+  t.appendChild(span);
+  t.scrollTop = t.scrollHeight;
+}
+
+function setPlatform(p) {
+  platform = p;
+  $('platMobile').classList.toggle('active', p === 'mobile');
+  $('platWindows').classList.toggle('active', p === 'windows');
+  renderChips();
+  refreshTagPreview(true);
+}
+
+function renderChips() {
+  const defs = platform === 'mobile'
+    ? [{a:'build', t:'APK only'}, {a:'apkzip', t:'APK + ZIP'}]
+    : [{a:'build', t:'Build only'}, {a:'installer', t:'Build + Installer (Inno)'}, {a:'installerzip', t:'Build + Installer + ZIP'}];
+  const valid = defs.map(d => d.a);
+  if (!valid.includes(action)) action = valid[0];
+  const chips = $('chips');
+  chips.innerHTML = '';
+  defs.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'chip' + (d.a === action ? ' active' : '');
+    el.dataset.action = d.a;
+    el.textContent = d.t;
+    el.onclick = () => { action = d.a; renderChips(); refreshTagPreview(false); };
+    chips.appendChild(el);
+  });
+}
+
+function bump(id) {
+  const el = $(id);
+  el.value = (parseInt(el.value || '0', 10) + 1);
+}
+
+function refreshTagPreview(force) {
+  const ver = platform === 'mobile' ? $('mv').value.trim() : $('wv').value.trim();
+  const build = platform === 'mobile' ? $('mb').value : $('wb').value;
+  $('tagPreview').innerHTML = '🏷️ Tag: <b>' + platform + '-' + ver + '</b>';
+  // اسم الريليس بيعتمد على نوع البناء (موبايل أو ويندوز) — بيتجدد تلقائيًا
+  // مع تغيير المنصة، وبيفضل قابل للتعديل يدويًا بعد كده.
+  const auto = force || !$('relName').value || $('relName').dataset.auto === '1';
+  if (auto) {
+    $('relName').value = platform === 'mobile'
+      ? 'Saytarly Mobile ' + ver + ' (build ' + build + ')'
+      : 'Saytarly Windows ' + ver;
+    $('relName').dataset.auto = '1';
+  }
+}
+
+async function loadEnv() {
+  env = await (await fetch('/api/env')).json();
+  $('mv').value = env.mobileVersion;
+  $('mb').value = env.mobileBuild;
+  $('wv').value = env.windowsVersion;
+  $('wb').value = env.windowsBuild;
+  $('repo').value = env.repo;
+  $('token').value = env.token;
+  $('iscc').value = env.iscc;
+  $('isccWarn').style.display = env.isccFound ? 'none' : 'block';
+  mode = (env.mode === 'offline') ? 'offline' : 'online';
+  setMode(mode);
+  ['mv', 'mb', 'wv', 'wb'].forEach(function (id) {
+    $(id).addEventListener('input', function () { refreshTagPreview(false); });
+  });
+  $('relName').addEventListener('input', function () { $('relName').dataset.auto = '0'; });
+  renderChips();
+  refreshTagPreview();
+  termLine('SaytarlyMind online — env loaded from .env ✓');
+}
+
+async function testGithub() {
+  try {
+    const res = await fetch('https://api.github.com/repos/' + $('repo').value.trim(), {
+      headers: { 'Authorization': 'Bearer ' + $('token').value.trim(), 'Accept': 'application/vnd.github+json' }
+    });
+    if (res.ok) { termLine('✅ GitHub connection OK (' + $('repo').value.trim() + ')'); }
+    else { termLine('❌ GitHub connection failed: ' + res.status, 'err'); }
+  } catch (e) {
+    termLine('❌ GitHub error: ' + e.message, 'err');
+  }
+}
+
+async function startBuild() {
+  const body = {
+    platform: platform,
+    version: (platform === 'mobile' ? $('mv').value : $('wv').value).trim(),
+    build: parseInt(platform === 'mobile' ? $('mb').value : $('wb').value, 10),
+    action: action,
+    upload: $('upload').checked,
+    releaseName: $('relName').value.trim(),
+    notes: $('notes').value,
+    iscc: $('iscc').value.trim(),
+    createOnly: !$('replace').checked,
+    noBuild: false,
+    mode: mode
+  };
+  if (!body.version || !/^\d+(\.\d+){0,3}$/.test(body.version)) {
+    termLine('❌ Invalid version format: ' + body.version, 'err');
+    return;
+  }
+  $('btnStart').disabled = true;
+  termLine('▶ Starting ' + platform + ' build — ' + body.version + ' (build ' + body.build + ')');
+  try {
+    const res = await fetch('/api/build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify(body)
+    });
+    const job = await res.json();
+    currentJob = job.id;
+    localStorage.setItem('saytarlymind_job', job.id);
+    lastLen = 0;
+    poll(job.id);
+    refreshMonitor();
+  } catch (e) {
+    termLine('❌ Failed to start build: ' + e.message, 'err');
+    $('btnStart').disabled = false;
+  }
+}
+
+let currentJob = null;
+let lastLen = 0;
+async function poll(id) {
+  try {
+    const logRes = await fetch('/api/log?id=' + id);
+    const logData = await logRes.json();
+    const text = logData.text || '';
+    if (text.length > lastLen) {
+      const fresh = text.substring(lastLen);
+      lastLen = lastLen + fresh.length;
+      fresh.split('\n').forEach(line => {
+        if (!line.trim()) return;
+        termLine(line, /error|failed|fatal/i.test(line) ? 'err' : '');
+      });
+    }
+    const stRes = await fetch('/api/status?id=' + id);
+    const st = await stRes.json();
+    if (!st.running) {
+      if (st.exitCode === 0) { termLine('✅ Build finished successfully'); }
+      else { termLine('❌ Build finished with exit code ' + st.exitCode, 'err'); }
+      $('btnStart').disabled = false;
+      if (currentJob === id) {
+        currentJob = null;
+        localStorage.removeItem('saytarlymind_job');
+      }
+      await loadEnvSilent();
+      refreshMonitor();
+      return;
+    }
+    setTimeout(() => poll(id), 1000);
+  } catch (e) {
+    termLine('❌ Polling error: ' + e.message, 'err');
+    $('btnStart').disabled = false;
+  }
+}
+
+// ============================ Build Monitor ============================
+
+function elapsed(iso) {
+  const t = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (t < 60) return Math.round(t) + 's';
+  const m = Math.floor(t / 60);
+  return m + 'm ' + Math.round(t % 60) + 's';
+}
+
+async function refreshMonitor() {
+  try {
+    const res = await fetch('/api/jobs');
+    const data = await res.json();
+    const jobs = (data.jobs || []).slice().reverse();
+    const lockBusy = data.lock && data.lock.active && data.lock.ownerAlive;
+    $('monitorCard').style.display = (jobs.length > 0 || lockBusy) ? 'block' : 'none';
+    $('lockWarn').style.display = lockBusy ? 'block' : 'none';
+    const list = $('monitorList');
+    list.innerHTML = '';
+    jobs.forEach(j => {
+      const div = document.createElement('div');
+      div.className = 'rel';
+      if (j.running) {
+        div.innerHTML =
+          '<span class="tag">🟢 ' + escapeHtml(j.platform) + ' ' + escapeHtml(j.version) + '</span>' +
+          '<span class="dim" style="flex:1">running · ' + elapsed(j.started) + (currentJob === j.id ? ' · following' : '') + '</span>' +
+          '<button class="mini" onclick="showJobLog(\'' + j.id + '\')">📄 Log</button>' +
+          '<button class="mini del" onclick="terminateJob(\'' + j.id + '\')">⏹ Terminate</button>';
+      } else {
+        div.innerHTML =
+          '<span class="tag">' + (j.exitCode === 0 ? '✅' : '❌') + ' ' + escapeHtml(j.platform) + ' ' + escapeHtml(j.version) + '</span>' +
+          '<span class="dim" style="flex:1">finished · exit ' + j.exitCode + '</span>' +
+          '<button class="mini" onclick="showJobLog(\'' + j.id + '\')">📄 Log</button>';
+      }
+      list.appendChild(div);
+    });
+  } catch (e) {}
+}
+
+function showJobLog(id) {
+  currentJob = id;
+  localStorage.setItem('saytarlymind_job', id);
+  lastLen = 0;
+  $('term').innerHTML = '';
+  termLine('▶ Following build ' + id);
+  poll(id);
+}
+
+async function terminateJob(id) {
+  try {
+    const res = await fetch('/api/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({ id: id })
+    });
+    const out = await res.json();
+    if (out.killed) {
+      termLine('⏹ Build ' + id + ' terminated', 'err');
+    } else {
+      termLine('⚠️ Could not terminate ' + id + ' (already finished?)', 'err');
+    }
+    if (currentJob === id) {
+      currentJob = null;
+      localStorage.removeItem('saytarlymind_job');
+      $('btnStart').disabled = false;
+    }
+    refreshMonitor();
+  } catch (e) {
+    termLine('❌ Terminate failed: ' + e.message, 'err');
+  }
+}
+
+async function loadEnvSilent() {
+  try {
+    env = await (await fetch('/api/env')).json();
+    $('mv').value = env.mobileVersion;
+    $('mb').value = env.mobileBuild;
+    $('wv').value = env.windowsVersion;
+    $('wb').value = env.windowsBuild;
+  } catch (e) {}
+}
+
+let releases = [];
+async function loadReleases() {
+  const repo = $('repo').value.trim();
+  const token = $('token').value.trim();
+  if (!repo) { termLine('❌ Set the repository first', 'err'); return; }
+  termLine('⏳ Fetching releases from ' + repo + ' …');
+  try {
+    const res = await fetch('https://api.github.com/repos/' + repo + '/releases?per_page=30', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!res.ok) { termLine('❌ GitHub returned ' + res.status, 'err'); return; }
+    releases = await res.json();
+    $('relCard').style.display = 'block';
+    const list = $('relList');
+    list.innerHTML = '';
+    releases.forEach((r, i) => {
+      const row = document.createElement('div');
+      row.className = 'rel';
+      row.innerHTML =
+        '<span class="tag">' + escapeHtml(r.tag_name) + '</span>' +
+        '<input type="text" value="' + escapeHtml(r.name || '') + '" data-i="' + i + '" data-field="name">' +
+        '<button class="mini" onclick="saveRelease(' + i + ')">💾 Save name</button>' +
+        '<button class="mini" onclick="openRelease(' + i + ')">↗ Open</button>' +
+        '<button class="mini del" onclick="deleteRelease(' + i + ')">🗑 Delete</button>';
+      list.appendChild(row);
+      const body = document.createElement('div');
+      body.className = 'rel';
+      body.innerHTML =
+        '<span class="tag" style="min-width:150px"></span>' +
+        '<textarea rows="2" style="flex:1" data-i="' + i + '" data-field="notes">' + escapeHtml(r.body || '') + '</textarea>' +
+        '<button class="mini" onclick="saveRelease(' + i + ')">💾 Save notes</button>';
+      list.appendChild(body);
+    });
+    termLine('✅ Loaded ' + releases.length + ' release(s)');
+  } catch (e) {
+    termLine('❌ Failed to load releases: ' + e.message, 'err');
+  }
+}
+
+async function saveRelease(i) {
+  const repo = $('repo').value.trim();
+  const token = $('token').value.trim();
+  const nameEl = document.querySelector('[data-i="' + i + '"][data-field="name"]');
+  const notesEl = document.querySelector('[data-i="' + i + '"][data-field="notes"]');
+  const r = releases[i];
+  try {
+    const res = await fetch('https://api.github.com/repos/' + repo + '/releases/' + r.id, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: nameEl.value, body: notesEl.value })
+    });
+    if (res.ok) { termLine('✅ Release ' + r.tag_name + ' updated'); }
+    else { termLine('❌ Update failed: ' + res.status, 'err'); }
+  } catch (e) {
+    termLine('❌ Update error: ' + e.message, 'err');
+  }
+}
+
+async function deleteRelease(i) {
+  const repo = $('repo').value.trim();
+  const token = $('token').value.trim();
+  const r = releases[i];
+  if (!confirm('Delete release "' + r.tag_name + '" permanently?')) return;
+  try {
+    const res = await fetch('https://api.github.com/repos/' + repo + '/releases/' + r.id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if (res.ok) { termLine('🗑 Release ' + r.tag_name + ' deleted'); loadReleases(); }
+    else { termLine('❌ Delete failed: ' + res.status, 'err'); }
+  } catch (e) {
+    termLine('❌ Delete error: ' + e.message, 'err');
+  }
+}
+
+function openRelease(i) {
+  window.open(releases[i].html_url, '_blank');
+}
+
+async function shutdown() {
+  try { await fetch('/api/stop'); } catch (e) {}
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#9b93c4;font-size:16px">SAYTARLYMIND server stopped 🧠 — you can close this tab.</div>';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// مراقبة البنائات كل ثانيتين + استرجاع آخر job لو الصفحة اتعملها refresh
+setInterval(refreshMonitor, 2000);
+refreshMonitor();
+loadEnv();
+const savedJob = localStorage.getItem('saytarlymind_job');
+if (savedJob) {
+  setTimeout(function () { showJobLog(savedJob); }, 800);
+}
+</script>
+</body>
+</html>

@@ -74,6 +74,7 @@ abstract class AppBootstrap {
 
     // ── Legacy database migrations (kept for upgraded installs) ─────────────
     try {
+      await DBHelper.ensureCustomersTable();
       await DBHelper.addPaidColumnToSalaries();
       await DBHelper.addSupervisorIdColumn();
       await DBHelper.addSupervisorShiftIdColumn();

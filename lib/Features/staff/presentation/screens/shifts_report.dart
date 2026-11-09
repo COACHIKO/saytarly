@@ -779,6 +779,35 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
     final itemsByInvoice = await _fetchItemsForInvoices(invoiceIds);
     final debtPaidByInvoice = await _fetchDebtPaidTotalsForInvoices(invoiceIds);
 
+    // 💰 دفعات الآجل اللي اتحصّلت فعلاً خلال الشيفت ده — الدفعة الجزئية
+    // المرحّلة لدين بتفضل على شيفت التحصيل الأصلي (وقت دفعها).
+    final debtPaidInRangeByInvoice = <int, double>{};
+    final debtPayRowsInRange = await db.query(
+      'debt_payments',
+      where: 'paid_at >= ? AND paid_at <= ?',
+      whereArgs: [rangeStart, rangeEnd],
+    );
+    for (final p in debtPayRowsInRange) {
+      final invId = p['invoice_id'];
+      if (invId == null) continue;
+      final id = (invId as num).toInt();
+      debtPaidInRangeByInvoice[id] =
+          (debtPaidInRangeByInvoice[id] ?? 0.0) +
+          ((p['amount'] ?? 0) as num).toDouble();
+    }
+
+    // 💰 الدفعات الجزئية: اللي اتحصّلت على فواتير الشيفت ده في شيفتات
+    // تانية (بتتخصم عشان ما تتعدّش مرتين)، واللي اتحصّلت هنا على فواتير
+    // اتحوّلت لشيفت تاني (بتتحسب هنا).
+    final partialsByInvoice = await DBHelper.getPartialsByInvoice(
+      invoiceIds: invoiceIds,
+      excludeShiftId: shift['id'] as int,
+    );
+    final shiftPartialRows = await DBHelper.getShiftPartialPayments(
+      shift['id'] as int,
+    );
+    final currentShiftInvoiceIdSet = invoiceIds.toSet();
+
     double paid = 0.0;
     double debt = 0.0;
     final List<Map<String, dynamic>> paidDetails = [];
@@ -832,10 +861,15 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       }
 
       if (type == 'paid') {
-        paid += total;
+        // 💰 خصم اللي اتحصّل جزئيًا في شيفتات سابقة على نفس الفاتورة —
+        // الفلوس دي محسوبة هناك، وهنا بنحسب الباقي اللي اتحصّل دلوقتي.
+        final priorPartials = partialsByInvoice[invoiceId] ?? 0.0;
+        final collectedNow =
+            (total - priorPartials).clamp(0.0, double.infinity);
+        paid += collectedNow;
         paidDetails.add({
           'customer_name': customerName,
-          'amount': total,
+          'amount': collectedNow,
           'start_time': startTime,
           'items_summary': itemsSummary,
           'device_summary': deviceSummary,
@@ -850,16 +884,21 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
         });
       } else if (type == 'debt' || type == 'علي الحساب') {
         final totalPaidPartial = debtPaidByInvoice[invoiceId] ?? 0.0;
+        // 💰 اللي اتحصّل على الدين ده خلال الشيفت ده تحديدًا — مش كل
+        // المدفوع من أول الفاتورة (اللي ممكن يكون اتحصّل في شيفتات قبلها).
+        final paidThisShift = debtPaidInRangeByInvoice[invoiceId] ?? 0.0;
 
         if (totalPaidPartial >= total) {
-          paid += total;
-          paidDetails.add({
-            'customer_name': customerName,
-            'amount': total,
-            'start_time': startTime,
-            'items_summary': itemsSummary,
-            'device_summary': deviceSummary,
-          });
+          paid += paidThisShift;
+          if (paidThisShift > 0) {
+            paidDetails.add({
+              'customer_name': customerName,
+              'amount': paidThisShift,
+              'start_time': startTime,
+              'items_summary': itemsSummary,
+              'device_summary': deviceSummary,
+            });
+          }
           salesDetails.add({
             'customer_name': customerName,
             'amount': total,
@@ -869,7 +908,16 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
             'device_summary': deviceSummary,
           });
         } else {
-          paid += totalPaidPartial;
+          paid += paidThisShift;
+          if (paidThisShift > 0) {
+            paidDetails.add({
+              'customer_name': customerName,
+              'amount': paidThisShift,
+              'start_time': startTime,
+              'items_summary': itemsSummary,
+              'device_summary': deviceSummary,
+            });
+          }
           final remaining = total - totalPaidPartial;
           debt += remaining;
           debtDetailsList.add({
@@ -891,7 +939,40 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       }
     }
 
-    final currentShiftInvoiceIds = invoices.map((e) => e['id'] as int).toSet();
+    // 💰 دفع جزئي اتحصّل خلال الشيفت على فواتير مش متسجلة فيه
+    // (اتحوّلت بتسليم شيفت أو لسه مفتوحة) — فلوس دخلت هنا وبتظهر فيه.
+    final settledShiftInvoiceIdSet =
+        invoices
+            .where((inv) => inv['end_time'] != null)
+            .map((inv) => inv['id'])
+            .whereType<int>()
+            .toSet();
+    final openPartialRows =
+        shiftPartialRows.where((p) {
+          final invId = p['invoice_id'];
+          if (invId == null) return true;
+          return !settledShiftInvoiceIdSet.contains((invId as num).toInt());
+        }).toList();
+    final partialCollected = openPartialRows.fold<double>(
+      0.0,
+      (sum, p) => sum + ((p['amount'] ?? 0) as num).toDouble(),
+    );
+    for (final p in openPartialRows) {
+      final rawCustomer = (p['customer_name'] ?? '').toString().trim();
+      final invId = p['invoice_id'];
+      paidDetails.add({
+        'customer_name':
+            rawCustomer.isEmpty
+                ? (invId == null
+                    ? 'غير معروف'.tr()
+                    : 'فاتورة #{v1}'.tr({'v1': invId}))
+                : rawCustomer,
+        'amount': ((p['amount'] ?? 0) as num).toDouble(),
+        'start_time': p['date'],
+      });
+    }
+
+    final currentShiftInvoiceIds = currentShiftInvoiceIdSet;
     final double invoiceOnlySales = paid + debt;
 
     final chargeLogs = await db.query(
@@ -949,9 +1030,10 @@ class _ShiftsReportScreenState extends State<ShiftsReportScreen> {
       (sum, p) => sum + ((p['discount'] ?? 0) as num).toDouble(),
     );
 
-    shift['paid'] = paid;
+    shift['paid'] = paid + partialCollected;
+    shift['partial_collected'] = partialCollected;
     shift['debt'] = debt;
-    shift['total_sales'] = invoiceOnlySales;
+    shift['total_sales'] = invoiceOnlySales + partialCollected;
     shift['charge_in'] = totalDeposits;
     shift['charge_out'] = totalWithdraws;
     shift['debt_collected'] = debtCollected;

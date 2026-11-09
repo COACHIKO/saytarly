@@ -10,6 +10,9 @@ import 'core/app/connectivity_controller.dart';
 import 'core/desktop/windows_tray.dart';
 import 'core/di/dependency_injection.dart';
 import 'core/services/shared_pref/shared_pref.dart';
+import 'core/updater/app_mode.dart';
+import 'core/updater/license_gate.dart';
+import 'core/utils/app_log.dart';
 import 'app_bootstrap.dart';
 import 'saytarly.dart';
 
@@ -27,6 +30,7 @@ Future<void> main() async {
       try {
         debugPrint('🔴 UNCAUGHT ASYNC ERROR: $error');
         debugPrint('Stack: $stackTrace');
+        AppLog.write('UNCAUGHT ASYNC ERROR: $error');
       } catch (_) {}
     },
   );
@@ -34,11 +38,13 @@ Future<void> main() async {
 
 Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppLog.write('=== Saytarly START ===');
 
   // Framework error traps.
   FlutterError.onError = (FlutterErrorDetails details) {
     try {
       debugPrint('🟠 FLUTTER ERROR: ${details.exceptionAsString()}');
+      AppLog.write('FLUTTER ERROR: ${details.exceptionAsString()}');
       if (kDebugMode) {
         FlutterError.presentError(details);
       }
@@ -47,6 +53,7 @@ Future<void> _bootstrap() async {
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
     try {
       debugPrint('🟠 PLATFORM ERROR: $error');
+      AppLog.write('PLATFORM ERROR: $error');
     } catch (_) {}
     return true;
   };
@@ -69,10 +76,20 @@ Future<void> _bootstrap() async {
   await AppBootstrap.init();
   final gate = AppBootstrap.gateWidget;
 
-  runApp(gate ?? const SaytarlyApp());
+  AppLog.write('runApp — gate=${gate == null ? 'none' : 'activation'}');
+  final Widget root;
+  if (gate != null) {
+    root = gate;
+  } else if (AppMode.isOnline) {
+    root = const LicenseGateApp();
+  } else {
+    root = const SaytarlyApp();
+  }
+  runApp(root);
 
   // The tray icon is created after the first frame so the native plugins and
   // the saved language are fully ready.
+  // ملاحظة: فحص التحديثات في الوضع الأونلاين بيبدأ بعد ما بوابة الترخيص تفتح.
   WidgetsBinding.instance.addPostFrameCallback((_) {
     unawaited(WindowsTray.instance.setupTray());
   });
