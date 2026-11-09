@@ -1,0 +1,23 @@
+# Render Blueprint — deploys https://github.com/COACHIKO/saytarly automatically
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: saytarly-dashboard
+    runtime: node
+    plan: free          # sleeps after 15 min idle; switch to "starter" for always-on
+    region: frankfurt   # closest region to Egypt
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Pasted by hand in the dashboard when the blueprint is applied.
+      # NEVER commit this value anywhere in the repo.
+      - key: RELEASES_TOKEN
+        sync: false
+      # One-time random secret so login sessions survive restarts/redeploys.
+      - key: SESSION_SECRET
+        generateValue: true
+      # Render terminates TLS and proxies to the app — required for Secure cookies.
+      - key: TRUST_PROXY
+        value: "1"

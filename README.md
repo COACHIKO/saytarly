@@ -59,15 +59,36 @@ npm start
 
 ## النشر (Deployment)
 
-المشروع بيعتمد على GitHub Pages بس — مفيش أي deployment إضافي:
+### الموقع التسويقي → GitHub Pages
 
 - Workflow `.github/workflows/pages.yml` بيرفع مجلد `public/` **فقط** على
   `https://coachiko.github.io/saytarly/` — يعني صفحة الدخول واللوحة
   (`admin/` و `views/`) عمرها ما بتتنشر.
-- في الـ workflow خطوة حماية (guard) بتوقف النشر فورًا لو حد رجّع
+- خطوة حماية (guard) في الـ workflow بتوقف النشر فورًا لو حد رجّع
   `dashboard.html` أو `admin/` أو `views/` جوّه `public/`.
-- اللوحة تعمل على سيرفر Node بتشغله بنفسك (`npm start` locally أو على أي
-  استضافة Node) — زي ما هو مشروح في «التشغيل محليًا» فوق.
+
+### السيرفر + اللوحة → Render
+
+`render.yaml` (Blueprint) في التريّة بيوصف السيرفر كامل، وأي push لـ
+`main` بيعمل deploy تلقائي:
+
+1. افتح [dashboard.render.com] → **New → Blueprint** → اختار ريبو
+   `COACHIKO/saytarly`.
+2. وقت تطبيق الـ Blueprint هيسألك على `RELEASES_TOKEN` — حط التوكن
+   بتاع `COACHIKO/saytarly_releases` (نفس القيمة اللي في `.env` المحلي).
+   التوكن عمره ما بيتكتب في أي ملف في التريّة.
+3. `SESSION_SECRET` بيتولّد لوحده، و`TRUST_PROXY=1` مثبت جاهز عشان
+   كوكي الجلسة يطلع `Secure` خلف HTTPS بروكسي بتاع Render.
+4. الدومين: من إعدادات الخدمة → **Custom Domains** → ضيف
+   `dash.saytarly.com`، وبعدها في الـ DNS بتاع saytarly.com ضيف سجل
+   `dash` → CNAME → القيمة اللي Render هتقولك عليها (شكلها
+   `saytarly-dashboard.onrender.com`). الشهادة بتتعمل تلقائيًا.
+5. الخطة الافتراضية `free` بتطفي بعد 15 دقيقة من غير استخدام
+   (≈30 ثانية لما تصحي). لو عايز اللوحة ترد فورًا 24/7، ارفع الخطة
+   لـ `starter` من الـ dashboard.
+
+بعدها اللوحة بتفتح من `https://dash.saytarly.com/dashboard` — بدون أي
+لينك ليها من الموقع العام.
 
 ## المسارات (نسخة السيرفر)
 
