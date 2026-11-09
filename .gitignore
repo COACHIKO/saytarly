@@ -42,6 +42,9 @@ app.*.map.json
 # Release builder output (instalers, zips, apks)
 /build_export/
 
+# Local environment secrets (tokens/keys) — never commit .env
+/.env
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
