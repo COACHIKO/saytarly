@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saytarly.github.io/saytarly/sitemap.xml

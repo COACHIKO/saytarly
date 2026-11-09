@@ -12,6 +12,7 @@
     h1 { font-family: var(--font-en); font-size: 90px; font-weight: 800; background: var(--grad-text); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     p { color: var(--text-2); margin: 12px 0 26px; }
     .lang-float { position: fixed; top: 20px; inset-inline-end: 20px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
   </style>
 </head>
 <body>
@@ -22,8 +23,11 @@
   <div>
     <h1>404</h1>
     <p data-i18n="notfound.text">الصفحة دي مش موجودة — ارجع للرئيسية.</p>
-    <a class="btn btn-primary" href="./index.html" data-i18n="notfound.home">الرئيسية</a>
+    <div class="actions">
+      <a class="btn btn-primary" href="./index.html" data-i18n="notfound.home">الرئيسية</a>
+      <a class="btn btn-ghost" href="./demo.html" data-i18n="demo.promo.cta">اطلب الديمو المجاني</a>
+    </div>
   </div>
-  <script src="./js/i18n.js?v=3"></script>
+  <script src="./js/i18n.js?v=4"></script>
 </body>
 </html>

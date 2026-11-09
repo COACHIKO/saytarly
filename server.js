@@ -190,6 +190,11 @@ app.get('/contact', (req, res) =>
   res.sendFile(path.join(PUBLIC_DIR, 'contact.html')),
 );
 
+// Free 7-day demo request page (static handler serves /demo.html too).
+app.get('/demo', (req, res) =>
+  res.sendFile(path.join(PUBLIC_DIR, 'demo.html')),
+);
+
 // The dashboard is served only after a valid admin session. Unauthenticated
 // visitors get the login page (no dashboard markup is ever sent to them).
 app.get('/dashboard', (req, res) => {
