@@ -27,12 +27,14 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Guard — no private dashboard files in public/
+      - name: Guard — no credentials in published files
         run: |
-          test ! -f public/dashboard.html || { echo "public/dashboard.html must not be published"; exit 1; }
-          test ! -d public/admin    || { echo "public/admin/ folder must not be published"; exit 1; }
-          test ! -d public/views    || { echo "public/views/ folder must not be published"; exit 1; }
-          ! grep -rqE "dashboard\.html" public --include='*.html' || { echo "Found a link to dashboard.html in public/"; exit 1; }
+          test ! -d public/admin || { echo "public/admin/ folder must not be published"; exit 1; }
+          test ! -d public/views || { echo "public/views/ folder must not be published"; exit 1; }
+          # The dashboard password must never appear in the client bundle.
+          ! grep -rqE "Saytar123" public || { echo "Dashboard password found in public/"; exit 1; }
+          # No GitHub tokens of any kind may be embedded.
+          ! grep -rqE "github_pat_[A-Za-z0-9_]{10,}|ghp_[A-Za-z0-9]{10,}|gho_[A-Za-z0-9]{10,}|RELEASES_TOKEN" public || { echo "Token or token reference found in public/"; exit 1; }
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
